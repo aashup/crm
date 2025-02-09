@@ -10,6 +10,11 @@ const Routing: Routes = [
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
   {
+    path: 'settings/st/city',
+    loadChildren: () => import('../modules/settings/country/country.module').then((m) => m.CountryModule),
+    // data: { layout: 'light-sidebar' },
+  },
+  {
     path: 'crafted/pages/profile',
     loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
     // data: { layout: 'light-sidebar' },

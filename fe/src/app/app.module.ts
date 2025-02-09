@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -53,6 +54,7 @@ function appInitializer(authService: AuthService) {
       multi: true,
       deps: [AuthService],
     },
+    provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent],
 })
