@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\v1;
 
-use App\Http\Requests\StoreStateRequest;
-use App\Http\Requests\UpdateStateRequest;
-use App\Models\State;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCountryRequest;
+use App\Http\Requests\UpdateCountryRequest;
+use App\Models\Country;
 
-class StateController extends Controller
+class CountryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +20,7 @@ class StateController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreStateRequest $request)
+    public function store(StoreCountryRequest $request)
     {
         //
     }
@@ -27,7 +28,7 @@ class StateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(State $state)
+    public function show(Country $country)
     {
         //
     }
@@ -35,7 +36,7 @@ class StateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStateRequest $request, State $state)
+    public function update(UpdateCountryRequest $request, Country $country)
     {
         //
     }
@@ -43,7 +44,7 @@ class StateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(State $state)
+    public function destroy(Country $country)
     {
         //
     }

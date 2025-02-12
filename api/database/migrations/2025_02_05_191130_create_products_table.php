@@ -16,23 +16,31 @@ return new class extends Migration
             Schema::create('countries', callback: function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
+                $table->timestamps();
+                $table->softDeletes();
             });
 
             Schema::create('states', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('country_id');
                 $table->foreign('country_id')->references('id')->on('countries');
+                $table->timestamps();
+                $table->softDeletes();
             });
 
             Schema::create('cities', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('state_id');
                 $table->foreign('state_id')->references('id')->on('states');
+                $table->unsignedBigInteger('country_id');
+                $table->foreign('country_id')->references('id')->on('countries');
+                $table->timestamps();
+                $table->softDeletes();
             });
 
             Schema::create('contacts', function (Blueprint $table) {
@@ -40,9 +48,10 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('mob1', 20)->nullable();
                 $table->string('mob2', 20)->nullable();
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('created_by');
                 $table->timestamps();
+                $table->softDeletes();
             });
 
             Schema::create('addresses', function (Blueprint $table) {
@@ -54,18 +63,20 @@ return new class extends Migration
                 $table->tinyInteger('type', false, true)
                 ->default(1)->comment('1-billing, 2-shipping');
                 $table->unsignedBigInteger('city_id');
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('created_by');
                 $table->foreign('created_by')->references('id')->on('users');
                 $table->foreign('city_id')->references('id')->on('cities');
                 $table->timestamps();
+                $table->softDeletes();
             });
 
             Schema::create('units', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->timestamps();
+                $table->softDeletes();
             });
             
             Schema::create('products', function (Blueprint $table) {
@@ -73,19 +84,21 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('slug');
                 $table->tinyInteger('type', false, true)->default(1);
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('created_by');
                 $table->timestamps();
                 $table->foreign('created_by')->references('id')->on('users');
+                $table->softDeletes();
             });
 
             Schema::create('product_details', function (Blueprint $table) {
                 $table->id();
                 $table->string(column: 'mrp');
 
-                $table->boolean('is_active')->default(true);
+                $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('product_id');
                 $table->timestamps();
+                $table->softDeletes();
                 
                 $table->foreign('product_id')->references('id')->on('products');
             });
@@ -103,6 +116,7 @@ return new class extends Migration
 
                 $table->boolean(column: 'status')->default(true);
                 $table->timestamps();
+                $table->softDeletes();
                 
                 $table->foreign('contact_id')->references('id')->on('contacts');
             });
@@ -116,6 +130,8 @@ return new class extends Migration
                 $table->string(column: 'notes')->nullable();
                 $table->tinyInteger( 'type', false, true)->default(1);
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->boolean(column: 'status')->default(true);
                 $table->foreign('product_id')->references('id')->on('products');
                 $table->foreign('supplier_id')->references('id')->on('suppliers');
@@ -130,6 +146,8 @@ return new class extends Migration
                 $table->decimal('purchase_price')->nullable();
                 $table->string(column: 'notes')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->boolean(column: 'status')->default(true);
                 $table->foreign('product_id')->references('id')->on('products');
                 $table->foreign('unit_id')->references('id')->on('units');
@@ -146,6 +164,8 @@ return new class extends Migration
                 $table->decimal('sale_price')->nullable();
                 $table->string(column: 'notes')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->boolean(column: 'status')->default(true);
                 $table->foreign('product_id')->references('id')->on('products');
                 $table->foreign('unit_id')->references('id')->on('units');
@@ -163,6 +183,8 @@ return new class extends Migration
                 $table->decimal(column: 'net_total')->nullable();
                 $table->string(column: 'notes')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->boolean(column: 'status')->default(true);
                 $table->foreign('contact_id')->references('id')->on('contacts');
                 $table->foreign('unit_id')->references('id')->on('units');
@@ -180,6 +202,8 @@ return new class extends Migration
                 ->comment("1. flat, 2. percent");
                 $table->decimal(column: 'net')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->foreign('sale_id')->references('id')->on('sales');
                 $table->foreign('unit_id')->references('id')->on('units');
                 $table->foreign('product_id')->references('id')->on('products');
@@ -194,6 +218,8 @@ return new class extends Migration
                 $table->decimal('amount')->nullable();
                 $table->string(column: 'notes')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->foreign('contact_id')->references('id')->on('contacts');
                 $table->foreign('unit_id')->references('id')->on('units');
                 $table->foreign('supplier_id')->references('id')->on('suppliers');
@@ -207,6 +233,8 @@ return new class extends Migration
                 $table->unsignedBigInteger('unit_id');
                 $table->decimal('amount')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
+                
                 $table->foreign('purchase_id')->references('id')->on('purchase');
                 $table->foreign('unit_id')->references('id')->on('units');
                 $table->foreign('product_id')->references('id')->on('products');
@@ -224,6 +252,8 @@ return new class extends Migration
                 ->comment('1-sale, 2-purchase')
                 ->default(1);
                 $table->timestamps();
+                $table->softDeletes();
+
                 $table->index('payment_id');
                 
                 $table->foreign('contact_id')->references('id')->on('contacts');
@@ -256,6 +286,7 @@ return new class extends Migration
         Schema::dropIfExists('product_has_unit');
         Schema::dropIfExists('inventry');
         Schema::dropIfExists('sale');
+        Schema::dropIfExists('sales');
         Schema::dropIfExists('sale_details');
         Schema::dropIfExists('purchase');
         Schema::dropIfExists('purchase_details');

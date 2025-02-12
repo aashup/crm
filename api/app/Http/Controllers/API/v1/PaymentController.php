@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\v1;
 
-use App\Http\Requests\StoreCountryRequest;
-use App\Http\Requests\UpdateCountryRequest;
-use App\Models\Country;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePaymentRequest;
+use App\Http\Requests\UpdatePaymentRequest;
+use App\Models\Payment;
 
-class CountryController extends Controller
+class PaymentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +20,7 @@ class CountryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCountryRequest $request)
+    public function store(StorePaymentRequest $request)
     {
         //
     }
@@ -27,7 +28,7 @@ class CountryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Country $country)
+    public function show(Payment $payment)
     {
         //
     }
@@ -35,7 +36,7 @@ class CountryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCountryRequest $request, Country $country)
+    public function update(UpdatePaymentRequest $request, Payment $payment)
     {
         //
     }
@@ -43,7 +44,7 @@ class CountryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Country $country)
+    public function destroy(Payment $payment)
     {
         //
     }

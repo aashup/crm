@@ -1,7 +1,7 @@
 <?php
+namespace App\Http\Controllers\API\v1;
 
-namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSaleDetailRequest;
 use App\Http\Requests\UpdateSaleDetailRequest;
 use App\Models\SaleDetail;
