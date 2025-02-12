@@ -1,1 +1,146 @@
-<p>city works!</p>
+
+
+<mat-card class="example-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>Shiba Inu</mat-card-title>
+      <mat-card-subtitle>Small</mat-card-subtitle>
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="dataSource.loading$ | async"
+      ></mat-progress-bar>
+
+      <mat-table
+        class="lmat-elevation-z8 table table-vcenter table-hover"
+        [ngStyle]="{
+          height: dataSource.hasItems ? 'calc(100vh - 255px)' : '56px'
+        }"
+        #table
+        [dataSource]="dataSource"
+        matSort
+        #sort1="matSort"
+        matSortActive="id"
+        matSortDirection="desc"
+        matSortDisableClear
+      >
+        <ng-container *ngFor="let cols of tableColumns; let i = index">
+          <!-- Checkbox Column -->
+          <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'select'">
+            <mat-header-cell
+              *matHeaderCellDef
+              class="mat-column-checkbox"
+              [ngStyle]="cols.style || {}"
+              [attr.aria-label]="'Select all'"
+            >
+              <mat-checkbox
+                [attr.aria-label]="'Select all'"
+                (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+              >
+              </mat-checkbox>
+            </mat-header-cell>
+            <mat-cell
+              *matCellDef="let row"
+              class="mat-column-checkbox"
+              [ngStyle]="cols.style || {}"
+            >
+              <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"
+              >
+              </mat-checkbox>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container
+            [matColumnDef]="cols.ref"
+            *ngIf="['action'].indexOf(cols.ref) == -1"
+          >
+            <mat-header-cell
+              [mat-sort-header]="cols.doNotSort ? null : cols.ref"
+              [disabled]="cols.doNotSort ? true : false"
+              *matHeaderCellDef
+              [class]="cols.class || ''"
+              [ngStyle]="cols.style || {}"
+            >
+              {{ cols.name }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
+              {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
+            <mat-header-cell
+              [attr.aria-label]="cols.name"
+              *matHeaderCellDef
+              [ngStyle]="cols.style || {}"
+            >
+              {{ cols.name }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
+              <button
+                aria-label="edit premise"
+                class="icon-button icon-button-dark"
+                *ngxPermissionsOnly="['premise.update']"
+                mat-icon-button
+                matTooltip="Edit premise"
+                [routerLink]="['../crud/edit', item.id]"
+              >
+                TEST
+              </button>
+              <button
+                aria-label="delete premise"
+                class="icon-button icon-button-dark"
+                *ngxPermissionsOnly="['premise.delete']"
+                (click)="delete(item)"
+                mat-icon-button
+                matTooltip="Delete premise"
+              >
+                TEST
+              </button>
+            </mat-cell>
+          </ng-container>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayableCol; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayableCol"></mat-row>
+      </mat-table>
+
+      <div class="mat-table__empty-state" *ngIf="!dataSource.hasItems">
+        <p class="mat-table__empty-state--not-found">No results found.</p>
+      </div>
+
+      <div class="mat-table__bottom">
+        <mat-spinner
+          [diameter]="20"
+          *ngIf="dataSource.loading$ | async"
+        ></mat-spinner>
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 20, 50, 100]"
+          [length]="dataSource.paginatorTotal$ | async"
+          [showFirstLastButtons]="true"
+        ></mat-paginator>
+
+        <div
+          class="mat-table__floating-modal"
+          *ngIf="selection.selected.length"
+        >
+          <div class="floating-modal">
+            <p class="font-weight-bold m-0" style="font-size: 16px">
+              {{ selection.selected.length }} selected
+            </p>
+            <div class="floating-modal__divider"></div>
+          </div>
+        </div>
+      </div>
+  </mat-card-content>
+</mat-card>
+

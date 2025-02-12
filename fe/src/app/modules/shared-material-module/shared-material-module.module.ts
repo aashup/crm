@@ -2,76 +2,61 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [],
   imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        MatInputModule,
-        MatSelectModule,
-        MatCheckboxModule,
-        MatButtonModule,
-        MatTooltipModule,
-        MatDialogModule,
-        MatIconModule,
-        MatTableModule,
-        MatSortModule,
-        MatPaginatorModule,
-        MatProgressSpinnerModule,
-        MatMenuModule,
-        MatTabsModule,
-        NgSelectModule,
-        MatDividerModule,
-        MatCardModule,
-        MatRadioModule,
-        MatFormFieldModule,
-        MatDatepickerModule,
-        MatExpansionModule,
-        MatSnackBarModule,
-        MatNativeDateModule,
-        MatListModule,
-        MatSlideToggleModule,
-        NgxUiLoaderModule,
-        MatGridListModule,
-        MatAutocompleteModule,
-        MatProgressBarModule,
-        MatChipsModule
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
+    MatTableModule,
+    MatSelectModule,
+    MatDividerModule,
+    MatDialogModule,
+    MatAutocompleteModule,
+    MatProgressBarModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatInputModule,
   ],
   exports: [
     FormsModule,
     ReactiveFormsModule,
-    MatInputModule,
-    MatSelectModule,
-    MatCheckboxModule,
     MatButtonModule,
-    MatTooltipModule,
-    MatDialogModule,
-    MatIconModule,
-    MatTableModule,
-    MatSortModule,
+    MatCardModule,
+    MatFormFieldModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    MatMenuModule,
-    MatTabsModule,
-    NgSelectModule,
+    MatSortModule,
+    MatTableModule,
+    MatSelectModule,
     MatDividerModule,
-    MatCardModule,
-    MatRadioModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    MatExpansionModule,
-    MatSnackBarModule,
-    MatNativeDateModule,
-    MatListModule,
-    MatSlideToggleModule,
-    NgxUiLoaderModule,
-    MatGridListModule,
+    MatDialogModule,
     MatAutocompleteModule,
     MatProgressBarModule,
-    MatChipsModule
-  ]
+    MatCheckboxModule,
+    MatIconModule,
+    MatInputModule,
+  ],
 })
-export class SharedMaterialModuleModule { }
+export class SharedMaterialModuleModule {}

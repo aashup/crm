@@ -5,7 +5,7 @@
 @import './assets/sass/plugins.scss';
 // @import "./assets/css/style.rtl.css";
 @import "./assets/sass/style.angular.scss";
-
+@import 'ngx-toastr/toastr';
 // Keenicons - High quality and pixel perfect font icons available in 3 styles, duotone, outline and solid for Metronic elements
 @import "./assets/plugins/keenicons/duotone/style.css";
 @import "./assets/plugins/keenicons/outline/style.css";
@@ -13,3 +13,7 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+mat-icon {
+  font-family: 'Material Icons' !important;
+  font-size: large;
+}

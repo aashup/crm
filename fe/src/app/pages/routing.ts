@@ -10,8 +10,8 @@ const Routing: Routes = [
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
   {
-    path: 'settings/st/city',
-    loadChildren: () => import('../modules/settings/country/country.module').then((m) => m.CountryModule),
+    path: 'settings',
+    loadChildren: () => import('../modules/settings/settings.module').then((m) => m.SettingsModule),
     // data: { layout: 'light-sidebar' },
   },
   {
