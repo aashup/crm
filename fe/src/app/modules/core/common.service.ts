@@ -1,42 +1,44 @@
-import { ApplicationRef, Injectable } from "@angular/core";
-import { Title } from "@angular/platform-browser";
-import { ToastrService } from "ngx-toastr";
-import { Observable, of } from "rxjs";
+import { ApplicationRef, Injectable } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { ToastrService } from 'ngx-toastr';
+import { Observable, of } from 'rxjs';
 import _ from 'lodash';
+import { PageInfoService } from 'src/app/_metronic/layout';
+import { FormGroup } from '@angular/forms';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CommonService {
   constructor(
     public titleService: Title,
     public toastr: ToastrService,
-    public app: ApplicationRef,
+    public page: PageInfoService,
+    public app: ApplicationRef
   ) {}
 
-  public handleError(e: { status: number; }) {
-    if ((e.status == 401)) {
-      this.toastr.error('Authentication failure from server, You need to login again.');
+  public handleError(e: { status: number }) {
+    console.log(e);
+    if (e.status == 401) {
+      this.toastr.error(
+        'Authentication failure from server, You need to login again.'
+      );
       location.href = location.href;
       return;
     }
-    let error = _.get(e, 'error.errors')
+    let error = _.get(e, 'error.errors');
     let msg = '';
     if (_.isString(error)) msg = error;
     if (_.isObject(error))
       _.mapKeys(error, (val: any) => {
         try {
           msg = msg + val.join(',') + '<br>';
-        } catch (e) { }
-      })
+        } catch (e) {}
+      });
     this.toastr.error(msg || 'Some error occurred.', 'Error', {
-      enableHtml: true
-    })
+      enableHtml: true,
+    });
     this.app.tick();
-  }
-
-  setTitle(title: string = '') {
-    this.titleService.setTitle(`${title} - XTROX`);
   }
 
   getReadableFileSizeString(fileSizeInBytes: number) {
@@ -49,7 +51,11 @@ export class CommonService {
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
   }
 
-  saveOfGetData<T>(key: string, defaultValue = null, data = null): Observable<T> {
+  saveOfGetData<T>(
+    key: string,
+    defaultValue = null,
+    data = null
+  ): Observable<T> {
     let user_id = '1';
     // let user_id = this.token.getUserInfo();
     // user_id = user_id && user_id.id && '1';
@@ -58,11 +64,15 @@ export class CommonService {
       localStorage.setItem(key + user_id, JSON.stringify(data));
     } else {
       try {
-        decoded = JSON.parse(localStorage.getItem(key + user_id) || "")
+        decoded = JSON.parse(localStorage.getItem(key + user_id) || '');
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     }
     return of<T>(<T>decoded ? decoded : defaultValue);
+  }
+
+  clone(data: any) {
+    return _.cloneDeep(data);
   }
 }

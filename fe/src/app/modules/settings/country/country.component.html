@@ -1,1 +1,115 @@
-<p>country works!</p>
+<div class="card text-center">
+  <div class="card-header">
+    <div class="w-100 my-auto d-flex flex-row-reverse">
+      <button mat-flat-button class="bg-success" (click)="add()">Add New</button>
+      <button mat-icon-button (click)="loadData()"><mat-icon>sync</mat-icon></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="dataSource.loading$ | async"
+      ></mat-progress-bar>
+      <table
+        #table
+        mat-table
+        [dataSource]="dataSource"
+        matSort
+        #sort1="matSort"
+        matSortActive="id"
+        matSortDirection="desc"
+        matSortDisableClear
+      >
+        <ng-container *ngFor="let cols of tableColumns; let i = index">
+          <!-- Checkbox Column -->
+          <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'select'">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              [ngStyle]="cols.style || {}"
+              [attr.aria-label]="'Select all'"
+            >
+              <mat-checkbox
+                [attr.aria-label]="'Select all'"
+                (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+              >
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
+              <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"
+              >
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container
+            [matColumnDef]="cols.ref"
+            *ngIf="['action', 'select'].indexOf(cols.ref) == -1"
+          >
+            <th
+              mat-header-cell
+              [mat-sort-header]="cols.doNotSort ? null : cols.ref"
+              [disabled]="cols.doNotSort ? true : false"
+              *matHeaderCellDef
+              [class]="cols.class || ''"
+              [ngStyle]="cols.style || {}"
+            >
+              {{ cols.name }}
+            </th>
+            <td mat-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
+              {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
+            </td>
+          </ng-container>
+
+          <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
+            <th
+              mat-header-cell
+              [attr.aria-label]="cols.name"
+              *matHeaderCellDef
+              [ngStyle]="cols.style || {}"
+            >
+              {{ cols.name }}
+            </th>
+            <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
+              <button mat-icon-button class="text-info blod" (click)="edit(item)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button class="text-danger" (click)="delete(item)"><mat-icon>delete</mat-icon></button>
+            </td>
+          </ng-container>
+        </ng-container>
+
+        <tr cdk-header-row *cdkHeaderRowDef="displayableCol"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayableCol"></tr>
+      </table>
+    </div>
+
+    <div class="mat-table__empty-state" *ngIf="!dataSource.hasItems">
+      <p class="mat-table__empty-state--not-found">No results found.</p>
+    </div>
+
+    <div class="pt-5">
+      <mat-spinner
+        [diameter]="20"
+        *ngIf="dataSource.loading$ | async"
+      ></mat-spinner>
+      <mat-paginator
+        [pageSize] = "dataSource.paginatorTotal$ | async"
+        [length]="dataSource.paginatorTotal$ | async"
+      ></mat-paginator>
+
+      <div class="mat-table__floating-modal" *ngIf="selection.selected.length">
+        <div class="floating-modal">
+          <p class="font-weight-bold m-0" style="font-size: 16px">
+            {{ selection.selected.length }} selected
+          </p>
+          <div class="floating-modal__divider"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

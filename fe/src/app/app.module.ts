@@ -16,6 +16,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { FakeAPIService } from './_fake/fake-api.service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ToastrModule } from 'ngx-toastr';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { MAT_PAGINATOR_DEFAULT_OPTIONS } from '@angular/material/paginator';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -38,16 +40,16 @@ function appInitializer(authService: AuthService) {
     // #fake-start#
     environment.isMockEnabled
       ? HttpClientInMemoryWebApiModule.forRoot(FakeAPIService, {
-        passThruUnknownUrl: true,
-        dataEncapsulation: false,
-      })
+          passThruUnknownUrl: true,
+          dataEncapsulation: false,
+        })
       : [],
     // #fake-end#
     AppRoutingModule,
     InlineSVGModule.forRoot(),
     NgbModule,
     SweetAlert2Module.forRoot(),
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
   ],
   providers: [
     {
@@ -56,8 +58,20 @@ function appInitializer(authService: AuthService) {
       multi: true,
       deps: [AuthService],
     },
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'outline' },
+    },
+    {
+      provide: MAT_PAGINATOR_DEFAULT_OPTIONS,
+      useValue: {
+        pageSizeOptions: [5, 10, 20, 50, 100],
+        showFirstLastButtons: true,
+        pageSize: 20
+       },
+    },
     provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

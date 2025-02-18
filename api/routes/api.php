@@ -1,0 +1,16 @@
+<?php
+use Illuminate\Support\Facades\Route;
+
+
+Route::prefix('v1')->group(function () {
+    Route::apiResource('country', 'App\Http\Controllers\API\v1\CountryController');
+    Route::apiResource('state', 'App\Http\Controllers\API\v1\StateController');
+    Route::apiResource('city', controller: 'App\Http\Controllers\API\v1\CityController');
+    Route::apiResource('unit', controller: 'App\Http\Controllers\API\v1\UnitController');
+    Route::apiResource('role', controller: 'App\Http\Controllers\API\v1\RoleController');
+    Route::apiResource('permission', controller: 'App\Http\Controllers\API\v1\PermissionController');
+    Route::apiResource('user', controller: 'App\Http\Controllers\API\v1\UserController');
+    Route::apiResource('purchase', controller: 'App\Http\Controllers\API\v1\PurchaseController');
+    Route::apiResource('sale', controller: 'App\Http\Controllers\API\v1\SaleController');
+    Route::apiResource('payment', controller: 'App\Http\Controllers\API\v1\PaymentController');
+});

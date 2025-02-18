@@ -44,9 +44,7 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dataSource = new CityDatasource(this.service);
   }
   ngOnInit(): void {
-    this.commonService.setTitle("City");
     this.loadData();
-    console.log("DATE")
   }
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
@@ -61,7 +59,7 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize;
     // this.filter.filter = JSON.stringify(this.search);
-    this.filter.with = ["state.country"];
+    this.filter.with = [];
     this.dataSource.find(this.filter);
   }
 

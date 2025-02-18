@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\v1;
 
+use App\Http\Controllers\API\BaseResponse;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCityRequest;
 use App\Http\Requests\UpdateCityRequest;
 use App\Models\City;
@@ -24,25 +26,6 @@ class CityController extends Controller
         $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
             ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
         $filter = json_decode($request->get('filter'), 1);
-        if (isset($filter['country_id'])) {
-            $country_id = $filter['country_id'];
-            if (isset($country_id) && $country_id !== '') {
-                $model->whereHas('state.country', function ($q) use ($country_id) {
-                    $q->where('id', $country_id);
-                });
-            }
-        }
-        $model = $model->whereHas('state.country', function ($q) {
-            $q->where('isActive', 1);
-        });
-        if (isset($filter['state_id'])) {
-            $state_id = $filter['state_id'];
-            if (isset($state_id) && $state_id !== '') {
-                $model = $model->whereHas('state', function ($q) use ($state_id) {
-                    $q->where('id', $state_id);
-                });
-            }
-        }
         $model = $model->whereHas('state', function ($q) {
             $q->where('status', 1);
         });
@@ -57,7 +40,7 @@ class CityController extends Controller
      *
      * @throws
      */
-    public function store(Request $request)
+    public function store(StoreCityRequest $request)
     {
         $model = new City();
         $$request->validate( $model->validationRule(), $model->validationMessage());
@@ -87,7 +70,7 @@ class CityController extends Controller
      *
      * @throws
      */
-    public function update(Request $request, City $city)
+    public function update(UpdateCityRequest $request, City $city)
     {
         $model = $city;
         $request->validate( $model->validationRule(), $model->validationMessage());

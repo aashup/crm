@@ -16,6 +16,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { CdkTableModule } from '@angular/cdk/table';
 
 @NgModule({
   declarations: [],
@@ -38,6 +39,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatCheckboxModule,
     MatIconModule,
     MatInputModule,
+    CdkTableModule
   ],
   exports: [
     FormsModule,
@@ -57,6 +59,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatCheckboxModule,
     MatIconModule,
     MatInputModule,
+    CdkTableModule
   ],
 })
 export class SharedMaterialModuleModule {}
