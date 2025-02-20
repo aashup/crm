@@ -7,11 +7,10 @@ export class StateModel {
   updated_at: Date;
   deleted_at: Date;
   clear() {
-    this.id = null;
+    this.id = 0;
     this.name = '';
     this.country_id = 0;
     this.status = 1;
-    this.created_at = new Date();
-    this.updated_at = new Date();
+    return this;
   }
 }

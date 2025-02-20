@@ -21,7 +21,7 @@ import { SubscriptionHandler } from '../../core/subscription.handler';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { AddCountryComponent } from './add-country/add-country.component';
-import { merge, tap } from 'rxjs';
+import { merge, take, tap } from 'rxjs';
 
 @Component({
   selector: 'app-country',
@@ -44,7 +44,7 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild("searchElementRef", { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'select', style: { 'max-width': '65px' } },
+    { ref: 'select', name: 'select', style: { 'width': '70px' } },
     {
       ref: 'id',
       name: 'ID',
@@ -118,6 +118,7 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((res) => {
         if (res) {
           this.service.delete(item).subscribe({
@@ -137,7 +138,7 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
         model: (new CountryModel()).clear(),
         isEdit: false,
       }
-    }).afterClosed().subscribe(flag => flag && this.loadData())
+    }).afterClosed().pipe(take(1)).subscribe(flag => flag && this.loadData())
   }
 
   edit(item: CountryModel) {
@@ -146,6 +147,6 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
         model: item,
         isEdit: true
       }
-    }).afterClosed().subscribe(flag => flag && this.loadData())
+    }).afterClosed().pipe(take(1)).subscribe(flag => flag && this.loadData())
   }
 }

@@ -75,4 +75,14 @@ export class CommonService {
   clone(data: any) {
     return _.cloneDeep(data);
   }
+
+  markFormGroupTouched(formGroup: FormGroup) {
+    (<any>Object).values(formGroup.controls).forEach((control: FormGroup<any>) => {
+      control.markAsTouched();
+
+      if (control.controls) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
 }

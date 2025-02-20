@@ -20,6 +20,7 @@
         matSortActive="id"
         matSortDirection="desc"
         matSortDisableClear
+        class="table table-row-dashed table-row-gray-300 align-middle gs-0"
       >
         <ng-container *ngFor="let cols of tableColumns; let i = index">
           <!-- Checkbox Column -->
@@ -83,7 +84,7 @@
           </ng-container>
         </ng-container>
 
-        <tr cdk-header-row *cdkHeaderRowDef="displayableCol"></tr>
+        <tr cdk-header-row *cdkHeaderRowDef="displayableCol" class="fw-bolder text-muted"></tr>
         <tr cdk-row *cdkRowDef="let row; columns: displayableCol"></tr>
       </table>
     </div>

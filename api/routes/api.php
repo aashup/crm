@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('v1')->group(function () {
+    Route::get('find/{type}', ['App\Http\Controllers\API\v1\FindController', 'handler']);
     Route::apiResource('country', 'App\Http\Controllers\API\v1\CountryController');
     Route::apiResource('state', 'App\Http\Controllers\API\v1\StateController');
     Route::apiResource('city', controller: 'App\Http\Controllers\API\v1\CityController');
@@ -13,4 +14,5 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('purchase', controller: 'App\Http\Controllers\API\v1\PurchaseController');
     Route::apiResource('sale', controller: 'App\Http\Controllers\API\v1\SaleController');
     Route::apiResource('payment', controller: 'App\Http\Controllers\API\v1\PaymentController');
+
 });
