@@ -4,6 +4,7 @@ import { CountryModel } from '../country.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CountryService } from '../country.service';
 import { CommonService } from '../../../core/common.service';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-add-country',
@@ -13,6 +14,7 @@ import { CommonService } from '../../../core/common.service';
 export class AddCountryComponent implements AfterViewInit {
   form: FormGroup;
   model: CountryModel;
+  clone: any;
   isEdit: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddCountryComponent>);
   readonly data = inject<{
@@ -45,6 +47,7 @@ export class AddCountryComponent implements AfterViewInit {
       ],
       status: [model.status, [Validators.required]],
     });
+    this.clone = this.form.value;
   }
 
   submit() {
@@ -53,7 +56,7 @@ export class AddCountryComponent implements AfterViewInit {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-    if (this.form.value.name == this.model.name) {
+    if (_.isEqual(this.form.value.name, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }

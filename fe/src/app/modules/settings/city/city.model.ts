@@ -8,13 +8,10 @@ export class CityModel {
   updated_at: Date;
   deleted_at: Date;
   clear() {
-    this.id = null;
     this.name = '';
     this.state_id = null;
     this.country_id = null
     this.status = 1;
-    this.created_at = new Date();
-    this.updated_at = new Date();
-    this.deleted_at = new Date();
+    return this;
   }
 }

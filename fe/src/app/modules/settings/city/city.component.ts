@@ -1,4 +1,14 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { CityDatasource } from './city.datasource';
 import { SelectionModel } from '@angular/cdk/collections';
 import { SubscriptionHandler } from '../../core/subscription.handler';
@@ -8,6 +18,10 @@ import { CityService } from './city.service';
 import { CommonService } from '../../core/common.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
+import { AddCityComponent } from './add-city/add-city.component';
+import { merge, take, tap } from 'rxjs';
 
 @Component({
   selector: 'app-city',
@@ -20,31 +34,55 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: CityDatasource;
   selection = new SelectionModel<CityModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
+  readonly dialog = inject(MatDialog);
 
-  filter: any = {}
-  displayableCol = [];
+  filter: any = {};
+  displayableCol = ['select', 'id', 'name', 'state', 'country', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
+  @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'select', style: { 'min-width': '50px' } },
-    { ref: 'id', name: 'ID', style: { 'min-width': '80px', 'max-width': '80px' } },
-    { ref: 'name', name: 'Name', style: { 'min-width': '250px' } },
-    { ref: 'city', name: 'Address', style: { 'min-width': '250px' } },
-    { ref: 'state', name: 'Jurisdiction', mutator: (item: { jurisdiction: any; }) => item.jurisdiction || '', style: { 'min-width': '200px' } },
-  ]
+    { ref: 'select', name: 'select', style: { width: '70px' } },
+    {
+      ref: 'id',
+      name: 'ID',
+      style: { 'max-width': '30px' },
+    },
+    { ref: 'name', name: 'Name' },
+    { ref: 'state', name: 'State', mutator: (item: any) => item?.state?.name },
+    {
+      ref: 'country',
+      name: 'Country',
+      mutator: (item: any) => item?.country?.name,
+    },
+    { ref: 'action', name: 'Actions' },
+  ];
 
   constructor(
     private cdr: ChangeDetectorRef,
     private service: CityService,
-
-    private commonService: CommonService,
+    private commonService: CommonService
   ) {
     this.dataSource = new CityDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
+    this.commonService.page.updateTitle('City List');
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
+      () => (this.paginator.pageIndex = 0)
+    );
+    this.subscriptionHandler.subscribe = merge(
+      this.sort.sortChange,
+      this.paginator.page
+    )
+      .pipe(
+        tap(() => {
+          this.loadData();
+        })
+      )
+      .subscribe();
   }
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
@@ -59,23 +97,76 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize;
     // this.filter.filter = JSON.stringify(this.search);
-    this.filter.with = [];
+    this.filter.with = ['country', 'state'];
     this.dataSource.find(this.filter);
   }
 
   masterToggle() {
-    if (this.selection.selected.length === this.dataSource.originalData.data.length) {
+    if (
+      this.selection.selected.length ===
+      this.dataSource.originalData.data.length
+    ) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: CityModel) => this.selection.select(row));
+      this.dataSource.originalData.data.forEach((row: CityModel) =>
+        this.selection.select(row)
+      );
     }
   }
 
   isAllSelected(): boolean {
-    return this.dataSource.originalData.data.length === this.selection.selected.length;
+    return (
+      this.dataSource.originalData.data.length ===
+      this.selection.selected.length
+    );
   }
 
   delete(item: CityModel) {
+    this.dialog
+      .open(ConfirmationDialogComponent, {
+        data: {
+          title: 'Delete Country',
+          body: `Are you sure you want to delete this country <span class="text-danger bold">${item.name}?</span>`,
+          okBtnName: 'Delete',
+        },
+      })
+      .afterClosed()
+      .subscribe((res) => {
+        if (res) {
+          this.service.delete(item).subscribe({
+            complete: () => {
+              this.commonService.toastr.success('Country has been deleted.');
+              this.loadData();
+            },
+            error: (err) => this.commonService.handleError(err),
+          });
+        }
+      });
+  }
 
+  add() {
+    this.dialog
+      .open(AddCityComponent, {
+        data: {
+          model: new CityModel().clear(),
+          isEdit: false,
+        },
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((flag) => flag && this.loadData());
+  }
+
+  edit(item: CityModel) {
+    this.dialog
+      .open(AddCityComponent, {
+        data: {
+          model: item,
+          isEdit: true,
+        },
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((flag) => flag && this.loadData());
   }
 }

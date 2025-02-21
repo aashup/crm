@@ -6,8 +6,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { take } from 'rxjs';
-import { MyErrorStateMatcher } from '../state.component';
 import { ErrorStateMatcher } from '@angular/material/core';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-add-state',
@@ -17,6 +17,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 export class AddStateComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   model: StateModel;
+  clone: any;
   isEdit: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddStateComponent>);
   readonly data = inject<{
@@ -25,7 +26,6 @@ export class AddStateComponent implements AfterViewInit, OnInit {
   }>(MAT_DIALOG_DATA);
 
   countries: StateModel[] = [];
-matcher: ErrorStateMatcher = new MyErrorStateMatcher();;
 
   constructor(
     private fb: FormBuilder,
@@ -61,16 +61,16 @@ matcher: ErrorStateMatcher = new MyErrorStateMatcher();;
       status: [model.status, [Validators.required]],
       country_id: [model.country_id, [Validators.required]],
     });
+    this.clone = this.form.value;
   }
 
   submit() {
-    console.log(this.form)
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-    if (this.form.value.name == this.model.name) {
+    if (_.isEqual(this.form.value.name, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }

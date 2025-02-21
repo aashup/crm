@@ -12,7 +12,6 @@ class Country extends Model
     protected $table = 'countries';
 
     protected $fillable = [
-        'id',
         'name',
         'status',
     ];

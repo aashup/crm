@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCityRequest;
 use App\Http\Requests\UpdateCityRequest;
 use App\Models\City;
+use App\Models\State;
 use Illuminate\Http\Request;
 
 class CityController extends Controller
@@ -40,11 +41,13 @@ class CityController extends Controller
      *
      * @throws
      */
-    public function store(StoreCityRequest $request)
+    public function store(Request $request)
     {
         $model = new City();
-        $$request->validate( $model->validationRule(), $model->validationMessage());
+        $request->validate( $model->validationRule(), $model->validationMessage());
+        $state = State::findOrFail($request->state_id);
         $model->fill($request->all());
+        $model->country_id =  $state->country_id;
         $model->save();
 
         return BaseResponse::success($model);
@@ -70,11 +73,13 @@ class CityController extends Controller
      *
      * @throws
      */
-    public function update(UpdateCityRequest $request, City $city)
+    public function update(Request $request, City $city)
     {
         $model = $city;
         $request->validate( $model->validationRule(), $model->validationMessage());
+        $state = State::findOrFail($request->state_id);
         $model->fill($request->all());
+        $model->country_id =  $state->country_id;
         $model->save();
 
         return BaseResponse::success($model);

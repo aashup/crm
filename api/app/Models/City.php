@@ -11,7 +11,6 @@ class City extends Model
     protected $table = 'cities';
 
     protected $fillable = [
-        'id',
         'name',
         'status',
         'state_id',
@@ -60,8 +59,8 @@ class City extends Model
         return [
             'id' => '',
             'name' => 'required',
-            'state_id' => 'required',
-            'country_id' => 'required',
+            'state_id' => ['required','exists:App\Models\State,id'],
+            'country_id' => '',
             'created_at' => '',
             'updated_at' => '',
         ];
