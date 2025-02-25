@@ -23,10 +23,6 @@ class MenuController extends Controller
         $model = new Menu();
         $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
             ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
-        $filter = json_decode($request->get('filter'), 1);
-        $model = $model->whereHas('state', function ($q) {
-            $q->where('status', 1);
-        });
 
         return $model->paginate($pageSize, ['*'], 'page', $request->page);
     }
@@ -85,8 +81,8 @@ class MenuController extends Controller
      *
      * @throws
      */
-    public function destroy(Menu $model)
+    public function destroy(Menu $menu)
     {
-        return BaseResponse::success($model->delete());
+        return BaseResponse::success($menu->delete());
     }
 }

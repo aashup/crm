@@ -1,22 +1,9 @@
-<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Country</h2>
+<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Menu</h2>
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Select State </mat-label>
-              <mat-select placeholder="State" formControlName="state_id">
-                <mat-option *ngFor="let item of states" [value]="item.id">
-                  {{item.name}}
-                </mat-option>
-              </mat-select>
-              <mat-error
-                >State is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </div>
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Please enter Name </mat-label>
@@ -28,6 +15,87 @@
               />
               <mat-error
                 >Name is <strong>required</strong> and must be
+                <strong>characters only</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Is Root? </mat-label>
+              <mat-select placeholder="Root" formControlName="root">
+                <mat-option [value]="1">True</mat-option>
+                <mat-option [value]="0">False</mat-option>
+              </mat-select>
+              <mat-error
+                >Root is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Parent </mat-label>
+              <mat-select placeholder="Menu" formControlName="parent_id">
+                <mat-option></mat-option>
+                <mat-option *ngFor="let item of menus" [value]="item.id">
+                  {{item.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error
+                >Menu is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Please enter Icon </mat-label>
+              <input
+                matInput
+                placeholder="Enter Name"
+                formControlName="icon"
+                maxlength="200"
+              />
+              <mat-error
+                >Icon is <strong>required</strong> and must be
+                <strong>characters only</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Please enter Page </mat-label>
+              <input
+                matInput
+                placeholder="Enter Name"
+                formControlName="page"
+              />
+              <mat-error
+                >Page is <strong>required</strong> and must be
+                <strong>characters only</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Status? </mat-label>
+              <mat-select placeholder="Status" formControlName="status">
+                <mat-option [value]="1">True</mat-option>
+                <mat-option [value]="0">False</mat-option>
+              </mat-select>
+              <mat-error
+                >Root is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Order By </mat-label>
+              <input
+                matInput
+                placeholder="Enter Name"
+                formControlName="order_by"
+              />
+              <mat-error
+                >Order By is <strong>required</strong> and must be
                 <strong>characters only</strong>
               </mat-error>
             </mat-form-field>

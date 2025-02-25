@@ -12,7 +12,7 @@ import { StateModel } from '../../state/state.model';
 @Component({
   selector: 'app-add-menu',
   templateUrl: './add-menu.component.html',
-  styleUrl: './add-menu.component.scss'
+  styleUrl: './add-menu.component.scss',
 })
 export class AddMenuComponent implements AfterViewInit, OnInit {
   form: FormGroup;
@@ -25,8 +25,7 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
     isEdit: boolean;
   }>(MAT_DIALOG_DATA);
 
-  countries: MenuModel[] = [];
-  states: StateModel[] = [];
+  menus: StateModel[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -43,11 +42,11 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
     //     next: (data: any) => (this.countries = data.data),
     //     error: (err) => this.commonService.handleError(err),
     //   });
-    this.find
-      .state()
+    this.service
+      .find({ pageSize: 1000 })
       .pipe(take(1))
       .subscribe({
-        next: (data: any) => (this.states = data.data),
+        next: (data: any) => (this.menus = data.data),
         error: (err) => this.commonService.handleError(err),
       });
   }
@@ -60,18 +59,14 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
 
   initForm(model: MenuModel) {
     this.form = this.fb.group({
-      id: [model.id, []],
-      name: [
-        model.name,
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(200),
-        ],
-      ],
-      status: [model.status, [Validators.required]],
-      country_id: [model.country_id],
-      state_id: [model.state_id, [Validators.required]],
+      id: [this.model.id, []],
+      name: [this.model.name, [Validators.required]],
+      root: [this.model.root],
+      icon: [this.model.icon],
+      page: [this.model.page],
+      parent_id: [this.model.parent_id],
+      order_by: [this.model.order_by],
+      status: [this.model.status],
     });
     this.clone = this.form.value;
   }
@@ -89,7 +84,7 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'State has been updated.' : 'State has been created.'
+          this.isEdit ? 'Menu has been updated.' : 'Menu has been created.'
         );
         this.dialogRef.close(true);
       },
