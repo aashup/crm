@@ -20,8 +20,6 @@ const routes: Routes = [
     NgxPermissionsModule.forChild(),
     SharedMaterialModuleModule
   ],
-  exports: [
-    RouterModule
-  ]
+  exports: []
 })
 export class CityModule { }
