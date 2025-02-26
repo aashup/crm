@@ -1,1 +1,58 @@
-<p>add-permission works!</p>
+<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Menu</h2>
+<div mat-dialog-content>
+  <div class="card m-auto">
+    <div class="card-body min-w-500px">
+      <form class="form" [formGroup]="form" *ngIf="form">
+        <div class="row">
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Please enter Name </mat-label>
+              <input
+                matInput
+                placeholder="Enter Name"
+                formControlName="name"
+                maxlength="200"
+              />
+              <mat-error
+                >Name is <strong>required</strong> and must be
+                <strong>characters only</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Please enter slug </mat-label>
+              <input
+                matInput
+                placeholder="Enter Name"
+                formControlName="slug"
+              />
+              <mat-error
+                >Slug is <strong>required</strong> and must be
+                <strong>characters only</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Status? </mat-label>
+              <mat-select placeholder="Status" formControlName="status">
+                <mat-option [value]="1">True</mat-option>
+                <mat-option [value]="0">False</mat-option>
+              </mat-select>
+              <mat-error
+                >Status is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="false">Cancel</button>
+  <button mat-button (click)="submit()" (keyup.enter)="submit()">
+    {{ isEdit ? "Update" : "Create" }}
+  </button>
+</div>
