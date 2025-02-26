@@ -13,7 +13,6 @@ export class MenuDatasource extends BaseDataSource {
             tap((res: any) => {
                 this.originalData = res;
                 this.entitySubject.next(res.data);
-                console.log(res.data);
                 this.paginatorTotalSubject.next(res.total);
             }),
             // catchError(err => of(new QueryResultsModel([], err))),

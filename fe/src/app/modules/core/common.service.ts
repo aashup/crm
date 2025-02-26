@@ -18,7 +18,6 @@ export class CommonService {
   ) {}
 
   public handleError(e: { status: number }) {
-    console.log(e);
     if (e.status == 401) {
       this.toastr.error(
         'Authentication failure from server, You need to login again.'
