@@ -2,50 +2,87 @@
 
 namespace App\Http\Controllers\API\v1;
 
+use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $pageSize = null;
+        if (intval($request->pageSize)) {
+            $pageSize = intval($request->get('pageSize', 1000));
+        }
+        $model = new Product();
+        $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
+            ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
+
+        return $model->paginate($pageSize, ['*'], 'page', $request->page);
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @return \Illuminate\Http\Response
+     *
+     * @throws
      */
-    public function store(StoreProductRequest $request)
+    public function store(Request $request)
     {
-        //
+        $model = new Product();
+        $request->validate( $model->validationRule(), $model->validationMessage());
+        $model->fill($request->all());
+        $model->save();
+
+        return BaseResponse::success($model);
     }
 
     /**
      * Display the specified resource.
+     *
+     * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function show(Product $product, Request $request)
     {
-        //
+        $product->load($product->getWith($request->with));
+
+        return BaseResponse::success($product);
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \App\Models\Product  $model
+     * @return \Illuminate\Http\Response
+     *
+     * @throws
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(Request $request, Product $product)
     {
-        //
+        $model = $product;
+        $request->validate( $model->validationRule(), $model->validationMessage());
+        $model->fill($request->all());
+        $model->save();
+
+        return BaseResponse::success($model);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @return \Illuminate\Http\Response
+     *
+     * @throws
      */
     public function destroy(Product $product)
     {
-        //
+        return BaseResponse::success($product->delete());
     }
 }

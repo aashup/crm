@@ -10,8 +10,8 @@ const Routing: Routes = [
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
   {
-    path: 'settings',
-    loadChildren: () => import('../modules/settings/settings.module').then((m) => m.SettingsModule),
+    path: 'apps',
+    loadChildren: () => import('../modules/apps/apps.module').then((m) => m.AppsModule),
     // data: { layout: 'light-sidebar' },
   },
   {

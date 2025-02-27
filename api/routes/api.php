@@ -16,5 +16,6 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('payment', controller: 'App\Http\Controllers\API\v1\PaymentController');
     Route::apiResource('menu', controller: 'App\Http\Controllers\API\v1\MenuController');
     Route::apiResource('permission', controller: 'App\Http\Controllers\API\v1\PermissionController');
+    Route::apiResource('product', controller: 'App\Http\Controllers\API\v1\ProductController');
 
 });
