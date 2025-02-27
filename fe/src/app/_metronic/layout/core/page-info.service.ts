@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { BehaviorSubject } from 'rxjs';
 
 export interface PageLink {
@@ -25,13 +26,17 @@ export class PageInfoService {
     Array<PageLink>
   >([]);
 
-  constructor() {}
+  constructor(
+    private titleService: Title,
+  ) {}
 
   public setTitle(_title: string) {
+    this.titleService.setTitle(_title);
     this.title.next(_title);
   }
 
   public updateTitle(_title: string) {
+    this.titleService.setTitle(_title);
     setTimeout(() => {
       this.setTitle(_title);
     }, 1);

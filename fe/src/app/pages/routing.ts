@@ -10,7 +10,7 @@ const Routing: Routes = [
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
   {
-    path: 'apps',
+    path: 'app',
     loadChildren: () => import('../modules/apps/apps.module').then((m) => m.AppsModule),
     // data: { layout: 'light-sidebar' },
   },

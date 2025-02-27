@@ -3,7 +3,7 @@ import { ProductService } from './product.service';
 import { BaseDataSource } from '../../core/base.datasource';
 
 
-export class CityDatasource extends BaseDataSource {
+export class ProductDatasource extends BaseDataSource {
     constructor(private service: ProductService) {
         super();
     }
