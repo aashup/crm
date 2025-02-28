@@ -15,10 +15,11 @@ import { AddUnitComponent } from '../../settings/unit/add-unit/add-unit.componen
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-product',
-  templateUrl: './product.component.html',
-  styleUrl: './product.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-product',
+    templateUrl: './product.component.html',
+    styleUrl: './product.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ProductComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;

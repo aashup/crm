@@ -24,10 +24,11 @@ import { AddCityComponent } from './add-city/add-city.component';
 import { merge, take, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-city',
-  templateUrl: './city.component.html',
-  styleUrl: './city.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-city',
+    templateUrl: './city.component.html',
+    styleUrl: './city.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;

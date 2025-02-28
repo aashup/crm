@@ -7,9 +7,10 @@ import { CommonService } from '../../../core/common.service';
 import _ from 'lodash';
 
 @Component({
-  selector: 'app-add-country',
-  templateUrl: './add-country.component.html',
-  styleUrl: './add-country.component.scss',
+    selector: 'app-add-country',
+    templateUrl: './add-country.component.html',
+    styleUrl: './add-country.component.scss',
+    standalone: false
 })
 export class AddCountryComponent implements AfterViewInit {
   form: FormGroup;

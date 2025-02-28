@@ -16,9 +16,10 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 
 @Component({
-  selector: 'app-state',
-  templateUrl: './state.component.html',
-  styleUrl: './state.component.scss'
+    selector: 'app-state',
+    templateUrl: './state.component.html',
+    styleUrl: './state.component.scss',
+    standalone: false
 })
 export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
  _ = _;

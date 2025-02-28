@@ -10,9 +10,10 @@ import { StateModel } from '../../state/state.model';
 import _ from 'lodash';
 
 @Component({
-  selector: 'app-add-city',
-  templateUrl: './add-city.component.html',
-  styleUrl: './add-city.component.scss',
+    selector: 'app-add-city',
+    templateUrl: './add-city.component.html',
+    styleUrl: './add-city.component.scss',
+    standalone: false
 })
 export class AddCityComponent implements AfterViewInit, OnInit {
   form: FormGroup;

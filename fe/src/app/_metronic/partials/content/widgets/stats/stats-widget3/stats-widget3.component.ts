@@ -2,8 +2,9 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { getCSSVariableValue } from '../../../../../kt/_utils';
 
 @Component({
-  selector: 'app-stats-widget3',
-  templateUrl: './stats-widget3.component.html',
+    selector: 'app-stats-widget3',
+    templateUrl: './stats-widget3.component.html',
+    standalone: false
 })
 export class StatsWidget3Component implements OnInit {
   @Input() title = '';

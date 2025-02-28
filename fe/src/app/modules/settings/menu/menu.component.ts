@@ -14,10 +14,11 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { SubscriptionHandler } from '../../core/subscription.handler';
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styleUrl: './menu.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-menu',
+    templateUrl: './menu.component.html',
+    styleUrl: './menu.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;

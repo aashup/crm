@@ -10,9 +10,10 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import _ from 'lodash';
 
 @Component({
-  selector: 'app-add-state',
-  templateUrl: './add-state.component.html',
-  styleUrl: './add-state.component.scss'
+    selector: 'app-add-state',
+    templateUrl: './add-state.component.html',
+    styleUrl: './add-state.component.scss',
+    standalone: false
 })
 export class AddStateComponent implements AfterViewInit, OnInit {
   form: FormGroup;

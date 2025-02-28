@@ -14,9 +14,10 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { SubscriptionHandler } from '../../core/subscription.handler';
 
 @Component({
-  selector: 'app-unit',
-  templateUrl: './unit.component.html',
-  styleUrl: './unit.component.scss'
+    selector: 'app-unit',
+    templateUrl: './unit.component.html',
+    styleUrl: './unit.component.scss',
+    standalone: false
 })
 export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;

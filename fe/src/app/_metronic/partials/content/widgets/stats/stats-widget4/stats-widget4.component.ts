@@ -2,8 +2,9 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { getCSSVariableValue } from '../../../../../kt/_utils';
 
 @Component({
-  selector: 'app-stats-widget4',
-  templateUrl: './stats-widget4.component.html',
+    selector: 'app-stats-widget4',
+    templateUrl: './stats-widget4.component.html',
+    standalone: false
 })
 export class StatsWidget4Component implements OnInit {
   @Input() svgIcon = '';

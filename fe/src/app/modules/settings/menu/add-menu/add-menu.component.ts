@@ -10,9 +10,10 @@ import { FindService } from 'src/app/modules/core/find.service';
 import { StateModel } from '../../state/state.model';
 
 @Component({
-  selector: 'app-add-menu',
-  templateUrl: './add-menu.component.html',
-  styleUrl: './add-menu.component.scss',
+    selector: 'app-add-menu',
+    templateUrl: './add-menu.component.html',
+    styleUrl: './add-menu.component.scss',
+    standalone: false
 })
 export class AddMenuComponent implements AfterViewInit, OnInit {
   form: FormGroup;

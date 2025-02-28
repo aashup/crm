@@ -10,9 +10,10 @@ import { StateModel } from '../../state/state.model';
 import { PermissionService } from '../permission.service';
 
 @Component({
-  selector: 'app-add-permission',
-  templateUrl: './add-permission.component.html',
-  styleUrl: './add-permission.component.scss'
+    selector: 'app-add-permission',
+    templateUrl: './add-permission.component.html',
+    styleUrl: './add-permission.component.scss',
+    standalone: false
 })
 export class AddPermissionComponent implements AfterViewInit, OnInit {
   form: FormGroup;

@@ -9,10 +9,11 @@ import { FindService } from 'src/app/modules/core/find.service';
 import { AddUnitComponent } from 'src/app/modules/settings/unit/add-unit/add-unit.component';
 
 @Component({
-  selector: 'app-add-product',
-  templateUrl: './add-product.component.html',
-  styleUrl: './add-product.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-add-product',
+    templateUrl: './add-product.component.html',
+    styleUrl: './add-product.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AddProductComponent implements AfterViewInit, OnInit {
   form: FormGroup;

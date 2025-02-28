@@ -14,9 +14,10 @@ import { SubscriptionHandler } from '../../core/subscription.handler';
 import { AddPermissionComponent } from './add-permission/add-permission.component';
 
 @Component({
-  selector: 'app-permission',
-  templateUrl: './permission.component.html',
-  styleUrl: './permission.component.scss'
+    selector: 'app-permission',
+    templateUrl: './permission.component.html',
+    styleUrl: './permission.component.scss',
+    standalone: false
 })
 export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;

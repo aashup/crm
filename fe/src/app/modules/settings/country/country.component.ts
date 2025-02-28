@@ -24,10 +24,11 @@ import { AddCountryComponent } from './add-country/add-country.component';
 import { merge, take, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-country',
-  templateUrl: './country.component.html',
-  styleUrl: './country.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-country',
+    templateUrl: './country.component.html',
+    styleUrl: './country.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;

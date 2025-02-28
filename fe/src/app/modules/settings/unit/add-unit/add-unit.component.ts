@@ -8,9 +8,10 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 
 @Component({
-  selector: 'app-add-unit',
-  templateUrl: './add-unit.component.html',
-  styleUrl: './add-unit.component.scss'
+    selector: 'app-add-unit',
+    templateUrl: './add-unit.component.html',
+    styleUrl: './add-unit.component.scss',
+    standalone: false
 })
 export class AddUnitComponent implements AfterViewInit, OnInit {
   form: FormGroup;

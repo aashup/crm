@@ -13,12 +13,11 @@ import {
 import { SafePipe } from '../pipes/safe-pipe.pipe';
 
 @Component({
-  selector: 'app-confirmation-dialog',
-  standalone: true,
-  imports: [SharedMaterialModuleModule, CommonModule],
-  templateUrl: './confirmation-dialog.component.html',
-  styleUrl: './confirmation-dialog.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-confirmation-dialog',
+    imports: [SharedMaterialModuleModule, CommonModule],
+    templateUrl: './confirmation-dialog.component.html',
+    styleUrl: './confirmation-dialog.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmationDialogComponent {
   readonly dialogRef = inject(MatDialogRef<ConfirmationDialogComponent>);
