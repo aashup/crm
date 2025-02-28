@@ -1,5 +1,4 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { ApexOptions } from 'ng-apexcharts';
 import { getCSSVariableValue } from '../../../../../kt/_utils';
 
 @Component({
@@ -40,7 +39,7 @@ function getChartOptions(
   labelColor: string,
   baseColor: string,
   lightColor: string
-): ApexOptions {
+) {
   return {
     series: [
       {
@@ -144,7 +143,7 @@ function getChartOptions(
         fontSize: '12px',
       },
       y: {
-        formatter: function (val) {
+        formatter: function (val: string) {
           return '$' + val + ' thousands';
         },
       },
