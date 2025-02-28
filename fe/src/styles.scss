@@ -1,42 +1,42 @@
-@use '@angular/material' as mat;
-
-// Define a dark theme
-$dark-theme: mat.define-theme((
-  color: (
-    theme-type: dark,
-    primary: mat.define-palette(mat.$deep-purple-palette),
-    accent: mat.define-palette(mat.$amber-palette),
-  ),
-  typography: mat.define-typography-config(),
-  density: 0
-));
-
-// Apply the theme globally
-@include mat.all-component-themes($dark-theme);
-
+@use "@angular/material" as mat;
 
 /* You can add global styles to this file, and also import other style files */
 @import "./assets/sass/style.scss";
 // Replace above style with this css file to enable RTL styles
 // @import "./assets/css/style.rtl";
-@import './assets/sass/plugins.scss';
+@import "./assets/sass/plugins.scss";
 // @import "./assets/css/style.rtl.css";
 @import "./assets/sass/style.angular.scss";
-@import 'ngx-toastr/toastr';
+@import "ngx-toastr/toastr";
 // Keenicons - High quality and pixel perfect font icons available in 3 styles, duotone, outline and solid for Metronic elements
 @import "./assets/plugins/keenicons/duotone/style.css";
 @import "./assets/plugins/keenicons/outline/style.css";
 @import "./assets/plugins/keenicons/solid/style.css";
 
-
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 mat-icon {
-  font-family: 'Material Icons' !important;
+  font-family: "Material Icons" !important;
   font-size: large;
 }
 
 .bold {
   font-weight: bold !important;
+}
+
+@if $enable-dark-mode {
+  :root {
+    @include mat.paginator-overrides(
+      (
+        container-text-color: var(--bs-body-color),
+        container-background-color: var(--bs-body-bg),
+      )
+    );
+  }
 }

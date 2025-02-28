@@ -6,6 +6,7 @@ use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -38,7 +39,10 @@ class ProductController extends Controller
     {
         $model = new Product();
         $request->validate( $model->validationRule(), $model->validationMessage());
-        $model->fill($request->all());
+        $model->fill([
+            ...$request->all(),
+            'created_by' => Auth::id()
+        ]);
         $model->save();
 
         return BaseResponse::success($model);

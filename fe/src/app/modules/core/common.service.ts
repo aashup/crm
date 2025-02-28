@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import _ from 'lodash';
 import { PageInfoService } from 'src/app/_metronic/layout';
 import { FormGroup } from '@angular/forms';
+import { Location } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class CommonService {
     public titleService: Title,
     public toastr: ToastrService,
     public page: PageInfoService,
-    public app: ApplicationRef
+    public app: ApplicationRef,
+    public location: Location,
   ) {}
 
   public handleError(e: { status: number }) {

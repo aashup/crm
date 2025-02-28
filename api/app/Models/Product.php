@@ -14,6 +14,7 @@ class Product extends Model
         'slug',
         'type',
         'status',
+        'created_by'
     ];
 
     protected $relations = [

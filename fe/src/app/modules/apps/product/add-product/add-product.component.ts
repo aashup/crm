@@ -7,13 +7,13 @@ import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { AddUnitComponent } from 'src/app/modules/settings/unit/add-unit/add-unit.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-add-product',
     templateUrl: './add-product.component.html',
     styleUrl: './add-product.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
 })
 export class AddProductComponent implements AfterViewInit, OnInit {
   form: FormGroup;
@@ -25,22 +25,25 @@ export class AddProductComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: ProductService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private router: Router,
+    private ar: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
-
+    this.model =( new ProductModel()).clear();
+    this.initForm(this.model);
   }
 
   ngAfterViewInit(): void {
-    this.model = new ProductModel().clear();
-    this.initForm(this.model);
+
   }
 
   initForm(model: ProductModel) {
     this.form = this.fb.group({
       id: [this.model.id, []],
       name: [this.model.name, [Validators.required]],
+      slug: [this.model.slug],
       status: [this.model.status],
     });
     this.clone = this.form.value;
@@ -61,8 +64,12 @@ export class AddProductComponent implements AfterViewInit, OnInit {
         this.commonService.toastr.success(
           this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
         );
+        this.commonService.location.back();
       },
       error: (err) => this.commonService.handleError(err),
     });
+  }
+  back() {
+    return this.commonService.location.back();
   }
 }

@@ -32,13 +32,13 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-
-  }
-
-  ngAfterViewInit(): void {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
+  }
+
+  ngAfterViewInit(): void {
+
   }
 
   initForm(model: UnitModel) {

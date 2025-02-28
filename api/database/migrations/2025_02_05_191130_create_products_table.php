@@ -82,10 +82,10 @@ return new class extends Migration
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->string('slug');
+                $table->string('slug')->nullable();
                 $table->tinyInteger('type', false, true)->default(1);
                 $table->boolean('status')->default(true);
-                $table->unsignedBigInteger('created_by');
+                $table->unsignedBigInteger('created_by')->nullable();
                 $table->timestamps();
                 $table->foreign('created_by')->references('id')->on('users');
                 $table->softDeletes();
