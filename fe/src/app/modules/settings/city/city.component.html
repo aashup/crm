@@ -1,12 +1,25 @@
-<div class="card text-center">
-  <div class="card-header">
-    <div class="w-100 my-auto d-flex flex-row-reverse">
-      <button mat-flat-button class="bg-success" (click)="add()">
-        Add New
-      </button>
-      <button mat-icon-button (click)="loadData()">
-        <mat-icon>sync</mat-icon>
-      </button>
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <div class="d-flex align-items-center position-relative my-1">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          data-action="filter"
+          class="form-control form-control-solid w-250px ps-12"
+          placeholder="Search Users"
+        />
+      </div>
+    </div>
+    <div class="card-toolbar">
+      <div class="d-flex justify-content-end">
+        <button mat-flat-button class="bg-success" (click)="add()">
+          Add New
+        </button>
+        <button mat-icon-button (click)="loadData()">
+          <mat-icon>sync</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
   <div class="card-body">
@@ -17,20 +30,20 @@
       ></mat-progress-bar>
       <table
         #table
-        mat-table
+        cdk-table
         [dataSource]="dataSource"
         matSort
         #sort1="matSort"
         matSortActive="id"
         matSortDirection="desc"
         matSortDisableClear
-        class="table table-row-dashed table-row-gray-300 align-middle gs-0"
+        class="table table-row-dashed table-row-gray-300 fs-6 align-middle gs-0"
       >
         <ng-container *ngFor="let cols of tableColumns; let i = index">
           <!-- Checkbox Column -->
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'select'">
             <th
-              mat-header-cell
+              cdk-header-cell
               *matHeaderCellDef
               [ngStyle]="cols.style || {}"
               [attr.aria-label]="'Select all'"
@@ -43,7 +56,7 @@
               >
               </mat-checkbox>
             </th>
-            <td mat-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
+            <td cdk-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
               <mat-checkbox
                 (click)="$event.stopPropagation()"
                 (change)="$event ? selection.toggle(row) : null"
@@ -58,7 +71,7 @@
             *ngIf="['action', 'select'].indexOf(cols.ref) == -1"
           >
             <th
-              mat-header-cell
+              cdk-header-cell
               [mat-sort-header]="cols.doNotSort ? null : cols.ref"
               [disabled]="cols.doNotSort ? true : false"
               *matHeaderCellDef
@@ -67,14 +80,14 @@
             >
               {{ cols.name }}
             </th>
-            <td mat-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
+            <td cdk-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
               {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
             </td>
           </ng-container>
 
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
             <th
-              mat-header-cell
+              cdk-header-cell
               [attr.aria-label]="cols.name"
               *matHeaderCellDef
               [ngStyle]="cols.style || {}"
