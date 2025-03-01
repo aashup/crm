@@ -1,0 +1,202 @@
+
+<div
+  class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
+  id="kt_create_account_stepper"
+>
+  <!--begin::Aside-->
+  <div
+    class="card d-flex justify-content-center justify-content-xl-start flex-row-auto w-100 w-xl-300px w-xxl-400px me-9"
+  >
+    <div class="card-body px-6 px-lg-10 px-xxl-15 py-20">
+      <div class="stepper-nav">
+        <div
+          class="stepper-item"
+          [ngClass]="{
+            current: currentStep$.value === 1,
+
+          }"
+        >
+          <!--begin::Wrapper-->
+          <div class="stepper-wrapper">
+            <!--begin::Icon-->
+            <div class="stepper-icon w-40px h-40px">
+              <i class="stepper-check fas fa-check"></i>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(1)">1</button>
+            </div>
+            <!--end::Icon-->
+
+            <!--begin::Label-->
+            <div class="stepper-label">
+              <h3 class="stepper-title">Product</h3>
+
+              <div class="stepper-desc fw-semibold">Setup Your product</div>
+            </div>
+            <!--end::Label-->
+          </div>
+          <!--end::Wrapper-->
+
+          <!--begin::Line-->
+          <div class="stepper-line h-40px"></div>
+          <!--end::Line-->
+        </div>
+
+        <div
+          class="stepper-item"
+          [ngClass]="{
+            current: currentStep$.value === 2,
+
+          }"
+        >
+          <!--begin::Wrapper-->
+          <div class="stepper-wrapper">
+            <!--begin::Icon-->
+            <div class="stepper-icon w-40px h-40px">
+              <i class="stepper-check fas fa-check"></i>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(2)">2</button>
+            </div>
+            <!--end::Icon-->
+
+            <!--begin::Label-->
+            <div class="stepper-label">
+              <h3 class="stepper-title">Unit Settings</h3>
+              <div class="stepper-desc fw-semibold">
+                Setup Units for product
+              </div>
+            </div>
+            <!--end::Label-->
+          </div>
+          <!--end::Wrapper-->
+
+          <!--begin::Line-->
+          <div class="stepper-line h-40px"></div>
+          <!--end::Line-->
+        </div>
+
+        <div
+          class="stepper-item"
+          [ngClass]="{
+            current: currentStep$.value === 3,
+
+          }"
+        >
+          <!--begin::Wrapper-->
+          <div class="stepper-wrapper">
+            <!--begin::Icon-->
+            <div class="stepper-icon w-40px h-40px">
+              <i class="stepper-check fas fa-check"></i>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(3)">3</button>
+            </div>
+            <!--end::Icon-->
+
+            <!--begin::Label-->
+            <div class="stepper-label">
+              <h3 class="stepper-title">Inventory Setup</h3>
+              <div class="stepper-desc fw-semibold">Add stock for Business</div>
+            </div>
+            <!--end::Label-->
+          </div>
+          <!--end::Wrapper-->
+
+          <!--begin::Line-->
+          <div class="stepper-line h-40px"></div>
+          <!--end::Line-->
+        </div>
+
+        <div
+          class="stepper-item"
+          [ngClass]="{
+            current: currentStep$.value === 4,
+
+          }"
+        >
+          <!--begin::Wrapper-->
+          <div class="stepper-wrapper">
+            <!--begin::Icon-->
+            <div class="stepper-icon w-40px h-40px">
+              <i class="stepper-check fas fa-check"></i>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(4)">4</button>
+            </div>
+            <!--end::Icon-->
+
+            <!--begin::Label-->
+            <div class="stepper-label">
+              <h3 class="stepper-title">Seller Details</h3>
+              <div class="stepper-desc fw-semibold">Set up Seller</div>
+            </div>
+            <!--end::Label-->
+          </div>
+          <!--end::Wrapper-->
+
+          <!--begin::Line-->
+          <div class="stepper-line h-40px"></div>
+          <!--end::Line-->
+        </div>
+
+        <div
+          class="stepper-item"
+          [ngClass]="{ current: currentStep$.value === 5 }"
+        >
+          <!--begin::Wrapper-->
+          <div class="stepper-wrapper">
+            <!--begin::Icon-->
+            <div class="stepper-icon w-40px h-40px">
+              <i class="stepper-check fas fa-check"></i>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(5)">5</button>
+            </div>
+            <!--end::Icon-->
+
+            <!--begin::Label-->
+            <div class="stepper-label">
+              <h3 class="stepper-title">Completed</h3>
+              <div class="stepper-desc fw-semibold">Woah, we are here</div>
+            </div>
+            <!--end::Label-->
+          </div>
+          <!--end::Wrapper-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--begin::Aside-->
+
+  <!--begin::Content-->
+  <div class="d-flex flex-row-fluid flex-center bg-body rounded">
+    <form
+      class="py-20 w-100 w-xl-700px px-9"
+      noValidate
+      id="kt_create_account_form"
+    >
+      <div class="current">
+        <ng-container *ngIf="currentStep$.value === 1">
+          <app-add-product></app-add-product>
+        </ng-container>
+
+        <ng-container *ngIf="currentStep$.value === 2">
+          <app-product-unit></app-product-unit>
+        </ng-container>
+
+        <ng-container *ngIf="currentStep$.value === 3"> step 3 </ng-container>
+
+        <ng-container *ngIf="currentStep$.value === 4"> step 4 </ng-container>
+
+        <ng-container *ngIf="currentStep$.value === 5"> step 5 </ng-container>
+      </div>
+
+      <div class="d-flex flex-stack pt-10">
+        <div class="mr-2">
+          <ng-container *ngIf="currentStep$.value !== 1">
+            <button
+              type="button"
+              class="btn btn-lg btn-light-primary me-3"
+              (click)="prevStep()"
+            >
+              <app-keenicon name="arrow-left" class="fs-3 ms-1"></app-keenicon>
+              Back
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!--end::Content-->
+</div>

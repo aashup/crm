@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -8,6 +8,8 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { AddUnitComponent } from 'src/app/modules/settings/unit/add-unit/add-unit.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { ICreateAccount, inits } from 'src/app/modules/wizards/create-account.helper';
 
 @Component({
     selector: 'app-add-product',
@@ -15,11 +17,20 @@ import { ActivatedRoute, Router } from '@angular/router';
     styleUrl: './add-product.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddProductComponent implements AfterViewInit, OnInit {
+export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   form: FormGroup;
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
+
+  formsCount = 5;
+  account$: BehaviorSubject<ICreateAccount> =
+    new BehaviorSubject<ICreateAccount>(inits);
+  currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
+  isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
+  private unsubscribe: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -69,7 +80,9 @@ export class AddProductComponent implements AfterViewInit, OnInit {
       error: (err) => this.commonService.handleError(err),
     });
   }
-  back() {
-    return this.commonService.location.back();
+
+  ngOnDestroy() {
+    this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
+
 }

@@ -137,15 +137,6 @@ export class ProductComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   edit(item: ProductModel) {
-    this.dialog
-      .open(AddUnitComponent, {
-        data: {
-          model: item,
-          isEdit: true,
-        },
-      })
-      .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+    this.router.navigate(['app/product/add', item.id ]);
   }
 }

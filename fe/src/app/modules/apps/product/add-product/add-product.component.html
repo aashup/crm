@@ -2,7 +2,7 @@
   <div class="card-body">
     <form class="form" [formGroup]="form" *ngIf="form">
       <div class="row">
-        <div class="col-md-6 kt-margin-bottom-20-mobile">
+        <div class="col-12 kt-margin-bottom-20-mobile">
           <mat-form-field class="w-100">
             <mat-label>Please enter Name </mat-label>
             <input
@@ -17,25 +17,22 @@
             </mat-error>
           </mat-form-field>
         </div>
-        <div class="col-md-6 kt-margin-bottom-20-mobile">
+        <div class="col-12 kt-margin-bottom-20-mobile">
           <mat-form-field class="w-100">
             <mat-label>Status? </mat-label>
             <mat-select placeholder="Status" formControlName="status">
               <mat-option [value]="1">Active</mat-option>
               <mat-option [value]="0">In-Active</mat-option>
             </mat-select>
-            <mat-error
-              >Status is <strong>required</strong>
-            </mat-error>
+            <mat-error>Status is <strong>required</strong> </mat-error>
           </mat-form-field>
         </div>
       </div>
+      <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-outline-primary">
+          Save & Next
+        </button>
+      </div>
     </form>
-  </div>
-  <div class="card-footer text-muted">
-    <button mat-button (click)="back()">Cancel</button>
-    <button mat-button (click)="submit()" (keyup.enter)="submit()">
-      {{ isEdit ? "Update" : "Create" }}
-    </button>
   </div>
 </div>
