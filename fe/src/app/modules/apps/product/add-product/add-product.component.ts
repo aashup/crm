@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -23,13 +23,9 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   clone: any;
   isEdit: boolean = false;
 
-  formsCount = 5;
-  account$: BehaviorSubject<ICreateAccount> =
-    new BehaviorSubject<ICreateAccount>(inits);
-  currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
-  isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-    false
-  );
+  @Input() product: ProductModel |  null;
+  @Input() next: () => void;
+
   private unsubscribe: Subscription[] = [];
 
   constructor(
@@ -42,7 +38,12 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.model =( new ProductModel()).clear();
+    if(this.product && this.product.id) {
+      this.isEdit = true;
+      this.model = this.product;
+    } else {
+      this.model = ( new ProductModel()).clear();
+    }
     this.initForm(this.model);
   }
 
@@ -75,7 +76,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
         this.commonService.toastr.success(
           this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
         );
-        this.commonService.location.back();
+        this.next();
       },
       error: (err) => this.commonService.handleError(err),
     });

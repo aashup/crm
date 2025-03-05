@@ -1,11 +1,21 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import _ from 'lodash';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, of, Subscription, switchMap } from 'rxjs';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
-import { ICreateAccount, inits } from 'src/app/modules/wizards/create-account.helper';
+import {
+  ICreateAccount,
+  inits,
+} from 'src/app/modules/wizards/create-account.helper';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
 
@@ -13,7 +23,7 @@ import { ProductService } from '../product.service';
   selector: 'app-stepper',
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   form: FormGroup;
@@ -30,6 +40,10 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   );
   private unsubscribe: Subscription[] = [];
 
+  product: ProductModel | null = null;
+  productId: number = 0;
+  loadCompleted = false;
+
   constructor(
     private fb: FormBuilder,
     private service: ProductService,
@@ -37,51 +51,34 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
     private commonService: CommonService,
     private router: Router,
     private ar: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    this.model =( new ProductModel()).clear();
-    this.initForm(this.model);
+  async ngOnInit(): Promise<void> {
+    this.productId = Number(this.ar.snapshot.paramMap.get('id'));
+    this.productId
+      ? this.loadProduct(this.productId)
+      : (this.loadCompleted = true);
   }
 
-  ngAfterViewInit(): void {
-
-  }
-
-  initForm(model: ProductModel) {
-    this.form = this.fb.group({
-      id: [this.model.id, []],
-      name: [this.model.name, [Validators.required]],
-      slug: [this.model.slug],
-      status: [this.model.status],
-    });
-    this.clone = this.form.value;
-  }
-
-  submit() {
-    this.commonService.markFormGroupTouched(this.form);
-    if (!this.form.valid) {
-      this.commonService.toastr.error('Please fix all errors.');
-      return;
-    }
-    if (_.isEqual(this.form.value, this.clone)) {
-      this.commonService.toastr.error('Nothing changed.');
-      return;
-    }
-    this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
-      complete: () => {
-        this.commonService.toastr.success(
-          this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
-        );
-        this.commonService.location.back();
+  loadProduct(productId: number) {
+    this.service.get({ id: productId }).subscribe({
+      next: ({ data }: any) => {
+        this.product = data;
+        this.cdr.markForCheck();
+        console.log(data);
+        this.loadCompleted = true;
       },
       error: (err) => this.commonService.handleError(err),
     });
   }
+
+  ngAfterViewInit(): void {}
+
+
   back() {
     return this.commonService.location.back();
   }
-
 
   updateAccount = (part: Partial<ICreateAccount>, isFormValid: boolean) => {
     const currentAccount = this.account$.value;

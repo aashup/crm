@@ -168,11 +168,15 @@
     >
       <div class="current">
         <ng-container *ngIf="currentStep$.value === 1">
-          <app-add-product></app-add-product>
+          <ng-container *ngIf="this.loadCompleted">
+            <app-add-product [product]="product" [next]="nextStep.bind(this)"></app-add-product>
+          </ng-container>
         </ng-container>
 
         <ng-container *ngIf="currentStep$.value === 2">
-          <app-product-unit></app-product-unit>
+          <ng-container *ngIf="this.loadCompleted">
+            <app-product-unit [product]="product" ></app-product-unit>
+          </ng-container>
         </ng-container>
 
         <ng-container *ngIf="currentStep$.value === 3"> step 3 </ng-container>

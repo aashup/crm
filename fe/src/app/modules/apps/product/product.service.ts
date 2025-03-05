@@ -20,6 +20,12 @@ readonly endpoint = 'product';
         })
     }
 
+    get(items: { id: any; }) {
+        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, {
+          params: HttpUtils.toHttpParams(items)
+      })
+    }
+
     update(items: { id: any; }) {
         return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items)
     }
