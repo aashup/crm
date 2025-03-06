@@ -62,7 +62,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   loadProduct(productId: number) {
-    this.service.get({ id: productId }).subscribe({
+    this.service.get({ id: productId, with: ['units'] }).subscribe({
       next: ({ data }: any) => {
         this.product = data;
         this.cdr.markForCheck();
@@ -74,7 +74,6 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {}
-
 
   back() {
     return this.commonService.location.back();

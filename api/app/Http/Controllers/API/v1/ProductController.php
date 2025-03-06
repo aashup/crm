@@ -71,6 +71,13 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $model = $product;
+        if($request->action == "add-unit") {
+            return $this->addUnit( $request, $product);
+        }
+        if($request->action == "load-units") {
+            $model->load('units.unit');
+            return BaseResponse::success($model->units);;
+        }
         $request->validate( $model->validationRule(), $model->validationMessage());
         $model->fill($request->all());
         $model->save();
@@ -78,6 +85,10 @@ class ProductController extends Controller
         return BaseResponse::success($model);
     }
 
+    private function addUnit(Request $request, Product $product) {
+        $data = $product->units()->create($request->data);
+        return BaseResponse::success($data);
+    }
     /**
      * Remove the specified resource from storage.
      *

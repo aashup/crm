@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { PageInfoService } from 'src/app/_metronic/layout';
 import { FormGroup } from '@angular/forms';
 import { Location } from '@angular/common';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,7 @@ export class CommonService {
     public page: PageInfoService,
     public app: ApplicationRef,
     public location: Location,
+    public loader: NgxSpinnerService
   ) {}
 
   public handleError(e: { status: number }) {

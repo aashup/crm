@@ -18,6 +18,7 @@ class Product extends Model
     ];
 
     protected $relations = [
+        'units'
     ];
 
     public function searchableColumns()
@@ -72,6 +73,10 @@ class Product extends Model
             'name' => 'Name is required field',
             'slug' => 'Contry is required field',
         ];
+    }
+
+    public function units() {
+        return $this->hasMany(ProductUnit::class, 'product_id');
     }
 
 }

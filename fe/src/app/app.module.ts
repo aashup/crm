@@ -18,6 +18,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { ToastrModule } from 'ngx-toastr';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_PAGINATOR_DEFAULT_OPTIONS } from '@angular/material/paginator';
+import { NgxSpinnerModule } from 'ngx-spinner';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -50,6 +51,7 @@ function appInitializer(authService: AuthService) {
     NgbModule,
     SweetAlert2Module.forRoot(),
     ToastrModule.forRoot(),
+    NgxSpinnerModule.forRoot()
   ],
   providers: [
     {

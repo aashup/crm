@@ -7,9 +7,10 @@ import { AddProductComponent } from './add-product/add-product.component';
 import { SharedModule } from 'src/app/_metronic/shared/shared.module';
 import { ProductUnitComponent } from './product-unit/product-unit.component';
 import { StepperComponent } from './stepper/stepper.component';
+import { AddProductUnitComponent } from './add-product-unit/add-product-unit.component';
 
 @NgModule({
-  declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent],
+  declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent, AddProductUnitComponent],
   imports: [
     CommonModule,
     SharedMaterialModuleModule,
