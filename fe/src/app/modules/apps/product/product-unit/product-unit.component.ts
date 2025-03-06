@@ -1,4 +1,12 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import _ from 'lodash';
@@ -10,23 +18,23 @@ import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { MatDialog } from '@angular/material/dialog';
 import { AddProductUnitComponent } from '../add-product-unit/add-product-unit.component';
 import { ProductUnitModel } from './product-unit.model';
+import { ProductUnitService } from './product-unit.service';
 
 @Component({
   selector: 'app-product-unit',
   templateUrl: './product-unit.component.html',
   styleUrl: './product-unit.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductUnitComponent implements OnInit, OnDestroy {
-
-  @Input() product: ProductModel |  null;
+  @Input() product: ProductModel;
   productUnits: ProductUnitModel[];
   private unsubscribe = new SubscriptionHandler();
   @Input() next: () => void;
   @Input() prev: () => void;
 
   constructor(
-    private service: ProductService,
+    private service: ProductUnitService,
     private find: FindService,
     private commonService: CommonService,
     private cdr: ChangeDetectorRef,
@@ -39,41 +47,46 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   }
 
   loadUnit() {
-    this.service.update({id: this.product?.id, action: 'load-units'}).subscribe({
+    this.service.find(this.product.id).subscribe({
       next: (resp: any) => {
         this.productUnits = resp.data;
         this.cdr.detectChanges();
       },
-      error: err => this.commonService.handleError(err)
-    })
+      error: (err) => this.commonService.handleError(err),
+    });
   }
 
   add() {
-   this.unsubscribe.subscribe = this.dialog.open(AddProductUnitComponent, {
-      data: {
-        product: this.product
-      }
-    }).afterClosed().subscribe(v => v)
+    this.unsubscribe.subscribe = this.dialog
+      .open(AddProductUnitComponent, {
+        data: {
+          product: this.product,
+        },
+      })
+      .afterClosed()
+      .subscribe((v) => v && this.loadUnit());
   }
 
   update() {
-    this.unsubscribe.subscribe = this.dialog.open(AddProductUnitComponent, {
-       data: {
-         product: this.product
-       }
-     }).afterClosed().subscribe(v => v)
-   }
+    this.unsubscribe.subscribe = this.dialog
+      .open(AddProductUnitComponent, {
+        data: {
+          product: this.product,
+        },
+      })
+      .afterClosed()
+      .subscribe((v) => v && this.loadUnit());
+  }
 
   delete(unit_id: number) {
-    this.service.update({
-      action: 'delete-unit',
-      id: this.product?.id,
-      unit_id: unit_id
-    })
+    this.service.delete(this.product.id, { id: unit_id }).subscribe({
+      complete: () =>
+        this.commonService.toastr.success('Unit has been detached.') && this.loadUnit(),
+      error: (err) => this.commonService.handleError(err),
+    });
   }
 
   ngOnDestroy() {
     this.unsubscribe.unsubscribe();
   }
-
 }

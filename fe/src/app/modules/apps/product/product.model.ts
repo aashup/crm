@@ -35,7 +35,7 @@ export class ContactModel {
   }
 }
 export class ProductModel {
-  id: number | null;
+  id: number;
   name: string;
   status: number;
   slug: string;

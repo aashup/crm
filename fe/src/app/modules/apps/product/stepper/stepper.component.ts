@@ -40,7 +40,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   );
   private unsubscribe: Subscription[] = [];
 
-  product: ProductModel | null = null;
+  product: ProductModel;
   productId: number = 0;
   loadCompleted = false;
 

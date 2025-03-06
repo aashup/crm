@@ -18,15 +18,8 @@ class ProductUnitController extends Controller
      */
     public function index(Request $request, Product $product)
     {
-        $pageSize = null;
-        if (intval($request->pageSize)) {
-            $pageSize = intval($request->get('pageSize', 1000));
-        }
-        $model = new ProductUnit();
-        $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
-            ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
-
-        return $model->paginate($pageSize, ['*'], 'page', $request->page);
+        $product->load('units.unit');
+        return BaseResponse::success($product->units);
     }
 
     /**
@@ -38,15 +31,7 @@ class ProductUnitController extends Controller
      */
     public function store(Request $request, Product $product)
     {
-        $model = new ProductUnit();
-        $request->validate( $model->validationRule(), $model->validationMessage());
-        $model->fill([
-            ...$request->all(),
-            'created_by' => Auth::id()
-        ]);
-        $model->save();
-
-        return BaseResponse::success($model);
+        return BaseResponse::success($product->units()->create($request->all()));
     }
 
     /**
@@ -86,8 +71,9 @@ class ProductUnitController extends Controller
      *
      * @throws
      */
-    public function destroy(ProductUnit $productUnit, Product $product)
+    public function destroy(Product $product, ProductUnit $productUnit)
     {
-        return BaseResponse::success($productUnit->delete());
+        abort_unless($product->id === $productUnit->product_id, 403);
+        return $productUnit->delete() ? BaseResponse::success('deleted'): BaseResponse::error('failed.');
     }
 }

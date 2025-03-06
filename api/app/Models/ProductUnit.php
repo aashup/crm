@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductUnit extends Model
 {
-    use SoftDeletes;
     protected $table = 'product_has_unit';
 
     protected $fillable = [

@@ -28,7 +28,7 @@
           <td scope="row">{{ item.status ? 'Active' : 'In-Active' }}</td>
           <td scope="row">{{ item.notes }}</td>
           <td>
-            <button mat-icon-button class="text-danger" (click)="delete(1)">
+            <button mat-icon-button class="text-danger" (click)="delete(item.id)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

@@ -11,6 +11,7 @@ import { ProductService } from '../product.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { take } from 'rxjs';
 import { UnitModel } from 'src/app/modules/settings/unit/unit.model';
+import { ProductUnitService } from '../product-unit/product-unit.service';
 
 @Component({
   selector: 'app-add-product-unit',
@@ -32,7 +33,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private service: ProductService,
+    private service: ProductUnitService,
     private find: FindService,
     private commonService: CommonService,
     private us: UnitService,
@@ -73,11 +74,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    this.service.update({
-      id: this.data.product.id,
-      action: 'add-unit',
-      data: this.form.value
-    }).subscribe({
+    this.service.create(this.data.product.id, this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success("Unit has been added.");
         this.dialogRef.close(true);
