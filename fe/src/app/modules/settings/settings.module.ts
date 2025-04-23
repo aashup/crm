@@ -27,6 +27,11 @@ export const routes: Routes = [
     path: 'unit',
     loadChildren: () => import('./unit/unit.module').then((m) => m.UnitModule),
   },
+  {
+    path: 'contact',
+    loadChildren: () => import('./contact/contact.module').then((m) => m.ContactModule),
+  },
+
   { path: '**', redirectTo: 'setting/city' },
 ];
 
