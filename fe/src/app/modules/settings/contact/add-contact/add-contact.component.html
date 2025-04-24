@@ -18,14 +18,13 @@
             </mat-form-field>
           </div>
 
-          <!-- Mobile 1 Input -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Enter Mobile 1</mat-label>
               <input
                 matInput
                 placeholder="Enter Mobile 1"
-                formControlName="mobile1"
+                formControlName="mob1"
                 maxlength="15"
               />
               <mat-error>Mobile 1 is <strong>required</strong></mat-error>
@@ -39,7 +38,7 @@
               <input
                 matInput
                 placeholder="Enter Mobile 2"
-                formControlName="mobile2"
+                formControlName="mob2"
                 maxlength="15"
               />
               <mat-error>Mobile 2 is optional</mat-error>
@@ -51,8 +50,8 @@
             <mat-form-field class="w-100">
               <mat-label>Status</mat-label>
               <mat-select placeholder="Select Status" formControlName="status">
-                <mat-option value="active">Active</mat-option>
-                <mat-option value="inactive">Inactive</mat-option>
+                <mat-option [value]="1">Active</mat-option>
+                <mat-option [value]="0">Inactive</mat-option>
               </mat-select>
               <mat-error>Status is <strong>required</strong></mat-error>
             </mat-form-field>

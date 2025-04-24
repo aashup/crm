@@ -7,6 +7,7 @@ import { FindService } from 'src/app/modules/core/find.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import _, { take } from 'lodash';
 
+
 @Component({
   selector: 'app-add-contact',
   standalone: false,
@@ -15,6 +16,7 @@ import _, { take } from 'lodash';
 })
 
 export class AddContactComponent {
+  
 form: FormGroup;
   model: ContactModel;
   clone: any;
@@ -54,9 +56,23 @@ form: FormGroup;
             Validators.maxLength(200),
           ],
         ],
+        mob1: [
+          model.mob1,
+          [
+            Validators.required,
+            Validators.minLength(10),
+            Validators.maxLength(15),
+          ],
+        ],
+        mob2: [
+          model.mob2,
+          [
+            Validators.minLength(10),
+            Validators.maxLength(15),   
+          ],
+
+        ],
         status: [model.status, [Validators.required]],
-        country_id: [model.id],
-       
       });
       this.clone = this.form.value;
     }
