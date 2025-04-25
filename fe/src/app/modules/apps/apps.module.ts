@@ -15,6 +15,11 @@ import { RouterModule } from '@angular/router';
         // data: { layout: 'light-sidebar' },
       },
       {
+        path: 'usermanagement',
+        loadChildren: () => import('../usermanagement/usermanagement.module').then((m) => m.UserManagementModule),
+        // data: { layout: 'light-sidebar' },
+      },
+      {
         path: 'product',
         loadChildren: () => import('./product/product.module').then((m) => m.ProductModule),
         // data: { layout: 'light-sidebar' },
