@@ -9,6 +9,7 @@ use App\Models\PasswordReset;
 use App\Models\PasswordResetToken;
 use App\Models\Role;
 use App\Models\User;
+use App\Repository\MenuRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -43,10 +44,10 @@ class AuthController extends Controller
         $data = [
             'access_token' => $user->createToken('access_token', ['*'])->accessToken,
             'user' => $user,
-            // 'permissions' => $user->getAllPermissions()->pluck('name'),
-            // 'menus' => Cache::remember('cache_menus', 60 * 60, function () use ($user) {
-            //     return (new MenuRepository())->getMenu($user);
-            // }),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'menus' => Cache::remember('cache_menus', 60 * 60, function () use ($user) {
+                return (new MenuRepository())->getMenu($user);
+            }),
         ];
         return $data;
     }

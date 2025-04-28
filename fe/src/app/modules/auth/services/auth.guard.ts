@@ -1,20 +1,43 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { AuthService } from './auth.service';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
+import { TokenStorageService } from '../../core/token-storage.service';
 
 @Injectable({ providedIn: 'root' })
-export class AuthGuard  {
-  constructor(private authService: AuthService) {}
+export class AuthGuard {
+  constructor(
+    private tokenStorageService: TokenStorageService,
+    private router: Router
+  ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const currentUser = this.authService.currentUserValue;
-    if (currentUser) {
-      // logged in so return true
-      return true;
+  private navigateToLogin(state: RouterStateSnapshot): void {
+    this.router.navigate(['/auth/login'], {
+      queryParams: { forwardUrl: state.url, ...state.root.queryParams },
+    });
+  }
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    const isLoggedIn = this.tokenStorageService.isAuth;
+    if (!isLoggedIn) {
+      this.navigateToLogin(state);
     }
+    return isLoggedIn;
+  }
 
-    // not logged in so redirect to login page with the return url
-    this.authService.logout();
-    return false;
+  canActivateChild(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    const isLoggedIn = this.tokenStorageService.isAuth;
+    if (!isLoggedIn) {
+      this.navigateToLogin(state);
+    }
+    return isLoggedIn;
   }
 }

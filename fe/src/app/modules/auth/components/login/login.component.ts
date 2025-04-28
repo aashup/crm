@@ -15,8 +15,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class LoginComponent implements OnInit, OnDestroy {
   // KeenThemes mock, change it to:
   defaultAuth: any = {
-    email: 'admin@demo.com',
-    password: 'demo',
+    email: 'vijay@xtrox.com',
+    password: 'Vijay@123',
   };
   loginForm: FormGroup;
   hasError: boolean;
@@ -34,9 +34,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {
     this.isLoading$ = this.authService.isLoading$;
     // redirect to home if already logged in
-    if (this.authService.currentUserValue) {
-      this.router.navigate(['/']);
-    }
+    // if (this.authService.currentUserValue) {
+    //   this.router.navigate(['/']);
+    // }
   }
 
   ngOnInit(): void {
@@ -77,13 +77,20 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.hasError = false;
     const loginSubscr = this.authService
       .login(this.f.email.value, this.f.password.value)
-      .pipe(first())
-      .subscribe((user: UserModel | undefined) => {
-        if (user) {
-          this.router.navigate([this.returnUrl]);
-        } else {
-          this.hasError = true;
-        }
+      .subscribe({
+        next : (data) => {
+          // if (this.form.remember_me) {
+          //   // this.storage.setItem('loginCredentials', this.form.value)
+          // } else {
+          //   // this.storage.removeItem('loginCredentials')
+          // }
+          this.router.navigate(['/app']);
+        },
+        error : (e) => {
+          
+        },
+        complete : () => {}
+
       });
     this.unsubscribe.push(loginSubscr);
   }
