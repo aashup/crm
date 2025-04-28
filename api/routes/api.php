@@ -13,6 +13,7 @@ Route::prefix('v1')->group(function () {
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('auth:api')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
         Route::get('find/{type}', ['App\Http\Controllers\API\v1\FindController', 'handler']);
         Route::apiResource('country', 'App\Http\Controllers\API\v1\CountryController');
         Route::apiResource('state', 'App\Http\Controllers\API\v1\StateController');
