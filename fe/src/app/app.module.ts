@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { ClipboardModule } from 'ngx-clipboard';
 import { TranslateModule } from '@ngx-translate/core';
@@ -19,6 +19,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_PAGINATOR_DEFAULT_OPTIONS } from '@angular/material/paginator';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { TokenInterceptor } from './modules/core/token.interceptor';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -71,6 +72,11 @@ function appInitializer(authService: AuthService) {
         showFirstLastButtons: true,
         pageSize: 20
        },
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true,
     },
     provideAnimationsAsync(),
   ],

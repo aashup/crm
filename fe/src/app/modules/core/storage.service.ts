@@ -1,31 +1,41 @@
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
-    disk = 'localStorage';
+  private storage: Storage;
 
-    setItem(name: string, payload: any): void {
-        if (_.isString(payload)) {
-            window[this.disk].setItem(name, payload);
-        } else {
-            window[this.disk].setItem(name, JSON.stringify(payload))
-        }
-    }
+  constructor() {
+    this.storage = window.localStorage;
+  }
 
-    getItem(name: string, parse: boolean = true) {
-        if (parse) {
-            try {
-                return JSON.parse(window[this.disk].getItem(name))
-            } catch (error) {
-                return false;
-            }
-        } else {
-            return window[this.disk].getItem(name)
-        }
+  setItem(key: string, value: unknown): void {
+    try {
+      const data = typeof value === 'string' ? value : JSON.stringify(value);
+      this.storage.setItem(key, data);
+    } catch (error) {
+      console.error(`Failed to set item "${key}" in storage:`, error);
     }
+  }
 
-    removeItem(name: string) {
-        return window[this.disk].removeItem(name)
+  getItem<T = unknown>(key: string, parseJson = true): T | string | null {
+    try {
+      const item = this.storage.getItem(key);
+      if (item === null) return null;
+      return parseJson ? (JSON.parse(item) as T) : item;
+    } catch (error) {
+      console.error(
+        `Failed to get or parse item "${key}" from storage:`,
+        error
+      );
+      return null;
     }
+  }
+
+  removeItem(key: string): void {
+    try {
+      this.storage.removeItem(key);
+    } catch (error) {
+      console.error(`Failed to remove item "${key}" from storage:`, error);
+    }
+  }
 }
