@@ -99,20 +99,20 @@ export class AuthService implements OnDestroy {
   }
 
   // need create new user then login
-  registration(user: UserModel): Observable<any> {
-    this.isLoadingSubject.next(true);
-    return this.authHttpService.createUser(user).pipe(
-      map(() => {
-        this.isLoadingSubject.next(false);
-      }),
-      switchMap(() => this.login(user.email, user.password)),
-      catchError((err) => {
-        console.error('err', err);
-        return of(undefined);
-      }),
-      finalize(() => this.isLoadingSubject.next(false))
-    );
-  }
+registration(user: UserModel): Observable<any> {  
+  this.isLoadingSubject.next(true);
+  return this.http.post(`${environment.API_ENDPOINT}/register`, user).pipe(
+    tap((data: any) => {
+      console.log('Registration successful:', data);
+    }),
+    switchMap(() => this.login(user.email, user.password)), // Optional: If you still want to log in after registration
+    catchError((err) => {
+      console.error('Registration error:', err);
+      return of(undefined);
+    }),
+    finalize(() => this.isLoadingSubject.next(false))
+  );
+}
 
   forgotPassword(email: string): Observable<boolean> {
     this.isLoadingSubject.next(true);
