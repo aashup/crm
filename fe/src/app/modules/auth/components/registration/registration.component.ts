@@ -45,7 +45,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   initForm() {
     this.registrationForm = this.fb.group(
       {
-        fullname: [
+        name: [
           '',
           Validators.compose([
             Validators.required,
@@ -70,7 +70,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             Validators.maxLength(100),
           ]),
         ],
-        cPassword: [
+        cpassword: [
           '',
           Validators.compose([
             Validators.required,
@@ -94,6 +94,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     Object.keys(this.f).forEach((key) => {
       result[key] = this.f[key].value;
     });
+    result['cpassword'] = this.f['cpassword'].value;
     const newUser = new UserModel();
     newUser.setUser(result);
     const registrationSubscr = this.authService
