@@ -72,10 +72,27 @@ export class AuthService implements OnDestroy {
   }
 
   logout() {
-    localStorage.removeItem(this.authLocalStorageToken);
-    this.router.navigate(['/auth/login'], {
-      queryParams: {},
-    });
+    console.log("logout");
+    
+    this.isLoadingSubject.next(true); // Optional: Show a loading indicator during logout
+    this.http.post(`${environment.API_ENDPOINT}/logout`, {}).pipe(
+      tap(() => {
+        // Clear local storage and other user data
+        localStorage.removeItem(this.authLocalStorageToken);
+        this.currentUserSubject.next(undefined);
+      }),
+      finalize(() => {
+        this.isLoadingSubject.next(false); // Stop the loading indicator
+        // Redirect to the login page
+        this.router.navigate(['/auth/login'], {
+          queryParams: {},
+        });
+      }),
+      catchError((err) => {
+        console.error('Logout error:', err);
+        return of(undefined); // Handle errors gracefully
+      })
+    ).subscribe();
   }
 
   getUserByToken(): Observable<UserType> {

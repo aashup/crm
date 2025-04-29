@@ -1,5 +1,5 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
 
@@ -24,13 +24,15 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.user$ = this.auth.currentUserSubject.asObservable();
+    this.user$  = of(JSON.parse(localStorage.getItem("user-data") ?? '{}')?.user);
+    console.log(this.user$);
+  
     this.setLanguage(this.translationService.getSelectedLanguage());
   }
 
   logout() {
     this.auth.logout();
-    document.location.reload();
+    // document.location.reload();
   }
 
   selectLanguage(lang: string) {

@@ -84,7 +84,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           // } else {
           //   // this.storage.removeItem('loginCredentials')
           // }
-          this.router.navigate(['/app']);
+          this.router.navigate(['/']);
         },
         error : (e) => {
           
