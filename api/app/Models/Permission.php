@@ -2,37 +2,28 @@
 
 namespace App\Models;
 
+use App\Traits\BaseModelTrait;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
-class Permission extends Model
+
+class Permission extends SpatiePermission
 {
-    protected $table = 'permissions';
+    use BaseModelTrait;
 
-    protected $fillable = [
-        'name',
-        'slug',
-        'status',
-    ];
-
-    protected $relations = [
-       
-    ];
-
-    public function searchableColumns()
-    {
-        return [
-            'name',
-            'status',
-        ];
-    }
+    protected $relations = ['menu'];
+    protected $with = ['menu'];
 
     public function getAllColumns()
     {
-        return [
+        return ([
             'id' => 'int',
-            'name' => 'string',
-            'slug' => 'string',
-            'status' => 'int',
-        ];
+            'name' => 'text',
+            'description' => 'text',
+            'guard_name' => 'text',
+            'menu_id' => 'int',
+            'created_at' => 'date',
+            'updated_at' => 'date',
+        ]);
     }
 
     public function getDefaultColumns()
@@ -40,25 +31,25 @@ class Permission extends Model
         return [
             'id',
             'name',
-            'slug',
-            'status',
+            'description',
+            'guard_name',
+            'menu_id',
+            'created_at',
+            'updated_at',
         ];
     }
 
-    public function validationRule()
+    public function searchableColumns()
     {
         return [
-            'name' => 'required',
-            'slug' => 'required',
+            'name',
+            'description',
+            'guard_name'
         ];
     }
 
-    public function validationMessage()
+    public function menu()
     {
-        return [
-            'name' => 'Name is required field',
-            'slug' => 'Slug is required field',
-        ];
+        return $this->belongsTo(Menu::class, 'menu_id', 'id');
     }
-
 }

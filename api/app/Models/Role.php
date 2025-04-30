@@ -2,36 +2,33 @@
 
 namespace App\Models;
 
+use App\Traits\BaseModelTrait;
+use Spatie\Permission\Models\Role as SpatieRole;
 
 
-class Role extends Model
+
+class Role extends SpatieRole
 {
+    use BaseModelTrait;
+
+
+    protected $relations = ['permissions'];
+
     protected $fillable = [
         'name',
+        'guard_name',
         'status',
     ];
 
-    protected $relations = [
-
-    ];
-
-    public function searchableColumns()
-    {
-        return [
-            'name',
-            'status',
-        ];
-    }
-
     public function getAllColumns()
     {
-        return [
+        return ([
             'id' => 'int',
             'name' => 'text',
-            'status' => 'int',
-            'created_at' => 'text',
-            'updated_at' => 'text',
-        ];
+            'guard_name' => 'text',
+            'created_at' => 'date',
+            'updated_at' => 'date',
+        ]);
     }
 
     public function getDefaultColumns()
@@ -39,9 +36,16 @@ class Role extends Model
         return [
             'id',
             'name',
-            'status',
-            'created_at',
-            'updated_at',
+            'guard_name',
+            'created_at'
+        ];
+    }
+
+    public function searchableColumns()
+    {
+        return [
+            'name',
+            'guard_name'
         ];
     }
 }

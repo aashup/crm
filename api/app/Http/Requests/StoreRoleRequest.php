@@ -23,7 +23,7 @@ class StoreRoleRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'status' => 'required|integer',
+            'guard_name' => 'required|in:api,web',
         ];
     }
 
