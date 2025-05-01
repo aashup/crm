@@ -11,7 +11,14 @@ class Permission extends SpatiePermission
     use BaseModelTrait;
 
     protected $relations = ['menu'];
-    protected $with = ['menu'];
+    protected $with = [];
+
+    protected $fillable = [
+        'name',
+        'description',
+        'guard_name',
+        'menu_id',
+    ];
 
     public function getAllColumns()
     {

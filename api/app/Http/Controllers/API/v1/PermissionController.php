@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\API\v1;
 
-use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePermissionRequest;
+use App\Http\Requests\UpdatePermissionRequest;
+use App\Models\Menu;
 use App\Models\Permission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PermissionController extends Controller
 {
@@ -34,14 +37,17 @@ class PermissionController extends Controller
      *
      * @throws
      */
-    public function store(Request $request)
+    public function store(StorePermissionRequest $request)
     {
         $model = new Permission();
-        $request->validate( $model->validationRule(), $model->validationMessage());
+        $menu = Menu::find($request->menu_id);
+        $request->merge([
+            'name' => Str::slug("{$menu->name} {$request->description}", '.'),
+        ]);
         $model->fill($request->all());
         $model->save();
 
-        return BaseResponse::success($model);
+        return $this->success("Permission created successfully!", $model);
     }
 
     /**
@@ -53,7 +59,7 @@ class PermissionController extends Controller
     {
         $permission->load($permission->getWith($request->with));
 
-        return BaseResponse::success($permission);
+        return $this->success("", $permission);
     }
 
     /**
@@ -64,14 +70,19 @@ class PermissionController extends Controller
      *
      * @throws
      */
-    public function update(Request $request, Permission $permission)
+    public function update(UpdatePermissionRequest $request, Permission $permission)
     {
         $model = $permission;
-        $request->validate( $model->validationRule(), $model->validationMessage());
+        if ($permission->menu_id != $request->menu_id || $permission->description != $request->description) {
+            $menu = Menu::find($request->menu_id);
+            $request->merge([
+                'name' => Str::slug("{$menu->name} {$request->description}", '.'),
+            ]);
+        }
         $model->fill($request->all());
         $model->save();
 
-        return BaseResponse::success($model);
+        return $this->success("Permission updated successfully!", $model);
     }
 
     /**
@@ -83,6 +94,6 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
-        return BaseResponse::success($permission->delete());
+        return $this->success("Permission deleted successfully!", $permission->delete());
     }
 }

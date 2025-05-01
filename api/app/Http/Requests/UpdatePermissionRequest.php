@@ -11,7 +11,7 @@ class UpdatePermissionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdatePermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'description' => 'required|string|max:255',
+            'guard_name' => 'required|in:api,web',
+            'menu_id' => 'required|integer|exists:menus,id',
         ];
     }
 }

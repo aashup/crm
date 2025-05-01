@@ -25,6 +25,7 @@ class Role extends SpatieRole
         return ([
             'id' => 'int',
             'name' => 'text',
+            'status' => 'text',
             'guard_name' => 'text',
             'created_at' => 'date',
             'updated_at' => 'date',
@@ -36,6 +37,7 @@ class Role extends SpatieRole
         return [
             'id',
             'name',
+            'status',
             'guard_name',
             'created_at'
         ];
@@ -45,6 +47,7 @@ class Role extends SpatieRole
     {
         return [
             'name',
+            'status',
             'guard_name'
         ];
     }
