@@ -1,0 +1,23 @@
+.change-password-btn {
+    padding: 0;
+    color: #1a73e8;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .change-password-btn:hover {
+    text-decoration: none;
+    color: #174ea6;
+  }
+  
+  .arrow-icon {
+    font-size: 14px; 
+    position: relative;
+    top: 1px; 
+    color: blue;
+  }
+  

@@ -176,10 +176,12 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
         data: {
           model: item,
           isEdit: true,
+          isPasswordChanged: true,
         },
       })
       .afterClosed()
       .pipe(take(1))
       .subscribe((flag) => flag && this.loadData());
   }
+ 
 }

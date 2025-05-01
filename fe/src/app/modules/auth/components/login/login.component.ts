@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     standalone: false
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  // KeenThemes mock, change it to:
+
   defaultAuth: any = {
     email: 'vijay@xtrox.com',
     password: 'Vijay@123',
@@ -23,8 +23,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   returnUrl: string;
   isLoading$: Observable<boolean>;
 
-  // private fields
-  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
+  private unsubscribe: Subscription[] = []; 
 
   constructor(
     private fb: FormBuilder,
@@ -84,7 +83,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           // } else {
           //   // this.storage.removeItem('loginCredentials')
           // }
-          this.router.navigate(['/app']);
+          this.router.navigate(['/']);
         },
         error : (e) => {
           
