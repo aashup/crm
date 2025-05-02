@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { HttpUtils } from "./http-util";
+import { Observable } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,10 @@ export class FindService {
       return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/contact-types`, {
           params: HttpUtils.toHttpParams(params)
       })
+  }
+
+  getRoles(): Observable<any> {
+    return this.http.get(`${environment.API_ENDPOINT}/role`);
   }
 
   findPremise(params = {}) {
