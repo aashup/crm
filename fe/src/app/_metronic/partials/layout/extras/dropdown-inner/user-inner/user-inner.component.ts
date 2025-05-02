@@ -1,42 +1,63 @@
-import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Observable, of, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
+import { TokenStorageService } from 'src/app/modules/core/token-storage.service';
+import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
+import { SnackBarService } from 'src/app/modules/core/snack-bar.service';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-user-inner',
-    templateUrl: './user-inner.component.html',
-    standalone: false
+  selector: 'app-user-inner',
+  templateUrl: './user-inner.component.html',
+  styleUrls: ['./user-inner.component.scss'],
+  standalone: false,
 })
 export class UserInnerComponent implements OnInit, OnDestroy {
   @HostBinding('class')
-  class = `menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px`;
+  class =
+    `menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px`;
   @HostBinding('attr.data-kt-menu') dataKtMenu = 'true';
 
   language: LanguageFlag;
   user$: Observable<UserType>;
   langs = languages;
-  private unsubscribe: Subscription[] = [];
+  subscriptionHandler = new SubscriptionHandler();
 
   constructor(
     private auth: AuthService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private tokenService: TokenStorageService,
+    private toast: ToastrService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.user$ = of(JSON.parse(localStorage.getItem("user-data") ?? '{}')?.user);;
+    this.subscriptionHandler.subscribe = this.tokenService.userUpdated$.subscribe((user) => {
+      this.user$ = of(user);
+    });
     this.setLanguage(this.translationService.getSelectedLanguage());
   }
 
   logout() {
-    this.auth.logout();
-   
+    this.auth.logout(this.user$).subscribe({
+      next: () => {
+        this.tokenService.clearToken();
+        this.toast.success('Logout Successfully.');
+        this.router.navigateByUrl('auth/login');
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Logout error', err);
+      },
+    });
   }
 
   selectLanguage(lang: string) {
     this.translationService.setLanguage(lang);
     this.setLanguage(lang);
-    // document.location.reload();
   }
 
   setLanguage(lang: string) {
@@ -51,7 +72,7 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+    this.subscriptionHandler.unsubscribe();
   }
 }
 

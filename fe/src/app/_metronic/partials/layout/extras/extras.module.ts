@@ -11,6 +11,7 @@ import {SearchResultInnerComponent} from "./dropdown-inner/search-result-inner/s
 import {NgbTooltipModule} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import { SharedModule } from "../../../shared/shared.module";
+import { FirstLetterPipe } from 'src/app/modules/core/pipes/first-letter.pipe';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { SharedModule } from "../../../shared/shared.module";
     SearchResultInnerComponent,
     UserInnerComponent,
     LayoutScrollTopComponent,
+    FirstLetterPipe
   ],
   imports: [
     CommonModule,
@@ -35,6 +37,7 @@ import { SharedModule } from "../../../shared/shared.module";
     SearchResultInnerComponent,
     UserInnerComponent,
     LayoutScrollTopComponent,
+    FirstLetterPipe
   ],
 })
 export class ExtrasModule {
