@@ -20,6 +20,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_PAGINATOR_DEFAULT_OPTIONS } from '@angular/material/paginator';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { TokenInterceptor } from './modules/core/token.interceptor';
+import { DatePipe } from '@angular/common';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -52,9 +53,10 @@ function appInitializer(authService: AuthService) {
     NgbModule,
     SweetAlert2Module.forRoot(),
     ToastrModule.forRoot(),
-    NgxSpinnerModule.forRoot()
+    NgxSpinnerModule.forRoot(),
   ],
   providers: [
+    DatePipe,
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,
@@ -70,8 +72,8 @@ function appInitializer(authService: AuthService) {
       useValue: {
         pageSizeOptions: [5, 10, 20, 50, 100],
         showFirstLastButtons: true,
-        pageSize: 20
-       },
+        pageSize: 20,
+      },
     },
     {
       provide: HTTP_INTERCEPTORS,

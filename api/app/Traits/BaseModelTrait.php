@@ -4,7 +4,8 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
 
-trait BaseModelTrait {
+trait BaseModelTrait
+{
     protected $queryBuilder = null;
 
     public function getAllColumns()
@@ -40,32 +41,49 @@ trait BaseModelTrait {
     public function applyFilter($filter)
     {
         $decodedData = json_decode($filter, 1);
-        if (!empty($decodedData) && is_array($decodedData)) {
+        if (! empty($decodedData) && is_array($decodedData)) {
             $decodedData = collect($decodedData);
 
             $bulder = $this->queryBuilder ?? $this;
-            if (!empty($decodedData['all'])) {
+            if (! empty($decodedData['all'])) {
                 $bulder = $bulder->where(function ($q) use ($decodedData) {
                     $fuzzySearchCols = implode('`,`', $this->searchableColumns());
-                    $fuzzySearch = implode("%", explode(" ", $decodedData['all']));
+                    $fuzzySearch = implode('%', explode(' ', $decodedData['all']));
                     $q = $q->where(DB::raw("CONCAT_WS('',`$fuzzySearchCols`)"), 'like', "%{$fuzzySearch}%");
+
                     return $q;
                 });
                 unset($decodedData['all']);
             }
+
             $allCols = $this->getAllColumns();
             foreach ($decodedData as $key => $value) {
-                if ((!empty($value) || $value === 0 || $value === "0") && isset($allCols[$key])) {
+                if ((! empty($value) || $value === 0 || $value === '0') && isset($allCols[$key])) {
                     if ($allCols[$key] == 'text') {
-                        $bulder = $bulder->where($key, 'like', strlen($value) > 3 ? "%$value%" : "$value%");
+                        $bulder = $bulder->where(function ($q) use ($value, $key) {
+                            $q->where($this->getTable() . '.' . $key, 'like', "$value %")
+                                ->orWhere($this->getTable() . '.' . $key, 'like', "$value%")
+                                ->orWhere($this->getTable() . '.' . $key, 'like', "%$value%")
+                                ->orWhere($this->getTable() . '.' . $key, 'like', "%$value");
+                        });
+                        $bulder->orders = null;
+                        $bulder->orderByRaw("case
+                                                when IFNULL({$this->getTable()}.{$key},\"\") like ? then 1
+                                                when IFNULL({$this->getTable()}.{$key},\"\") like ? then 2
+                                                when IFNULL({$this->getTable()}.{$key},\"\") like ? then 3
+                                                when IFNULL({$this->getTable()}.{$key},\"\") like ? then 4
+                                                else 5 end", ['{$value} %', '{$value}%', '%{$value}%', '%{$value}']);
+                    } elseif ($allCols[$key] == 'array') {
+                        $bulder = $bulder->whereIn($this->getTable() . '.' . $key, $value);
                     } else {
-                        $bulder = $bulder->where($key, $value);
+                        $bulder = $bulder->where($this->getTable() . '.' . $key, $value);
                     }
                 }
             }
 
             $this->queryBuilder = $bulder;
         }
+
         return $this;
     }
 

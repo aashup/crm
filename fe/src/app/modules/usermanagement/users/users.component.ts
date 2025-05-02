@@ -1,27 +1,36 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { SubscriptionHandler } from "../../core/subscription.handler";
-import { SelectionModel } from "@angular/cdk/collections";
-import { MatDialog } from "@angular/material/dialog";
-import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { CommonService } from "../../core/common.service";
-import _, { merge } from "lodash";
-import { take, tap } from "rxjs";
-import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
-import {  UsersDatasource } from "./users.datasource";
-import {  UsersModel } from "./users.model";
-import { UsersService } from "./users.service";
-import { AddUsersComponent } from "./add-users/add-users.component";
-
-
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { SubscriptionHandler } from '../../core/subscription.handler';
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { CommonService } from '../../core/common.service';
+import _, { merge } from 'lodash';
+import { debounceTime, distinctUntilChanged, fromEvent, take, tap } from 'rxjs';
+import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
+import { UsersDatasource } from './users.datasource';
+import { UsersModel } from './users.model';
+import { UsersService } from './users.service';
+import { AddUsersComponent } from './add-users/add-users.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
-    selector: 'app-users',
-    templateUrl: './users.component.html',
-   
-    styleUrl: './users.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-users',
+  templateUrl: './users.component.html',
+
+  styleUrl: './users.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
@@ -31,7 +40,8 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
 
   filter: any = {};
-  displayableCol = ['select', 'id', 'name',"email",'status','created_at','roles','action'];
+  search: any = { all: '' };
+  displayableCol = ['select', 'id', 'name', 'email', 'status', 'created_at', 'roles', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
@@ -48,48 +58,42 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       ref: 'roles',
       name: 'Roles',
-      mutator: (row: any) =>
-        Array.isArray(row.roles)
-          ? row.roles.map((r: any) => r.name).join(', ')
-          : '—',
+      mutator: (row: any) => (Array.isArray(row.roles) ? row.roles.map((r: any) => r.name).join(', ') : '—'),
     },
-   
+
     {
       ref: 'status',
       name: 'Status',
       doNotSort: false,
-      mutator: (row: any) => (row.status === 1 ? 'Active' : 'Inactive'),
+      mutator: (row: UsersModel) => (row.status === 1 ? 'Active' : 'Inactive'),
     },
     {
-      ref:"email"   ,
-      name:"Email",
+      ref: 'email',
+      name: 'Email',
     },
     {
       ref: 'created_at',
       name: 'Created At',
-      mutator: (item: any) => item?.created_at,
+      mutator: (row: UsersModel) => this.datePipe.transform(row.created_at, 'mediumDate'),
     },
-   
+
     { ref: 'action', name: 'Actions' },
   ];
 
   constructor(
     private cdr: ChangeDetectorRef,
     private service: UsersService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private datePipe: DatePipe
   ) {
     this.dataSource = new UsersDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
     this.commonService.page.updateTitle('Users List');
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
-      () => (this.paginator.pageIndex = 0)
-    );
-    this.subscriptionHandler.subscribe = merge(
-      this.sort.sortChange,
-      this.paginator.page
-    )
+
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
       .pipe(
         tap(() => {
           this.loadData();
@@ -101,37 +105,39 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
   ngAfterViewInit(): void {
-    // throw new Error('Method not implemented.');
+    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.search.all = this.searchElementRef.nativeElement.value;
+          this.loadData();
+        })
+      )
+      .subscribe();
   }
 
   loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
     this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize;
-    // this.filter.filter = JSON.stringify(this.search);
-    this.filter.with = ['roles', 'status','created_at'];
-    this.dataSource.find(this.filter);
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.with = ['roles'];
+    this.dataSource.find(_.pickBy(this.filter));
   }
 
   masterToggle() {
-    if (
-      this.selection.selected.length ===
-      this.dataSource.originalData.data.length
-    ) {
+    if (this.selection.selected.length === this.dataSource.originalData.data.length) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: UsersModel) =>
-        this.selection.select(row)
-      );
+      this.dataSource.originalData.data.forEach((row: UsersModel) => this.selection.select(row));
     }
   }
 
   isAllSelected(): boolean {
-    return (
-      this.dataSource.originalData.data.length ===
-      this.selection.selected.length
-    );
+    return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
 
   delete(item: UsersModel) {
@@ -144,6 +150,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((res) => {
         if (res) {
           this.service.delete(item).subscribe({
@@ -183,5 +190,4 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(take(1))
       .subscribe((flag) => flag && this.loadData());
   }
- 
 }
