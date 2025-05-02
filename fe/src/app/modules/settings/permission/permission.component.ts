@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import _ from 'lodash';
-import { merge, tap, take } from 'rxjs';
+import { merge, tap, take, debounceTime, distinctUntilChanged, fromEvent } from 'rxjs';
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
@@ -25,7 +25,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<PermissionModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-
+  search: any = { all: '' };
   filter: any = {};
   displayableCol = ['select', 'id', 'name', 'slug', 'status', 'action'];
 
@@ -74,19 +74,29 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
   ngAfterViewInit(): void {
-    // throw new Error('Method not implemented.');
-  }
-
-  loadData() {
-    this.filter.orderField = this.sort.active;
-    this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize;
-    // this.filter.filter = JSON.stringify(this.search);
-    this.filter.with = ['parent'];
-    this.dataSource.find(this.filter);
-  }
-
+      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+        .pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          tap(() => {
+            this.paginator.pageIndex = 0;
+            this.search.all = this.searchElementRef.nativeElement.value;
+            this.loadData();
+          })
+        )
+        .subscribe();
+    }
+  
+    loadData() {
+      this.filter.orderField = this.sort.active;
+      this.filter.orderBy = this.sort.direction;
+      this.filter.page = this.paginator.pageIndex + 1;
+      this.filter.pageSize = this.paginator.pageSize || 20;
+      this.filter.filter = JSON.stringify(_.pickBy(this.search));
+      this.filter.with = ['roles'];
+      this.dataSource.find(_.pickBy(this.filter));
+    }
+  
   masterToggle() {
     if (
       this.selection.selected.length ===

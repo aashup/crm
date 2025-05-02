@@ -20,7 +20,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
-import { merge, take, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ContactDatasource } from './contact.datasource';
 import { ContactService } from './contact.service';
@@ -40,7 +40,7 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<ContactModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-
+  search: any = { all: '' };
   filter: any = {};
   displayableCol = ['select', 'id', 'name', 'mob1', 'mob2', 'status', 'action'];
 
@@ -98,18 +98,28 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
-  ngAfterViewInit(): void {
-    // throw new Error('Method not implemented.');
-  }
+   ngAfterViewInit(): void {
+     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+       .pipe(
+         debounceTime(500),
+         distinctUntilChanged(),
+         tap(() => {
+           this.paginator.pageIndex = 0;
+           this.search.all = this.searchElementRef.nativeElement.value;
+           this.loadData();
+         })
+       )
+       .subscribe();
+   }
 
-  loadData() {
+ loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
     this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize;
-    // this.filter.filter = JSON.stringify(this.search);
-    this.filter.with = ['country', 'state'];
-    this.dataSource.find(this.filter);
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.with = ['roles'];
+    this.dataSource.find(_.pickBy(this.filter));
   }
 
   masterToggle() {
