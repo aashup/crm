@@ -1,24 +1,23 @@
 <ng-container *ngIf="user$ | async as _user">
   <div class="menu-item px-3">
     <div class="menu-content d-flex align-items-center px-3">
-      <ng-container *ngIf="_user?.pic; else no_icon">
-        <div class="symbol symbol-50px me-5">
-          <img alt="Logo" [src]="_user.pic" />
-        </div>
-      </ng-container>
-      
-      <ng-template #no_icon>
-        <span class="symbol-label rounded font-size-h1 font-weight-bold user-first-letter-icon">
-          {{ _user.name || '' | firstLetter }}
+      <!-- User Initial in Circle -->
+      <div
+        class="symbol d-flex align-items-center justify-content-center bg-light-primary text-primary rounded-circle"
+        style="width: 60px; height: 60px; font-size: 24px;"
+      >
+        <span class="fw-bold">
+          {{ _user.name ? (_user.name | firstLetter) : '' }}
         </span>
-      </ng-template>
+      </div>
 
-      <div class="d-flex flex-column">
+      <!-- User Full Name and Email -->
+      <div class="d-flex flex-column ms-3">
         <div class="fw-bolder d-flex align-items-center fs-5">
           {{ _user.name }}
-          <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2"
-            >Pro</span
-          >
+          <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2">
+            Pro
+          </span>
         </div>
         <a class="fw-bold text-muted text-hover-primary fs-7 cursor-pointer">
           {{ _user.email }}
