@@ -5,6 +5,7 @@ use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Menu;
 use App\Models\Role;
 use App\Models\State;
 use Illuminate\Support\Str;
@@ -55,6 +56,14 @@ class FindController extends Controller
     public function role()
     {
         $model = new Role();
+        $model = $model->select('id', 'name');
+
+        return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
+    }
+
+    public function menu()
+    {
+        $model = new Menu();
         $model = $model->select('id', 'name');
 
         return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
