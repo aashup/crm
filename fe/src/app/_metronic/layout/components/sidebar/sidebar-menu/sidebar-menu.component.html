@@ -296,12 +296,15 @@
       </ng-container>
       <ng-template #noChild>
         <div class="menu-item">
-          <a class="menu-link without-sub" routerLink="{{ menuItem?.page }}">
-            <span class="menu-icon">
-              <app-keenicon name="{{ menuItem?.icon }}" class="fs-2"></app-keenicon>
-            </span>
-            <span class="menu-title">{{ menuItem?.name }}</span>
-          </a>
+          <a class="menu-link without-sub" 
+          routerLink="{{ menuItem?.page }}"
+          routerLinkActive="active">
+         <span class="menu-bullet">
+           <span class="bullet bullet-dot"></span>
+         </span>
+         <span class="menu-title">{{ menuItem?.name }}</span>
+       </a>
+          
         </div>
       </ng-template>
     </ng-container>
