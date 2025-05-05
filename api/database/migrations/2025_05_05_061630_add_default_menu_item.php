@@ -36,7 +36,7 @@ return new class extends Migration
                     'order_by' => 3,
                     'children' => [
                         ['name' => "Users", 'page' => "/app/usermanagement/users", 'order_by' => 1],
-                        ['name' => "Role", 'page' => "/app/usermanagement/role", 'order_by' => 4],
+                        ['name' => "Role", 'page' => "/app/usermanagement/roles", 'order_by' => 4],
                         ['name' => "Permission", 'page' => "/app/usermanagement/permission", 'order_by' => 5],
                     ],
                 ],
