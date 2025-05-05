@@ -282,12 +282,14 @@
           </span>
           <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
             <div *ngFor="let chieldMenus of menuItem.children" class="menu-item">
-              <a class="menu-link without-sub" routerLink="{{ chieldMenus?.page }}" routerLinkActive="active">
-                <span class="menu-bullet">
-                  <span class="bullet bullet-dot"></span>
-                </span>
-                <span class="menu-title">{{ chieldMenus?.name }}</span>
-              </a>
+              <a class="menu-link without-sub" 
+              [routerLink]="[chieldMenus?.page]" 
+              routerLinkActive="active">
+             <span class="menu-bullet">
+               <span class="bullet bullet-dot"></span>
+             </span>
+             <span class="menu-title">{{ chieldMenus?.name }}</span>
+           </a>
             </div>
           </div>
         </div>

@@ -3,11 +3,10 @@ import { PermissionModel } from '../permission.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
-import { take } from 'rxjs';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
-import { StateModel } from '../../state/state.model';
 import { PermissionService } from '../permission.service';
+import { MenuService } from 'src/app/modules/settings/menu/menu.service';
 
 @Component({
     selector: 'app-add-permission',
@@ -20,6 +19,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   model: PermissionModel;
   clone: any;
   isEdit: boolean = false;
+  menus:any = [];
   readonly dialogRef = inject(MatDialogRef<AddPermissionComponent>);
   readonly data = inject<{
     model: PermissionModel;
@@ -30,11 +30,11 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: PermissionService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
   ) {}
 
   ngOnInit(): void {
-
+   this.fetchMenus();
   }
 
   ngAfterViewInit(): void {
@@ -46,13 +46,22 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   initForm(model: PermissionModel) {
     this.form = this.fb.group({
       id: [this.model.id, []],
-      name: [this.model.name, [Validators.required]],
-      slug: [this.model.slug],
-      status: [this.model.status],
-    });
+      name: [this.model.name],
+      description: [this.model.description, []],
+      guard_name: [this.model.guard_name, [Validators.required]],
+      menu_id: [this.model.menu_id, []],});
     this.clone = this.form.value;
   }
 
+  fetchMenus(): void {
+    
+      this.find.findMenu().subscribe({
+        next: (res:any) => {
+          this.menus = res?.data;
+        },
+      });
+  }
+    
   submit() {
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {

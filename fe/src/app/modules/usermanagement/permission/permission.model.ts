@@ -1,14 +1,15 @@
 export class PermissionModel {
   id: number | null;
   name: string| null;
-  slug: string;
-  status: number;
+  description: string | null;
+  guard_name: string | null;
+  menu_id: string | null;
 
   clear() {
       this.id = null;
       this.name = null;
-      this.slug = '';
-      this.status = 1;
+      this.description = null;
+      this.guard_name = null;
       return this;
   }
 }

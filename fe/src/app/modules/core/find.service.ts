@@ -204,4 +204,10 @@ export class FindService {
           params: HttpUtils.toHttpParams(params)
       })
   }
+
+  findMenu(params = {}) {
+        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/menu`, {
+            params: HttpUtils.toHttpParams(params)
+        })
+  }
 }
