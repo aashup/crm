@@ -32,6 +32,7 @@
             </mat-form-field>
           </div>
 
+          <!-- Mobile Input -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Enter Mobile</mat-label>
@@ -44,17 +45,29 @@
               <mat-error>Mobile is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
+
+          <!-- Password Fields -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <!-- Edit Case: Show Change Password Button -->
-            <div *ngIf="isEdit && !showPasswordFields; else passwordFields" class="col-12 mt-2 mb-2">
-              <button class="btn btn-link change-password-btn" (click)="togglePasswordFields()">
+            <div *ngIf="isEdit" class="text-center mb-3">
+              <button
+                *ngIf="!showPasswordFields"
+                class="btn btn-outline-primary change-password-btn"
+                (click)="togglePasswordFields()"
+              >
                 Change Password
                 <i class="fas fa-arrow-right arrow-icon"></i>
               </button>
+              <button
+                *ngIf="showPasswordFields"
+                class="btn btn-outline-danger cancel-password-btn"
+                (click)="togglePasswordFields()"
+              >
+                Cancel Change Password
+              </button>
             </div>
           
-            <!-- Add Case or Edit Case with Password Fields Visible -->
-            <ng-template #passwordFields>
+            <!-- Password Fields for Add or Edit -->
+            <div *ngIf="!isEdit || showPasswordFields" class="mt-3">
               <div class="col-12 kt-margin-bottom-20-mobile">
                 <mat-form-field class="w-100" appearance="outline">
                   <mat-label>Enter Password</mat-label>
@@ -104,12 +117,7 @@
                   >
                 </mat-form-field>
               </div>
-          
-              <!-- Edit Case: Show Cancel Change Password Button -->
-              <button *ngIf="isEdit" class="btn btn-link change-password-btn" (click)="togglePasswordFields()">
-                Cancel Change Password
-              </button>
-            </ng-template>
+            </div>
           </div>
 
           <!-- Status Dropdown -->
@@ -118,7 +126,7 @@
               <mat-label>Status</mat-label>
               <mat-select placeholder="Select Status" formControlName="status" defaultValue="1">
                 <mat-option [value]="1">Active</mat-option>
-                <mat-option [value]="0">Inactive</mat-option>
+                <mat-option [value]="2">Inactive</mat-option>
               </mat-select>
               <mat-error>Status is <strong>required</strong></mat-error>
             </mat-form-field>
@@ -136,9 +144,9 @@
                 <mat-option
                   *ngFor="let role of fechedRoles"
                   [value]="role.id"
-                 
-                  >{{ role.name }}</mat-option
                 >
+                  {{ role.name }}
+                </mat-option>
               </mat-select>
               <mat-error
                 >At least one role is <strong>required</strong></mat-error

@@ -17,14 +17,24 @@
               <mat-error>Role is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-
+          
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Type</mat-label>
+              <mat-select placeholder="Select Type" formControlName="guard_name">
+                <mat-option [value]="'api'">API</mat-option>
+                <mat-option [value]="'web'">Web</mat-option>
+              </mat-select>
+              <mat-error>Type is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
           <!-- Status Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Status</mat-label>
               <mat-select placeholder="Select Status" formControlName="status">
                 <mat-option [value]="1">Active</mat-option>
-                <mat-option [value]="0">Inactive</mat-option>
+                <mat-option [value]="2">Inactive</mat-option>
               </mat-select>
               <mat-error>Status is <strong>required</strong></mat-error>
             </mat-form-field>

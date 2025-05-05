@@ -6,12 +6,13 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { CommonService } from "../../core/common.service";
 import _, { merge } from "lodash";
-import { take, tap } from "rxjs";
+import { debounceTime, distinctUntilChanged, fromEvent, take, tap } from "rxjs";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
 import { RolesDatasource } from "./roles.datasource";
 import { RolesModel } from "./roles.model";
 import { RolesService } from "./roles.service";
 import { AddRolesComponent } from "./add-roles/add-roles.component";
+import { DatePipe } from "@angular/common";
 
 
 @Component({
@@ -27,9 +28,11 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<RolesModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-
+      
+  
+  search: any = { all: '' };
   filter: any = {};
-  displayableCol = ['select', 'id', 'name','status','created_at', 'action'];
+  displayableCol = ['select', 'id', 'name','status','guard_name','created_at', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
@@ -48,12 +51,18 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'status',
       name: 'Status',
       doNotSort: false,
-      mutator: (row: any) => (row.status === 1 ? 'Active' : 'Inactive'),
+      mutator: (item: any) => item.status === "active" ? 'Active' : 'Inactive',
     },
     {
       ref: 'created_at',
       name: 'Created At',
-      mutator: (item: any) => item?.created_at,
+           mutator: (row: RolesModel) => this.datePipe.transform(row.created_at, 'mediumDate'),
+     
+    },
+    {
+      ref: 'guard_name',
+      name: 'Guard Name',
+      mutator: (item: any) => item?.guard_name,
     },
    
     { ref: 'action', name: 'Actions' },
@@ -62,7 +71,8 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: RolesService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private datePipe: DatePipe
   ) {
     this.dataSource = new RolesDatasource(this.service);
   }
@@ -86,18 +96,27 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
-  ngAfterViewInit(): void {
-    // throw new Error('Method not implemented.');
-  }
-
-  loadData() {
+   ngAfterViewInit(): void {
+     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+       .pipe(
+         debounceTime(500),
+         distinctUntilChanged(),
+         tap(() => {
+           this.paginator.pageIndex = 0;
+           this.search.all = this.searchElementRef.nativeElement.value;
+           this.loadData();
+         })
+       )
+       .subscribe();
+   }
+loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
     this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize;
-    // this.filter.filter = JSON.stringify(this.search);
-    this.filter.with = ['roles', 'status','created_at'];
-    this.dataSource.find(this.filter);
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.with = ['roles'];
+    this.dataSource.find(_.pickBy(this.filter));
   }
 
   masterToggle() {

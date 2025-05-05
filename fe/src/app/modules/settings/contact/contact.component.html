@@ -2,13 +2,11 @@
   <div class="card-header border-0 pt-6">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
-        <mat-icon>search</mat-icon>
-        <input
-          type="text"
-          data-action="filter"
-          class="form-control form-control-solid w-250px ps-12"
-          placeholder="Search Users"
-        />
+        <mat-form-field appearance="outline">
+          <mat-label>Search in all fields</mat-label>
+          <input #searchElementRef matInput placeholder="Search" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
       </div>
     </div>
     <div class="card-toolbar">

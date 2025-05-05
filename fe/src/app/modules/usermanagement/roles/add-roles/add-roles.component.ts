@@ -72,7 +72,7 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
         ],
       ],
       status: [model.status, [Validators.required]],
-     
+      guard_name: [model.guard_name, [Validators.required]],
     });
     this.clone = this.form.value;
   }
