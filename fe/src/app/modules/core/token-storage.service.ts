@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { StorageService } from './storage.service';
 import { isEmpty } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
+import { SidebarMenuService } from 'src/app/shared/services/sidebar-menu.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ export class TokenStorageService {
   private _user: any;
   public userUpdated$: BehaviorSubject<any>;
   public _decodedData: any = null;
+  private _menu: any[] = [];
 
   get accessToken(): string {
     return this._accessToken;
@@ -29,7 +31,7 @@ export class TokenStorageService {
     }
   }
 
-  constructor(private storage: StorageService) {
+  constructor(private storage: StorageService, private sidebarMenuService: SidebarMenuService) {
     this.userUpdated$ = new BehaviorSubject<any>(this.getUserInfo());
   }
 
@@ -41,6 +43,10 @@ export class TokenStorageService {
     }
     this._user = this._decodedData.user || {};
     this.userUpdated$.next(this._user);
+
+    this._menu = this._decodedData.menus || [];
+    this.sidebarMenuService.setMenu(this._menu);
+
     return this._accessToken ? true : false;
   }
 
