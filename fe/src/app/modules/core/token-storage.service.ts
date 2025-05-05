@@ -3,6 +3,7 @@ import { StorageService } from './storage.service';
 import { isEmpty } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { SidebarMenuService } from 'src/app/shared/services/sidebar-menu.service';
+import { NgxPermissionsService } from 'ngx-permissions';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +32,11 @@ export class TokenStorageService {
     }
   }
 
-  constructor(private storage: StorageService, private sidebarMenuService: SidebarMenuService) {
+  constructor(
+    private storage: StorageService,
+    private sidebarMenuService: SidebarMenuService,
+    private permissionsService: NgxPermissionsService
+  ) {
     this.userUpdated$ = new BehaviorSubject<any>(this.getUserInfo());
   }
 
@@ -46,6 +51,8 @@ export class TokenStorageService {
 
     this._menu = this._decodedData.menus || [];
     this.sidebarMenuService.setMenu(this._menu);
+
+    this.permissionsService.loadPermissions(this._decodedData['permissions'] || []);
 
     return this._accessToken ? true : false;
   }
