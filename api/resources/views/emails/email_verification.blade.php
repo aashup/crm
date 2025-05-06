@@ -9,7 +9,7 @@
         <table style="width: 100%; margin: 0; padding: 0;" border="0">
             <tr>
                 <td style="background-color: #ffffff; border-bottom: 1px solid #e6e6e6; padding: 20px 10px;">
-                    <span style="color: #333; font-size: 25px;">ThoughtSole</span>
+                    <span style="color: #333; font-size: 25px;">Kissan</span>
                 </td>
             </tr>
             <tr>
@@ -22,7 +22,7 @@
             </tr>
             <tr>
                 <td style="background-color: #ffffff; border-bottom: 1px solid #e6e6e6; padding: 20px 10px; text-align: center;">
-                    <span style="font-size: 15px;">ThoughtSole &copy; 2022</span>
+                    <span style="font-size: 15px;">Kissan &copy; 2022</span>
                 </td>
             </tr>
         </table>

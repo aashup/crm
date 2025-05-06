@@ -44,6 +44,6 @@ class ForgotPassword extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->subject('ThoughtSole :: Forgot Password')->view('emails.forgot_password');
+        return $this->subject('KISSAN :: Forgot Password')->view('emails.forgot_password');
     }
 }
