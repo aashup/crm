@@ -47,12 +47,10 @@ export class AuthService implements OnDestroy {
 
   // public methods
   login(email: string, password: string): Observable<any> {
-    this.isLoadingSubject.next(true);
-
     return this.http.post(`${environment.API_ENDPOINT}/login`, {email, password}).pipe(
       tap((data: any) => {
         this.token.storeToken(data.data);
-      })
+      }),
     );
   }
 

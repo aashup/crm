@@ -74,6 +74,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   submit() {
     this.hasError = false;
+    this.authService.isLoadingSubject.next(true);
     const loginSubscr = this.authService
       .login(this.f.email.value, this.f.password.value)
       .subscribe({
@@ -86,9 +87,11 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         },
         error : (e) => {
-          
+          this.authService.isLoadingSubject.next(false);
         },
-        complete : () => {}
+        complete : () => {
+          this.authService.isLoadingSubject.next(false);
+        }
 
       });
     this.unsubscribe.push(loginSubscr);
