@@ -94,13 +94,12 @@ registration(user: UserModel): Observable<any> {
   );
 }
 
-  forgotPassword(email: string): Observable<boolean> {
-    this.isLoadingSubject.next(true);
-    return this.authHttpService
-      .forgotPassword(email)
-      .pipe(finalize(() => this.isLoadingSubject.next(false)));
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${environment.API_ENDPOINT}/forgot-password`, {email});
   }
-
+  resetPassword(payload: { token: string; password: string; confirmPassword: string }): Observable<any> {
+    return this.http.post('/api/reset-password', payload);
+  }
   // private methods
   private setAuthFromLocalStorage(auth: AuthModel): boolean {
     // store auth authToken/refreshToken/epiresIn in local storage to keep user logged in between page refreshes

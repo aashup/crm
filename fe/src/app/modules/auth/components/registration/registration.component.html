@@ -1,5 +1,6 @@
-<form class="form w-100" novalidate="novalidate" id="kt_login_signup_form" [formGroup]="registrationForm"
-  (ngSubmit)="submit()">
+<form class="form" novalidate="novalidate" id="kt_login_signup_form" [formGroup]="registrationForm"
+  (ngSubmit)="submit()"
+  style="width: 600px;">
   <!--begin::Heading-->
   <div class="text-center mb-11">
     <!--begin::Title-->
@@ -9,48 +10,42 @@
     <!--end::Title-->
 
     <!--begin::Subtitle-->
-    <div class="text-gray-500 fw-semibold fs-6">
+    <!-- <div class="text-gray-500 fw-semibold fs-6">
       Your Social Campaigns
-    </div>
+    </div> -->
     <!--end::Subtitle--->
   </div>
   <!--begin::Heading-->
 
   <!--begin::Login options-->
-  <div class="row g-3 mb-9">
-    <!--begin::Col-->
+  <!-- <div class="row g-3 mb-9">
+   
     <div class="col-md-6">
-      <!--begin::Google link--->
+      
       <a href="#"
         class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
         <img alt="Logo" src="./assets/media/svg/brand-logos/google-icon.svg" class="h-15px me-3" />
         Sign in with Google
       </a>
-      <!--end::Google link--->
+     
     </div>
-    <!--end::Col-->
-
-    <!--begin::Col-->
+   
     <div class="col-md-6">
-      <!--begin::Google link--->
+    
       <a href="#"
         class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
         <img alt="Logo" src="./assets/media/svg/brand-logos/apple-black.svg" class="theme-light-show h-15px me-3" />
         <img alt="Logo" src="./assets/media/svg/brand-logos/apple-black-dark.svg" class="theme-dark-show h-15px me-3" />
         Sign in with Apple
       </a>
-      <!--end::Google link--->
+      
     </div>
-    <!--end::Col-->
-  </div>
-  <!--end::Login options-->
+    
+  </div> -->
 
-  <!--begin::Separator-->
-  <div class="separator separator-content my-14"><span class="w-125px text-gray-500 fw-semibold fs-7">Or with
-      email</span></div>
-  <!--end::Separator-->
+  <!-- <div class="separator separator-content my-14"><span class="w-125px text-gray-500 fw-semibold fs-7">Or with
+      email</span></div> -->
 
-  <!-- begin::Alert error-->
   <ng-container *ngIf="hasError">
     <div class="mb-lg-15 alert alert-danger">
       <div class="alert-text font-weight-bold">
@@ -58,10 +53,8 @@
       </div>
     </div>
   </ng-container>
-  <!-- end::Alert error-->
-
-  <!--begin::Form group-->
-  <div class="fv-row mb-8">
+  
+  <div class="fv-row mb-8" >
     <label class="form-label fw-bolder text-gray-900 fs-6">Fullname</label>
     <input class="form-control bg-transparent" type="text" name="name" formControlName="name"
       placeholder="Fullname" autocomplete="off" [ngClass]="{
@@ -118,65 +111,107 @@
   <!--end::Form group-->
 
   <!--begin::Form group-->
-  <div class="fv-row mb-8">
-    <label class="form-label fw-bolder text-gray-900 fs-6">Password</label>
-    <input class="form-control bg-transparent" type="password" placeholder="Password" name="password"
-      formControlName="password" autocomplete="off" [ngClass]="{
+  <!-- Password Field -->
+<!-- Password Field -->
+<!-- Password Field -->
+<div class="fv-row mb-8">
+  <label class="form-label fw-bolder text-gray-900 fs-6">Password</label>
+  <div class="input-group">
+    <input
+      class="form-control bg-transparent"
+      [type]="showPassword ? 'text' : 'password'"
+      placeholder="Password"
+      name="password"
+      formControlName="password"
+      autocomplete="off"
+      [ngClass]="{
         'is-invalid': registrationForm.controls['password'].invalid,
         'is-valid': registrationForm.controls['password'].valid
-      }" />
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'required',
-        message: 'Password is required',
-        control: registrationForm.controls['password']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'minlength',
-        message: 'Password should have at least 3 symbols',
-        control: registrationForm.controls['password']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'maxLength',
-        message: 'Password should have maximum 100 symbols',
-        control: registrationForm.controls['password']
-      }"></ng-container>
+      }"
+      style="border-right: none;"
+    />
+    <button
+      type="button"
+      class="btn btn-outline-secondary  bg-transparent fv-row"
+      (click)="showPassword = !showPassword"
+      style="border-left: none; border: 1px solid #ced4da; border-radius: 0.375rem; background-color: transparent;"
+      [ngClass]="{
+        'is-invalid': registrationForm.controls['password'].invalid,
+        'is-valid': registrationForm.controls['password'].valid
+      }"
+    >
+      <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+    </button>
   </div>
-  <!--end::Form group-->
+  <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
+      validation: 'required',
+      message: 'Password is required',
+      control: registrationForm.controls['password']
+    }"></ng-container>
+  <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
+      validation: 'minlength',
+      message: 'Password should have at least 3 symbols',
+      control: registrationForm.controls['password']
+    }"></ng-container>
+  <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
+      validation: 'maxLength',
+      message: 'Password should have maximum 100 symbols',
+      control: registrationForm.controls['password']
+    }"></ng-container>
+</div>
 
-  <!--begin::Form group-->
-  <div class="fv-row mb-8">
-    <label class="form-label fw-bolder text-gray-900 fs-6">Confirm Password</label>
-    <input class="form-control bg-transparent" type="password" placeholder="Confirm password" name="cpassword"
-      autocomplete="off" formControlName="cpassword" [ngClass]="{
+<!-- Confirm Password Field -->
+<div class="fv-row mb-8">
+  <label class="form-label fw-bolder text-gray-900 fs-6">Confirm Password</label>
+  <div class="input-group">
+    <input
+      class="form-control bg-transparent"
+      [type]="showConfirmPassword ? 'text' : 'password'"
+      placeholder="Confirm password"
+      name="cpassword"
+      autocomplete="off"
+      formControlName="cpassword"
+      [ngClass]="{
         'is-invalid': registrationForm.controls['cpassword'].invalid,
         'is-valid': registrationForm.controls['cpassword'].valid
-      }" />
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'required',
-        message: 'Confirm Password is required',
-        control: registrationForm.controls['cpassword']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'minlength',
-        message: 'Confirm Password should have at least 3 symbols',
-        control: registrationForm.controls['cpassword']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'maxLength',
-        message: 'Confirm Password should have maximum 100 symbols',
-        control: registrationForm.controls['cpassword']
-      }"></ng-container>
-    <ng-container *ngIf="
-        registrationForm.controls['cpassword'].errors &&
-        registrationForm.controls['cpassword'].errors.ConfirmPassword
-      ">
-      <div class="fv-plugins-message-container">
-        <div class="fv-help-block">
-          'Passsword' and 'Confirm Password' didn't match.
-        </div>
-      </div>
-    </ng-container>
+      }"
+      style="border-right: none;"
+    />
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="showConfirmPassword = !showConfirmPassword"
+      style="border-left: none; border: 1px solid #ced4da; border-radius: 0.375rem; background-color: transparent;"
+    >
+      <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+    </button>
   </div>
+  <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
+      validation: 'required',
+      message: 'Confirm Password is required',
+      control: registrationForm.controls['cpassword']
+    }"></ng-container>
+  <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
+      validation: 'minlength',
+      message: 'Confirm Password should have at least 3 symbols',
+      control: registrationForm.controls['cpassword']
+    }"></ng-container>
+  <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
+      validation: 'maxLength',
+      message: 'Confirm Password should have maximum 100 symbols',
+      control: registrationForm.controls['cpassword']
+    }"></ng-container>
+  <ng-container *ngIf="
+      registrationForm.controls['cpassword'].errors &&
+      registrationForm.controls['cpassword'].errors.ConfirmPassword
+    ">
+    <div class="fv-plugins-message-container">
+      <div class="fv-help-block">
+        'Password' and 'Confirm Password' didn't match.
+      </div>
+    </div>
+  </ng-container>
+</div>
   <!--end::Form group-->
 
   <!--begin::Form group-->

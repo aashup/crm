@@ -11,3 +11,9 @@
     }
   }
 }
+
+.fv-row .btn-icon {
+  height: 100%; /* Match the height of the input field */
+  border: none; /* Remove button border */
+  background: transparent; /* Make the button background transparent */
+}
