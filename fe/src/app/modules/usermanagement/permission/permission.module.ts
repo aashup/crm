@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PermissionComponent } from './permission.component';
-import { AddPermissionComponent } from './add-permission/add-permission.component';
+
 import { SharedMaterialModuleModule } from '../../shared-material-module/shared-material-module.module';
 import { RouterModule } from '@angular/router';
+import { PermissionComponent } from './permission.component';
+import { AddPermissionComponent } from './add-permission/add-permission.component';
 
 @NgModule({
   declarations: [PermissionComponent, AddPermissionComponent],

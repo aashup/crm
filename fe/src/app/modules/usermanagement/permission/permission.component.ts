@@ -27,7 +27,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
   filter: any = {};
-  displayableCol = ['select', 'id', 'name', 'slug', 'status', 'action'];
+  displayableCol = ['select', 'id', 'name', 'description','guard_name','menu_id','action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
@@ -41,8 +41,9 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
       style: { 'max-width': '30px' },
     },
     { ref: 'name', name: 'Name' },
-    { ref: 'slug', name: 'Slug' },
-    { ref: 'status', name: 'Status' },
+    { ref: 'description', name: 'Description' },
+    { ref: 'guard_name', name: 'Guard Name' },
+    {ref:'menu_id', name:'Menu'},
     { ref: 'action', name: 'Actions' },
   ];
 
