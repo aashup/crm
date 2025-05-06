@@ -21,6 +21,7 @@ import { MAT_PAGINATOR_DEFAULT_OPTIONS } from '@angular/material/paginator';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { TokenInterceptor } from './modules/core/token.interceptor';
 import { DatePipe } from '@angular/common';
+import { NgxPermissionsModule } from 'ngx-permissions';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -54,6 +55,7 @@ function appInitializer(authService: AuthService) {
     SweetAlert2Module.forRoot(),
     ToastrModule.forRoot(),
     NgxSpinnerModule.forRoot(),
+    NgxPermissionsModule.forRoot()
   ],
   providers: [
     DatePipe,
