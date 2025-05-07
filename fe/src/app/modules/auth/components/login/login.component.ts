@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     email: 'vijay@xtrox.com',
     password: 'Vijay@123',
   };
+  emailVerified: boolean = false;
   loginForm: FormGroup;
   hasError: boolean;
   returnUrl: string;
@@ -83,6 +84,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       .login(this.f.email.value, this.f.password.value)
       .subscribe({
         next : (data) => {
+          console.log(data);
+          
           // if (this.form.remember_me) {
           //   // this.storage.setItem('loginCredentials', this.form.value)
           // } else {
@@ -91,6 +94,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         },
         error : (e) => {
+          console.log(e);
+          
           this.authService.isLoadingSubject.next(false);
         },
         complete : () => {

@@ -47,10 +47,19 @@ export class AuthService implements OnDestroy {
 
   // public methods
   login(email: string, password: string): Observable<any> {
-    return this.http.post(`${environment.API_ENDPOINT}/login`, {email, password}).pipe(
+    debugger
+    return this.http.post(`${environment.API_ENDPOINT}/login`, { email, password }).pipe(
       tap((data: any) => {
+       
+        if (!data.data.user.email_verified_at) {
+          throw new Error('Email is not verified. Please verify your email before logging in.');
+        }
         this.token.storeToken(data.data);
       }),
+      catchError((err) => {
+        console.error('Login error:', err);
+        return of(err);
+      })
     );
   }
 
