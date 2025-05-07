@@ -79,12 +79,26 @@
 
   <!--begin::Form group-->
   <div class="fv-row mb-8"  style="width: 600px;">
-    <label class="form-label fs-6 fw-bolder text-gray-900">Email</label>
-    <input class="form-control bg-transparent" type="email" name="email" formControlName="email" autocomplete="off"
-      [ngClass]="{
+   
+   
+      <mat-form-field [ngClass]="{
         'is-invalid': loginForm.controls['email'].invalid,
         'is-valid': loginForm.controls['email'].valid
-      }" />
+      }" 
+      style="width: 600px;">
+        <mat-label>Enter your email</mat-label>
+        <input
+          matInput
+          type="email" name="email" formControlName="email"
+          placeholder="pat@example.com"
+          autocomplete="off"
+          required
+          class="form-control bg-transparent"
+          
+        />
+       
+      </mat-form-field>
+     
     <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
         validation: 'required',
         message: 'Email is required',
@@ -110,14 +124,29 @@
 
   <!--begin::Form group-->
   <div class="fv-row mb-3">
-
-    <label class="form-label fw-bolder text-gray-900 fs-6 mb-0">Password</label>
-
-    <input class="form-control bg-transparent" type="password" name="password" autocomplete="off"
-      formControlName="password" [ngClass]="{
+      <mat-form-field [ngClass]="{
         'is-invalid': loginForm.controls['password'].invalid,
         'is-valid': loginForm.controls['password'].valid
-      }" />
+      }" 
+      style="width: 600px;"
+      >
+        <mat-label>Enter your password</mat-label>
+        <input matInput [type]="hide() ? 'password' : 'text'" class="form-control bg-transparent" 
+        type="password" name="password" autocomplete="off"
+        formControlName="password" 
+        width="600px"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="clickEvent($event)"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hide()"
+          type="button"
+        >
+          <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
     <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
         validation: 'required',
         message: 'Password is required',

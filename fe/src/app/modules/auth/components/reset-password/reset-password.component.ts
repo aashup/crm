@@ -22,6 +22,8 @@ export class ResetPasswordComponent implements OnInit {
   errorStates = ErrorStates;
   isLoading$: Observable<boolean>;
   private token: string = '';
+  showPassword: boolean = false; // Add this property
+  showConfirmPassword: boolean = false; // Add this property
 
   // private fields
   private unsubscribe: Subscription[] = []; 
