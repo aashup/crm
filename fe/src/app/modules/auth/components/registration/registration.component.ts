@@ -17,7 +17,16 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   registrationForm: FormGroup;
   hasError: boolean;
   isLoading$: Observable<boolean>;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
 
+  togglePasswordVisibility(field: string): void {
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else if (field === 'confirmPassword') {
+      this.showConfirmPassword = !this.showConfirmPassword;
+    }
+  }
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
@@ -54,7 +63,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
           ]),
         ],
         email: [
-          'qwe@qwe.qwe',
+          '',
           Validators.compose([
             Validators.required,
             Validators.email,
@@ -102,7 +111,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       .pipe(first())
       .subscribe((user: UserModel) => {
         if (user) {
-          this.router.navigate(['/']);
+          this.router.navigate(['/auth/login']);
         } else {
           this.hasError = true;
         }

@@ -33,14 +33,11 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   // convenience getter for easy access to form fields
-  get f() {
-    return this.forgotPasswordForm.controls;
-  }
+
 
   initForm() {
     this.forgotPasswordForm = this.fb.group({
-      email: [
-        'admin@demo.com',
+      email: ["",
         Validators.compose([
           Validators.required,
           Validators.email,
@@ -53,11 +50,23 @@ export class ForgotPasswordComponent implements OnInit {
 
   submit() {
     this.errorState = ErrorStates.NotSubmitted;
+    this.authService.isLoadingSubject.next(true);
     const forgotPasswordSubscr = this.authService
-      .forgotPassword(this.f.email.value)
-      .pipe(first())
-      .subscribe((result: boolean) => {
-        this.errorState = result ? ErrorStates.NoError : ErrorStates.HasError;
+      .forgotPassword(this.forgotPasswordForm.value.email)
+      .subscribe({
+        next: (res) => {
+          debugger;
+          this.errorState = ErrorStates.NoError;
+          this.forgotPasswordForm.reset();
+        },
+        error: (err) => {
+          this.errorState = ErrorStates.HasError;
+          this.authService.isLoadingSubject.next(false);
+        },
+        complete: () => {
+          debugger;
+          this.authService.isLoadingSubject.next(false);
+        },
       });
     this.unsubscribe.push(forgotPasswordSubscr);
   }

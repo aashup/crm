@@ -94,7 +94,7 @@ class AuthController extends Controller
                     $user->email_verified_at = now();
                     $user->save();
                 }
-                return redirect(Config::get('services.urls.ui_url') . 'auth/login');
+                return redirect(Config::get('services.urls.ui_url') . '/auth/login');
             } else {
                 return view('errors.link_expire');
             }

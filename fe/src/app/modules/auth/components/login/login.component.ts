@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription, Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
@@ -37,7 +37,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     //   this.router.navigate(['/']);
     // }
   }
-
+  hide = signal(true);
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
+  }
   ngOnInit(): void {
     this.initForm();
     // get return url from route parameters or default to '/'

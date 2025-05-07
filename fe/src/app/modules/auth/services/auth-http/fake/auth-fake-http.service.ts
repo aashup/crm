@@ -62,8 +62,11 @@ export class AuthHTTPService {
     return this.getAllUsers().pipe(
       map((result: UserModel[]) => {
         const user = result.find(
+
           (u) => u.email.toLowerCase() === email.toLowerCase()
-        );
+        );   
+        console.log(user);
+        
         return user !== undefined;
       })
     );
@@ -82,6 +85,8 @@ export class AuthHTTPService {
   }
 
   getAllUsers(): Observable<UserModel[]> {
+    console.log(this.http.get<UserModel[]>(API_USERS_URL));
+    
     return this.http.get<UserModel[]>(API_USERS_URL);
   }
 }
