@@ -97,8 +97,8 @@ registration(user: UserModel): Observable<any> {
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${environment.API_ENDPOINT}/forgot-password`, {email});
   }
-  resetPassword(payload: { token: string; password: string; confirmPassword: string }): Observable<any> {
-    return this.http.post('/api/reset-password', payload);
+  resetPassword(payload: { token: string; password: string; cpassword: string }): Observable<any> {
+    return this.http.post(`${environment.API_ENDPOINT}/reset-password`, payload);
   }
   // private methods
   private setAuthFromLocalStorage(auth: AuthModel): boolean {

@@ -35,7 +35,11 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.token = this.route.snapshot.queryParamMap.get('token') || ''; 
+    this.route.paramMap.subscribe(params => {
+      this.token = params.get('token') || ''; 
+      console.log('Extracted Token:', this.token); 
+    });
+    
     this.initForm();
   }
 
@@ -45,7 +49,7 @@ export class ResetPasswordComponent implements OnInit {
 
   initForm() {
     this.resetPasswordForm = this.fb.group({
-      token: [this.token, Validators.required],
+  
       password: ["",
         Validators.compose([
           Validators.required,
@@ -71,6 +75,36 @@ export class ResetPasswordComponent implements OnInit {
 
     if (this.resetPasswordForm?.value.cpassword=== this.resetPasswordForm?.value.password) {
       console.log('Form Submitted:', this.resetPasswordForm.value);
+      console.log({
+        password: this.resetPasswordForm.value.password,
+        cpassword: this.resetPasswordForm.value.cpassword,
+        token: this.token
+      })
+      this.authService.resetPassword({
+        password: this.resetPasswordForm.value.password,
+        cpassword: this.resetPasswordForm.value.cpassword,
+        token: this.token
+      }).subscribe({
+        next: (res) => {
+          debugger;
+          this.errorState = ErrorStates.NoError;
+          this.resetPasswordForm.reset();
+          this.router.navigate(['/auth/login']);
+        },
+        error: (err) => {
+          this.errorState = ErrorStates.HasError;
+          this.authService.isLoadingSubject.next(false);
+        },
+        complete: () => {
+          debugger;
+          this.authService.isLoadingSubject.next(false);
+        },
+      });
+      this.unsubscribe.push(this.authService.resetPassword({
+        password: this.resetPasswordForm.value.password,
+        cpassword: this.resetPasswordForm.value.cpassword,
+        token: this.token
+      }).subscribe());
     } else {
       console.log('Form is invalid');
     }
