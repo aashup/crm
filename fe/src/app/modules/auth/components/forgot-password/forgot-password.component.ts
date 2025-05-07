@@ -52,7 +52,7 @@ export class ForgotPasswordComponent implements OnInit {
     this.errorState = ErrorStates.NotSubmitted;
     this.authService.isLoadingSubject.next(true);
     const forgotPasswordSubscr = this.authService
-      .forgotPassword("")
+      .forgotPassword(this.forgotPasswordForm.value.email)
       .subscribe({
         next: (res) => {
           debugger;

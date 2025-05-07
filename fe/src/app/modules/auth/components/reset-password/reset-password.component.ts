@@ -24,7 +24,7 @@ export class ResetPasswordComponent implements OnInit {
   private token: string = '';
 
   // private fields
-  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
+  private unsubscribe: Subscription[] = []; 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -35,11 +35,10 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.token = this.route.snapshot.queryParamMap.get('token') || ''; // Token URL se le rahe hain
+    this.token = this.route.snapshot.queryParamMap.get('token') || ''; 
     this.initForm();
   }
 
-  // convenience getter for easy access to form fields
   get f() {
     return this.resetPasswordForm.controls;
   }
@@ -54,7 +53,7 @@ export class ResetPasswordComponent implements OnInit {
           Validators.maxLength(20),
         ]),
       ],
-      confirmPassword: ["",
+      cpassword: ["",
         Validators.compose([
           Validators.required,
           Validators.minLength(8),
@@ -64,26 +63,16 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
-  submit() {
-    if (this.resetPasswordForm.invalid) {
-      this.errorState = ErrorStates.HasError;
-      return;
+  submit(event: Event): void {
+    debugger
+    console.log('Form Submitted:', this.resetPasswordForm.value);
+    
+    event.preventDefault();
+
+    if (this.resetPasswordForm?.value.cpassword=== this.resetPasswordForm?.value.password) {
+      console.log('Form Submitted:', this.resetPasswordForm.value);
+    } else {
+      console.log('Form is invalid');
     }
-
-    const payload = {
-      token: this.f['token'].value,
-      password: this.f['password'].value,
-      confirmPassword: this.f['confirmPassword'].value,
-    };
-
-    this.authService.resetPassword(payload).subscribe({
-      next: () => {
-        this.errorState = ErrorStates.NoError;
-        this.router.navigate(['/login']); // Reset ke baad login page par redirect
-      },
-      error: () => {
-        this.errorState = ErrorStates.HasError;
-      },
-    });
   }
 }
