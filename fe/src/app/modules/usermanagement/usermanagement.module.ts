@@ -16,6 +16,7 @@ export const routes: Routes = [
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
   },
   
+  
   { path: '**', redirectTo: 'usermanagement/roles' },
 ];
 
