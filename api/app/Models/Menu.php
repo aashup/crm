@@ -20,7 +20,7 @@ class Menu extends Model
     ];
 
     protected $relations = [
-        'parent'
+        'parent', "permissions"
     ];
 
     public function searchableColumns()
@@ -73,12 +73,14 @@ class Menu extends Model
         ];
     }
 
-    public function menu()
-    {
-        return $this->hasMany(\App\Models\Menu::class, 'parent_id', 'id');
-    }
     public function parent()
     {
         return $this->belongsTo(\App\Models\Menu::class, 'parent_id', 'id');
     }
+
+    public function permissions()
+    {
+        return $this->hasMany(Permission::class);
+    }
+
 }

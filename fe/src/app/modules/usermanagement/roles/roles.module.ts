@@ -5,20 +5,25 @@ import { NgxPermissionsModule } from "ngx-permissions";
 import { NgModule } from "@angular/core";
 import { RolesComponent } from "./roles.component";
 import { AddRolesComponent } from "./add-roles/add-roles.component";
+import { SyncPermissionComponent } from "./sync-permission/sync-permission.component";
 
 const routes: Routes = [
   { path: "", component: RolesComponent},
-  { path: "add", component: AddRolesComponent },
+  {
+    path: ':id/sync-permission',
+    component: SyncPermissionComponent,
+  },
+
 ];
 
 @NgModule({
-  declarations: [ RolesComponent, AddRolesComponent],
+  declarations: [ RolesComponent, AddRolesComponent, SyncPermissionComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     NgxPermissionsModule.forChild(),
     SharedMaterialModuleModule
   ],
-  exports: []
+  exports: [SyncPermissionComponent]
 })
 export class RolesModule { }

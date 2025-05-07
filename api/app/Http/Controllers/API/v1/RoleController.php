@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
+use Exception;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -67,5 +68,24 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         return BaseResponse::success($role->delete());
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     * @param  Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function syncPermission(Request $request, Role $role)
+    {
+        $this->authorize('syncPermission', Role::class);
+        try {
+            $permissions = collect($request->permissions)->filter()->mapWithKeys(function ($val) {
+                return $val;
+            })->filter()->keys();
+            $role->syncPermissions($permissions);
+            return $this->success('Permission updated successfully!');
+        } catch (Exception $e) {
+            return $this->error('Permission Updation Failed!');
+        }
     }
 }
