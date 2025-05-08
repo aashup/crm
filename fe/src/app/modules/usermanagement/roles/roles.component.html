@@ -103,9 +103,7 @@
               <button
               mat-icon-button
               class="text-warning"
-              [routerLink]="['/user-management/roles/edit', item.id]"
-              [queryParams]="{ id: item.id }"
-              [queryParamsHandling]="'merge'"
+              (click)="navigateToEditPermission(item.id)"
             >
               <mat-icon>tune</mat-icon>
             </button>

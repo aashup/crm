@@ -13,6 +13,7 @@ import { RolesModel } from "./roles.model";
 import { RolesService } from "./roles.service";
 import { AddRolesComponent } from "./add-roles/add-roles.component";
 import { DatePipe } from "@angular/common";
+import { Router } from "@angular/router";
 
 
 @Component({
@@ -57,7 +58,7 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'created_at',
       name: 'Created At',
            mutator: (row: RolesModel) => this.datePipe.transform(row.created_at, 'mediumDate'),
-     
+    
     },
     {
       ref: 'guard_name',
@@ -71,6 +72,7 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: RolesService,
+    private router: Router,
     private commonService: CommonService,
     private datePipe: DatePipe
   ) {
@@ -138,7 +140,9 @@ loadData() {
       this.selection.selected.length
     );
   }
-
+  navigateToEditPermission(id: number): void {
+    this.router.navigate([`/app/usermanagement/roles/edit-permission/${id}`]);
+  }
   delete(item: RolesModel) {
     this.dialog
       .open(ConfirmationDialogComponent, {

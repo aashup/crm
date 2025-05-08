@@ -6,6 +6,9 @@ import { NgModule } from "@angular/core";
 import { RolesComponent } from "./roles.component";
 import { AddRolesComponent } from "./add-roles/add-roles.component";
 import { SyncPermissionComponent } from "./sync-permission/sync-permission.component";
+import { EditPermissionComponent } from "./edit-permission/edit-permission.component";
+import { MatButtonModule } from "@angular/material/button";
+import { MatExpansionModule } from '@angular/material/expansion';
 
 const routes: Routes = [
   { path: "", component: RolesComponent},
@@ -13,16 +16,21 @@ const routes: Routes = [
     path: ':id/sync-permission',
     component: SyncPermissionComponent,
   },
-
+  {
+    path: 'edit-permission/:id',
+    component: EditPermissionComponent,
+  },
 ];
 
 @NgModule({
-  declarations: [ RolesComponent, AddRolesComponent, SyncPermissionComponent],
+  declarations: [ RolesComponent, AddRolesComponent, SyncPermissionComponent,EditPermissionComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     NgxPermissionsModule.forChild(),
-    SharedMaterialModuleModule
+    SharedMaterialModuleModule,
+    MatExpansionModule,
+    MatButtonModule,
   ],
   exports: [SyncPermissionComponent]
 })
