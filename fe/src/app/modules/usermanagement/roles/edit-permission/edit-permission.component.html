@@ -24,10 +24,9 @@
           </mat-expansion-panel-header>
   
           <div class="permission-options">
-            <mat-checkbox [(ngModel)]="section.read">Read</mat-checkbox>
-            <mat-checkbox [(ngModel)]="section.create">Create</mat-checkbox>
-            <mat-checkbox [(ngModel)]="section.update">Update</mat-checkbox>
-            <mat-checkbox [(ngModel)]="section.delete">Delete</mat-checkbox>
+            <div *ngFor="let permission of permissions">
+              <mat-checkbox [(ngModel)]="section[permission.id]">{{ permission.name }}</mat-checkbox>
+            </div>
           </div>
   
           <button mat-raised-button color="primary" (click)="addNewPermission(section)">

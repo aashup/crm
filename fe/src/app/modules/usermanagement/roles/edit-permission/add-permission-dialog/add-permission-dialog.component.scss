@@ -1,0 +1,22 @@
+.dialog-content {
+    padding: 24px;
+    min-width: 400px; /* Increased modal width */
+  }
+  
+  .form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Reduced gap between fields and error */
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .error-message {
+    margin-top: -8px; /* Pull error closer to input */
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: red;
+  }
+  

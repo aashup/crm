@@ -9,6 +9,10 @@ import { SyncPermissionComponent } from "./sync-permission/sync-permission.compo
 import { EditPermissionComponent } from "./edit-permission/edit-permission.component";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDialogModule } from "@angular/material/dialog";
+import { AddPermissionDialogComponent } from "./edit-permission/add-permission-dialog/add-permission-dialog.component";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
 
 const routes: Routes = [
   { path: "", component: RolesComponent},
@@ -23,7 +27,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [ RolesComponent, AddRolesComponent, SyncPermissionComponent,EditPermissionComponent],
+  declarations: [ RolesComponent, AddRolesComponent, SyncPermissionComponent,EditPermissionComponent, AddPermissionDialogComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -31,6 +35,9 @@ const routes: Routes = [
     SharedMaterialModuleModule,
     MatExpansionModule,
     MatButtonModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   exports: [SyncPermissionComponent]
 })
