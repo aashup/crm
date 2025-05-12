@@ -13,7 +13,7 @@ class RolePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->can('role.view.any');
     }
 
     /**
@@ -63,4 +63,12 @@ class RolePolicy
     {
         return false;
     }
+
+    /**
+     * @param  \App\Models\User  $user
+     */
+    public function syncPermission(User $user){
+        return $user->can('role.sync.permission');
+    }
+
 }

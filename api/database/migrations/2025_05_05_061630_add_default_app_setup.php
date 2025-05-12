@@ -1,13 +1,33 @@
 <?php
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
     public function up(): void
     {
         DB::transaction(function () {
+            $user = new User();
+            $user->fill([
+                'name' => 'Super Admin',
+                'email' => 'vijay@xtrox.com',
+                'password' => bcrypt('Vijay@123'),
+            ]);
+            $user->save();
+
+            $role = new Role();
+            $role->fill([
+                'name' => 'Super Admin',
+                'guard_name' => 'api',
+                'status' => 1,
+            ]);
+            $role->save();
+            $user->assignRole($role);
+
             $menus = [
                 [
                     'name' => "Dashboard",
@@ -37,7 +57,7 @@ return new class extends Migration
                     'children' => [
                         ['name' => "Users", 'page' => "/app/usermanagement/users", 'order_by' => 1],
                         ['name' => "Role", 'page' => "/app/usermanagement/roles", 'order_by' => 4],
-                        ['name' => "Permission", 'page' => "/app/usermanagement/permission", 'order_by' => 5],
+                        ['name' => "Permission", 'page' => "/app/usermanagement/permissions", 'order_by' => 5],
                     ],
                 ],
                 [
@@ -58,6 +78,17 @@ return new class extends Migration
                 ],
             ];
 
+            $permisions = [
+                "view any",
+                "show",
+                "create",
+                "update",
+                "delete",
+            ];
+
+
+
+            $tempPermissionsId = [];
             foreach ($menus as $menu) {
                 $parentId = DB::table('menus')->insertGetId([
                     'name' => $menu['name'],
@@ -71,8 +102,20 @@ return new class extends Migration
                     'updated_at' => now(),
                 ]);
 
+                foreach ($permisions as $permission) {
+                    $tempPermissionsId[] = DB::table('permissions')->insertGetId([
+                        'name' => Str::slug("{$menu['name']} {$permission}", '.'),
+                        'guard_name' => 'api',
+                        'description' => $permission,
+                        'menu_id' => $parentId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+
                 foreach ($menu['children'] as $child) {
-                    DB::table('menus')->insert([
+                    $childMenuId = DB::table('menus')->insertGetId([
                         'name' => $child['name'],
                         'page' => $child['page'],
                         'icon' => $child['icon'] ?? null,
@@ -83,8 +126,30 @@ return new class extends Migration
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                    foreach ($permisions as $permission) {
+                        $tempPermissionsId[] = DB::table('permissions')->insertGetId([
+                            'name' => Str::slug("{$child['name']} {$permission}", '.'),
+                            'guard_name' => 'api',
+                            'description' => $permission,
+                            'menu_id' => $childMenuId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+
+                    if ($child['name'] == 'Role') {
+                        $tempPermissionsId[] = DB::table('permissions')->insertGetId([
+                            'name' => Str::slug("{$child['name']} sync permission", '.'),
+                            'guard_name' => 'api',
+                            'description' => 'sync permission',
+                            'menu_id' => $childMenuId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
             }
+            $role->syncPermissions($tempPermissionsId);
         });
     }
 
