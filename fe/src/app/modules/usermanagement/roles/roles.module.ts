@@ -13,6 +13,7 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { AddPermissionDialogComponent } from "./edit-permission/add-permission-dialog/add-permission-dialog.component";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+import { ClipboardModule } from "ngx-clipboard";
 
 const routes: Routes = [
   { path: "", component: RolesComponent},
@@ -38,6 +39,8 @@ const routes: Routes = [
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    ClipboardModule,
+
   ],
   exports: [SyncPermissionComponent]
 })

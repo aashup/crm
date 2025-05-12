@@ -24,10 +24,14 @@
           </mat-expansion-panel-header>
   
           <div class="permission-options">
-            <div *ngFor="let permission of permissions">
-              <mat-checkbox [(ngModel)]="section[permission.id]">{{ permission.name }}</mat-checkbox>
+            <div *ngFor="let permission of section.permissions" style="display: flex; align-items: center;">
+              <mat-checkbox [(ngModel)]="section[permission.id]">{{ permission.description }}</mat-checkbox>
+              <button mat-icon-button style="margin-left: 8px;" matTooltip="Copy" class="small-button" (click)="copyText(permission.description)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
             </div>
           </div>
+          
   
           <button mat-raised-button color="primary" (click)="addNewPermission(section)">
             + New
