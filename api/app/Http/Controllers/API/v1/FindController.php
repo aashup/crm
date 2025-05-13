@@ -3,11 +3,14 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Address;
 use App\Models\City;
+use App\Models\Contact;
 use App\Models\Country;
 use App\Models\Menu;
 use App\Models\Role;
 use App\Models\State;
+use App\Models\Vendor;
 use Illuminate\Support\Str;
 
 class FindController extends Controller
@@ -67,6 +70,30 @@ class FindController extends Controller
         $model = $model->select('id', 'name');
 
         return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
+    }
+
+    public function vendor()
+    {
+        $model = new Vendor();
+        $model = $model->select('id', 'name');
+
+        return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
+    }
+
+    public function contact()
+    {
+        $model = new Contact();
+        $model = $model->select('id', 'name');
+
+        return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
+    }
+
+    public function address()
+    {
+        $model = new Address();
+        $model = $model->select('id', 'address');
+
+        return BaseResponse::success($model->orderBy('address', 'desc')->limit(250)->get());
     }
 
 }

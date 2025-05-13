@@ -31,5 +31,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('product', controller: 'App\Http\Controllers\API\v1\ProductController');
         Route::apiResource('product/{product}/product-unit', controller: 'App\Http\Controllers\API\v1\ProductUnitController');
         Route::apiResource('contact', controller: 'App\Http\Controllers\API\v1\ContactController');
+        Route::apiResource('address', controller: 'App\Http\Controllers\API\v1\AddressController');
+        Route::apiResource('vendor', controller: 'App\Http\Controllers\API\v1\VendorController');
     });
 });

@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Log;
 
 class RolePolicy
 {
@@ -68,7 +69,7 @@ class RolePolicy
      * @param  \App\Models\User  $user
      */
     public function syncPermission(User $user){
-        return $user->can('role.sync.permission');
+        return $user->can('role.sync.permission') || $user->roles->pluck('name')->contains('Super Admin');
     }
 
 }

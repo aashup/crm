@@ -39,12 +39,30 @@ return new class extends Migration
                     'children' => [],
                 ],
                 [
+                    'name' => "Vendors",
+                    'page' => "/app/vendor",
+                    'icon' => "element-11",
+                    'root' => 1,
+                    'status' => 1,
+                    'order_by' => 2,
+                    'children' => [],
+                ],
+                [
+                    'name' => "Customers",
+                    'page' => "/app/customer",
+                    'icon' => "element-11",
+                    'root' => 1,
+                    'status' => 1,
+                    'order_by' => 3,
+                    'children' => [],
+                ],
+                [
                     'name' => "Products",
                     'page' => "/app/product",
                     'icon' => "element-11",
                     'root' => 1,
                     'status' => 1,
-                    'order_by' => 2,
+                    'order_by' => 4,
                     'children' => [],
                 ],
                 [
@@ -53,7 +71,7 @@ return new class extends Migration
                     'icon' => "user",
                     'root' => 1,
                     'status' => 1,
-                    'order_by' => 3,
+                    'order_by' => 5,
                     'children' => [
                         ['name' => "Users", 'page' => "/app/usermanagement/users", 'order_by' => 1],
                         ['name' => "Role", 'page' => "/app/usermanagement/roles", 'order_by' => 4],
@@ -66,7 +84,7 @@ return new class extends Migration
                     'icon' => 'setting',
                     'root' => 1,
                     'status' => 1,
-                    'order_by' => 4,
+                    'order_by' => 6,
                     'children' => [
                         ['name' => "City", 'page' => "/app/settings/city", 'order_by' => 1],
                         ['name' => "State", 'page' => "/app/settings/state", 'order_by' => 2],
@@ -74,6 +92,7 @@ return new class extends Migration
                         ['name' => "Menu", 'page' => "/app/settings/menu", 'order_by' => 6],
                         ['name' => "Contact", 'page' => "/app/settings/contact", 'order_by' => 7],
                         ['name' => "Units", 'page' => "/app/settings/unit", 'order_by' => 8],
+                        ['name' => "Address", 'page' => "/app/settings/address", 'order_by' => 9],
                     ],
                 ],
             ];
@@ -168,7 +187,10 @@ return new class extends Migration
             'Permission',
             'Menu',
             'Contact',
-            'Units'
+            'Units',
+            'Vendors',
+            'Customers',
+            'Address'
         ])->delete();
     }
 };
