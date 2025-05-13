@@ -15,13 +15,16 @@ export const routes: Routes = [
     path: 'permissions',
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
   },
-  
+  {
+    path: 'roles/edit-permission/:id',
+    loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule),
+  },
   { path: '**', redirectTo: 'usermanagement/roles' },
 ];
 
 @NgModule({
   declarations: [],
-  imports: [CommonModule, RouterModule.forChild(routes)],
+  imports: [CommonModule, RouterModule.forChild(routes),],
   exports: [],
 })
 export class UserManagementModule {}

@@ -30,5 +30,8 @@ export class PermissionService {
     delete(items: { id: any; }) {
         return this.http.delete(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`)
     }
+    updateRolePermissions(roleId: any, permissions: any) {
+        return this.http.post(`${environment.API_ENDPOINT}/role/${roleId}/sync-permission`, { permissions })
+    }
 
 }

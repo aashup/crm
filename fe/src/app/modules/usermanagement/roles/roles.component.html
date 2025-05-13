@@ -101,6 +101,13 @@
                 <mat-icon>edit</mat-icon>
               </button>
               <button
+              mat-icon-button
+              class="text-warning"
+              (click)="navigateToEditPermission(item.id)"
+            >
+              <mat-icon>tune</mat-icon>
+            </button>
+              <button
                 mat-icon-button
                 class="text-danger"
                 (click)="delete(item)"
