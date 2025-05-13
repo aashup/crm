@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddPermissionDialogComponent } from './add-permission-dialog/add-permission-dialog.component';
 import { data } from 'jquery';
 import { ActivatedRoute } from '@angular/router';
+import { RolesService } from '../roles.service';
 
 @Component({
   selector: 'app-edit-permission',
@@ -17,6 +18,7 @@ export class EditPermissionComponent implements AfterViewInit, OnInit {
   constructor(
     private commonService: CommonService,
     private menuService: MenuService,
+    private rolesService: RolesService,
     private permissionService: PermissionService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
@@ -27,17 +29,50 @@ export class EditPermissionComponent implements AfterViewInit, OnInit {
   searchText: string = '';
   sections:any = []
   permissions:any=[]
+  role:any
   roleId:any
-getAllSections() {
-    this.menuService.find({
-      "with": ["permissions"],
-      "cols": ["id", "name"]
-  }).subscribe((response: any) => {
-     
-      this.sections = response.data;
-      this.cdr.detectChanges()
-      setTimeout(() => {}, 0); 
-
+  getRoles(roleId: any) {
+    
+    this.rolesService.showRole(roleId, { with: ['permissions'] }).subscribe(
+    
+      (response: any) => {
+        if (response.status) {
+          debugger
+          this.role = response.data;  
+          this.sections.forEach((section: any) => {
+            section.permissions.forEach((permission: any) => {
+              const allowedPermission = this.role.permissions.find(
+                (rolePermission: any) =>
+                  rolePermission.id === permission.id && rolePermission.menu_id === section.id
+              );
+              section[permission.id] = !!allowedPermission; 
+            });
+          });
+  
+          this.cdr.detectChanges();
+        }
+      },
+      (error) => {
+        console.error('Error fetching role:', error);
+      }
+    );
+  }
+  getAllSections(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.menuService.find({
+        with: ['permissions'],
+        cols: ['id', 'name']
+      }).subscribe(
+        (response: any) => {
+          this.sections = response.data;
+          this.cdr.detectChanges();
+          resolve(); // Resolve the promise when sections are loaded
+        },
+        (error) => {
+          console.error('Error fetching sections:', error);
+          reject(error); // Reject the promise if there's an error
+        }
+      );
     });
   }
  getAllPermissions() {  
@@ -45,6 +80,7 @@ getAllSections() {
      
   }).subscribe((response: any) => {
       this.permissions = response.data;
+
       this.cdr.detectChanges()
       setTimeout(() => {}, 0); 
 
@@ -52,7 +88,16 @@ getAllSections() {
   }
   selectAllPermissions() {
  }
+
     
+ toggleSelectAll(isChecked: boolean): void {
+  this.selectAll = isChecked;
+  this.sections.forEach((section:any) => {
+    section.permissions.forEach((permission:any) => {
+      section[permission.id] = isChecked;
+    });
+  });
+}
 
 
   filteredSections() {
@@ -91,8 +136,10 @@ getAllSections() {
     });
   }
   resetPermissions() {
-    this.sections.forEach((section:any) => {
-      section.read = section.create = section.update = section.delete = false;
+    this.getAllSections().then(() => {
+      this.getRoles(this.roleId);
+    }).catch((error) => {
+      console.error('Error initializing component:', error);
     });
   }
 
@@ -116,10 +163,18 @@ getAllSections() {
       }
     });
   
-    console.log( permissionsPayload);
     this.permissionService.updateRolePermissions(this.roleId,permissionsPayload).subscribe((response: any) => {
-      if (response.success) {
-        alert('Permissions updated successfully');
+      if (response.status) {
+
+        
+        this.commonService.toastr.success('Permissions updated successfully');
+        
+        this.getAllSections().then(() => {
+          this.getRoles(this.roleId);
+        }).catch((error) => {
+          console.error('Error initializing component:', error);
+        });
+       
       } else {
       }
     }, (error) => {
@@ -132,8 +187,12 @@ getAllSections() {
   ngOnInit(): void {
     this.commonService.page.updateTitle('Role Permission Management (AHJ - Preplan)');
     this.roleId =this.route.snapshot.paramMap.get('id');
-
-    this.getAllSections();
+    this.getAllSections().then(() => {
+      this.getRoles(this.roleId);
+    }).catch((error) => {
+      console.error('Error initializing component:', error);
+    });
+    
   }
   ngAfterViewInit(): void {
    

@@ -18,7 +18,11 @@ export class RolesService {
             params: HttpUtils.toHttpParams(params)
         })
     }
-
+    showRole(id: any,p:any) {
+        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/${id}`,{
+          params: HttpUtils.toHttpParams(p)
+        })
+    }
     update(items: { id: any; }) {
         return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items)
     }
