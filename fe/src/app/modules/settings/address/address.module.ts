@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SharedMaterialModuleModule } from '../../shared-material-module/shared-material-module.module';
 import { RouterModule } from '@angular/router';
 import { AddressComponent } from './address.component';
-import { AddAddressComponent } from './add-address/add-adddress.component';
+import { AddAddressComponent } from './add-address/add-address.component';
 
 
 

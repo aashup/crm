@@ -18,7 +18,7 @@ export class UsersService {
             params: HttpUtils.toHttpParams(params)
         })
     }
-
+   
     update(items: { id: any; }) {
         return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items)
     }

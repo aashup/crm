@@ -5,16 +5,16 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import _ from 'lodash';
+import _, { multiply } from 'lodash';
 import { merge, tap, take, debounceTime, distinctUntilChanged, fromEvent } from 'rxjs';
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
 import { AddressService } from './address.service';
-import { AddAddressComponent } from './add-address/add-adddress.component';
+import { AddAddressComponent } from './add-address/add-address.component';
 
 @Component({
-    selector: 'app-unit',
+    selector: 'app-address',
     templateUrl: './address.component.html',
     styleUrl: './address.component.scss',
     standalone: false
@@ -27,7 +27,7 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
   filter: any = {};
-  displayableCol = ['select', 'id', 'name', 'status', 'action'];
+  displayableCol = ['select', 'id','address','city_id' ,'mob1','mob2','type','pin','status','created_by', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
@@ -40,7 +40,21 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
       name: 'ID',
       style: { 'max-width': '30px' },
     },
-    { ref: 'name', name: 'Name' },
+    {ref:'address', name: 'Address Name'},
+    { 
+      ref: 'city_id', 
+      name: 'City', 
+      mutator: (item: AddressModel) => item.city ? item.city.name : 'N/A' 
+    },
+    { ref: 'pin', name: 'Pin Code' },
+    { ref: 'mob1', name: 'Mobile No 1' },
+    { ref: 'mob2', name: 'Mobile No 2' },
+    {ref: 'type', name: 'Address Type', mutator: (item: AddressModel) => item.type == '1' ? 'Billing' : 'Shipping' },
+    { 
+      ref: 'created_by', 
+      name: 'Created By', 
+      mutator: (item: AddressModel) => item.created_by?.name || 'N/A' 
+    },
     { ref: 'status', name: 'Status', mutator: (item: AddressModel) => item.status == 0 ? 'In-Active' : 'Active' },
     { ref: 'action', name: 'Actions' },
   ];
@@ -87,15 +101,14 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
    }
  
    loadData() {
-     this.filter.orderField = this.sort.active;
-     this.filter.orderBy = this.sort.direction;
-     this.filter.page = this.paginator.pageIndex + 1;
-     this.filter.pageSize = this.paginator.pageSize || 20;
-     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-     this.filter.with = ['roles'];
-     this.dataSource.find(_.pickBy(this.filter));
-   }
-
+    this.filter.orderField = this.sort.active;
+    this.filter.orderBy = this.sort.direction;
+    this.filter.page = this.paginator.pageIndex + 1;
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.with = ['roles', 'city', 'createdBy']; 
+    this.dataSource.find(_.pickBy(this.filter));
+  }
   masterToggle() {
     if (
       this.selection.selected.length ===

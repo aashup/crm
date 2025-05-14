@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AddAddressComponent } from './add-adddress.component';
+import { AddAddressComponent } from './add-address.component';
 
 
 describe('AddAddressComponent', () => {
