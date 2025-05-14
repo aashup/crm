@@ -1,33 +1,107 @@
-<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Menu</h2>
+<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Address</h2>
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
+          <!-- Address Field -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
-              <mat-label>Please enter Name </mat-label>
+              <mat-label>Please enter Address Name</mat-label>
               <input
                 matInput
-                placeholder="Enter Name"
-                formControlName="name"
+                placeholder="Enter Address Name"
+                formControlName="address"
                 maxlength="200"
               />
-              <mat-error
-                >Name is <strong>required</strong> and must be
-                <strong>characters only</strong>
+              <mat-error *ngIf="form.get('address')?.hasError('required')">
+                Address is <strong>required</strong>.
               </mat-error>
             </mat-form-field>
           </div>
+
+          <!-- Type Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
-              <mat-label>Status? </mat-label>
-              <mat-select placeholder="Status" formControlName="status">
+              <mat-label>Type</mat-label>
+              <mat-select placeholder="Select Type" formControlName="type">
+                <mat-option *ngFor="let option of typeOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.get('type')?.hasError('required')">
+                Type is <strong>required</strong>.
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- City Dropdown -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>City</mat-label>
+              <mat-select placeholder="Select City" formControlName="city">
+                <mat-option *ngFor="let city of cityOptions" [value]="city.id">
+                  {{ city.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.get('city')?.hasError('required')">
+                City is <strong>required</strong>.
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Mobile 1 Field -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Mobile 1</mat-label>
+              <input
+                matInput
+                placeholder="Enter Mobile 1"
+                formControlName="mob1"
+              />
+              <mat-error *ngIf="form.get('mob1')?.hasError('required')">
+                Mobile 1 is <strong>required</strong>.
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Mobile 2 Field -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Mobile 2</mat-label>
+              <input
+                matInput
+                placeholder="Enter Mobile 2"
+                formControlName="mob2"
+              />
+            </mat-form-field>
+          </div>
+
+          <!-- Pin Field -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Pin</mat-label>
+              <input
+                matInput
+                placeholder="Enter Pin"
+                formControlName="pin"
+              />
+              <mat-error *ngIf="form.get('pin')?.hasError('required')">
+                Pin is <strong>required</strong>.
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Status Dropdown -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Status</mat-label>
+              <mat-select placeholder="Select Status" formControlName="status">
                 <mat-option [value]="1">Active</mat-option>
                 <mat-option [value]="0">In-Active</mat-option>
               </mat-select>
-              <mat-error
-                >Status is <strong>required</strong>
+              <mat-error *ngIf="form.get('status')?.hasError('required')">
+                Status is <strong>required</strong>.
               </mat-error>
             </mat-form-field>
           </div>

@@ -57,7 +57,10 @@ export class AuthService implements OnDestroy {
   logout(user: any) {
     return this.http.post(`${environment.API_ENDPOINT}/logout`, user);
   }
-
+  getCurrentUser(): any {
+    const user = localStorage.getItem('user-data'); 
+    return user ? JSON.parse(user) : null;
+  }
   getUserByToken(): Observable<UserType> {
     const auth = this.getAuthFromLocalStorage();
     if (!auth || !auth.authToken) {

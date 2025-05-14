@@ -53,7 +53,7 @@ export class CommonService {
     } while (fileSizeInBytes > 1024);
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
   }
-
+ 
   saveOfGetData<T>(
     key: string,
     defaultValue = null,
