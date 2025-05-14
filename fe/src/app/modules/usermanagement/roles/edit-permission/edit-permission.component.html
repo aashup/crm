@@ -1,48 +1,60 @@
 <mat-card>
-    
-    <mat-card-title>
-      
-     
-    </mat-card-title>
+  <mat-card-title></mat-card-title>
 
-    <mat-card-content>
-      <div
-      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;margin-top: 10px;"
-      >
-        <mat-form-field appearance="outline" class="search-field" style="width: 300px;">
-            <mat-label>Search section</mat-label>
-            <input matInput [(ngModel)]="searchText"  />
-          </mat-form-field>
-      
-          <mat-checkbox [(ngModel)]="selectAll">Select All</mat-checkbox>
-      </div>
-  
-      <div *ngFor="let section of filteredSections()" class="section-container">
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>{{ section.name }}</mat-panel-title>
-          </mat-expansion-panel-header>
-  
-          <div class="permission-options">
-            <div *ngFor="let permission of section.permissions" style="display: flex; align-items: center;">
-              <mat-checkbox [(ngModel)]="section[permission.id]">{{ permission.description }}</mat-checkbox>
-              <button mat-icon-button style="margin-left: 8px;" matTooltip="Copy" class="small-button" (click)="copyText(permission.description)">
-                <mat-icon>content_copy</mat-icon>
-              </button>
-            </div>
+  <mat-card-content>
+    <div class="action-buttons">
+      <button mat-button (click)="resetPermissions()">Reset</button>
+      <button mat-raised-button color="primary" (click)="saveChanges()">Save Changes</button>
+    </div>
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-top: 10px;"
+    >
+      <mat-form-field appearance="outline" class="search-field" style="width: 300px;">
+        <mat-label>Search section</mat-label>
+        <input matInput [(ngModel)]="searchText" />
+      </mat-form-field>
+
+      <mat-checkbox [(ngModel)]="selectAll" (change)="toggleSelectAll($event.checked)">Select All</mat-checkbox>
+    </div>
+
+    <div *ngFor="let section of filteredSections(); let i = index" class="section-container">
+      <mat-expansion-panel [expanded]="selectAll">
+        <mat-expansion-panel-header>
+          <mat-panel-title
+            style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+          >
+            <span>{{ section.name }}</span>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="addNewPermission(section)"
+              style="margin:20px;"
+            >
+              + New
+            </button>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="permission-options">
+          <div *ngFor="let permission of section.permissions" style="display: flex; align-items: center;">
+            <mat-checkbox [(ngModel)]="section[permission.id]">{{ permission.description }}</mat-checkbox>
+            <button
+              mat-icon-button
+              style="margin-left: 8px;"
+              matTooltip="Copy"
+              class="small-button"
+              (click)="copyText(permission.description)"
+            >
+              <mat-icon>content_copy</mat-icon>
+            </button>
           </div>
-          
-  
-          <button mat-raised-button color="primary" (click)="addNewPermission(section)">
-            + New
-          </button>
-        </mat-expansion-panel>
-      </div>
-  
-      <div class="action-buttons">
-        <button mat-button (click)="resetPermissions()">Reset</button>
-        <button mat-raised-button color="primary" (click)="saveChanges()">Save Changes</button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  
+        </div>
+      </mat-expansion-panel>
+    </div>
+
+    <div class="action-buttons">
+      <button mat-button (click)="resetPermissions()">Reset</button>
+      <button mat-raised-button color="primary" (click)="saveChanges()">Save Changes</button>
+    </div>
+  </mat-card-content>
+</mat-card>
