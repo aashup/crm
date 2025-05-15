@@ -7,10 +7,12 @@ import { FindService } from 'src/app/modules/core/find.service';
 import _ from 'lodash';
 import { CustomersModel } from '../customers.model';
 import { CustomersService } from '../customers.service';
+import { ContactService } from 'src/app/modules/settings/contact/contact.service';
+import { AddressService } from 'src/app/modules/settings/address/address.service';
 @Component({
     selector: 'app-add-customers',
     templateUrl: '././add-customers.component.html',
-    styleUrl: '../add-customers.component.scss',
+    styleUrl: '././add-customers.component.scss',
     standalone: false
 })
 export class AddCustomersComponent implements AfterViewInit, OnInit {
@@ -18,6 +20,9 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
   model: CustomersModel;
   clone: any;
   isEdit: boolean = false;
+  contacts: any = [];
+  addresses: any = [];
+  readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddCustomersComponent>);
   readonly data = inject<{
     model: CustomersModel;
@@ -30,26 +35,28 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: CustomersService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private contactService: ContactService,
+    private addressService: AddressService,
   ) {}
 
   ngOnInit(): void {
-    // this.find
-    //   .country()
-    //   .pipe(take(1))
-    //   .subscribe({
-    //     next: (data: any) => (this.countries = data.data),
-    //     error: (err) => this.commonService.handleError(err),
-    //   });
-    this.find
-      .state()
-      .pipe(take(1))
-      .subscribe({
-        next: (data: any) => (this.customers = data.data),
-        error: (err) => this.commonService.handleError(err),
-      });
+   this.getContacts()
+   this.getAddresses()
   }
 
+  getContacts() {
+    this.contactService.find().subscribe((res: any) => {
+      this.contacts = res.data;
+    }
+    );
+  }
+  getAddresses() {
+    this.addressService.find().subscribe((res: any) => {
+      this.addresses = res.data;
+    }
+    );
+  }
   ngAfterViewInit(): void {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
@@ -69,8 +76,7 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
       ],
       contact_id: [model.contact_id, []],
       address_id: [model.address_id, []],
-      created_at: [model.created_at, []],
-      updated_at: [model.updated_at, []],
+     
     });
     this.clone = this.form.value;
   }

@@ -12,17 +12,18 @@ import { RouterModule } from '@angular/router';
       {
         path: 'settings',
         loadChildren: () => import('../settings/settings.module').then((m) => m.SettingsModule),
-        // data: { layout: 'light-sidebar' },
       },
       {
         path: 'usermanagement',
         loadChildren: () => import('../usermanagement/usermanagement.module').then((m) => m.UserManagementModule),
-        // data: { layout: 'light-sidebar' },
       },
       {
         path: 'product',
         loadChildren: () => import('./product/product.module').then((m) => m.ProductModule),
-        // data: { layout: 'light-sidebar' },
+      },
+      {
+        path: 'customer',
+        loadChildren: () => import('./customer/customers.module').then((m) => m.CustomersModule),
       },
     ])
   ]

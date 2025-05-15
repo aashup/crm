@@ -5,10 +5,7 @@ const Routing: Routes = [
     path: 'dashboard',
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
-  {
-    path: 'customers',
-    loadChildren: () => import('./customer/customers.module').then((m) => m.CustomersModule),
-  },
+  
   {
     path: 'builder',
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),

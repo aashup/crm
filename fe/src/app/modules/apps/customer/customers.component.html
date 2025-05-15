@@ -79,7 +79,29 @@
               {{ cols.name }}
             </th>
             <td cdk-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
-              {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
+              <div style="display: flex; justify-content: left; align-items: center;">
+                <div>
+                  {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
+                </div>
+                <button
+                  *ngIf="cols.ref === 'address'"
+                  mat-icon-button
+                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{ row.address?.mob1 || 'N/A' }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{getCityName(row.address.city_id)}}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{ row.address?.type===1?'Billing':'Shipping' || 'N/A' }}"
+                  matTooltipPosition="above"
+                  class="text-info"
+                >
+                  <mat-icon>info</mat-icon>
+                </button>
+                <button
+                  *ngIf="cols.ref === 'contact'"
+                  mat-icon-button
+                  matTooltip="Name: {{ row.contact?.name || 'N/A' }}, Phone 1: {{ row.contact?.mob1 || 'N/A' }}, Phone 2: {{ row.contact?.mob2 || 'N/A' }}, "
+                  matTooltipPosition="above"
+                  class="text-info"
+                >
+                  <mat-icon>info</mat-icon>
+                </button>
+              </div>
             </td>
           </ng-container>
 

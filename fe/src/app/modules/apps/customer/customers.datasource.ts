@@ -1,6 +1,6 @@
 import { tap, finalize } from 'rxjs/operators';
 import { CustomersService } from './customers.service';
-import { BaseDataSource } from '../../modules/core/base.datasource';
+import { BaseDataSource } from '../../core/base.datasource';
 
 
 export class CustomersDatasource extends BaseDataSource {
