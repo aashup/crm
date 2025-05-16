@@ -23,8 +23,8 @@ class StoreVendorRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:vendors,name',
-            'contact_id' => 'nullable|exists:contacts,id',
-            'address_id' => 'nullable|exists:addresses,id',
+            'contact_id' => 'required|exists:contacts,id',
+            'address_id' => 'required|exists:addresses,id',
         ];
     }
 }

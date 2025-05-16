@@ -11,7 +11,7 @@
     </div>
     <div class="card-toolbar">
       <div class="d-flex justify-content-end">
-        <button mat-flat-button class="bg-success" (click)="add()">
+        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['vendors.create']">
           Add New
         </button>
         <button mat-icon-button (click)="loadData()">
@@ -22,10 +22,7 @@
   </div>
   <div class="card-body">
     <div class="table-responsive">
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="dataSource.loading$ | async"
-      ></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" *ngIf="dataSource.loading$ | async"></mat-progress-bar>
       <table
         #table
         cdk-table
@@ -40,12 +37,7 @@
         <ng-container *ngFor="let cols of tableColumns; let i = index">
           <!-- Checkbox Column -->
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'select'">
-            <th
-              cdk-header-cell
-              *matHeaderCellDef
-              [ngStyle]="cols.style || {}"
-              [attr.aria-label]="'Select all'"
-            >
+            <th cdk-header-cell *matHeaderCellDef [ngStyle]="cols.style || {}" [attr.aria-label]="'Select all'">
               <mat-checkbox
                 [attr.aria-label]="'Select all'"
                 (change)="$event ? masterToggle() : null"
@@ -64,10 +56,7 @@
             </td>
           </ng-container>
 
-          <ng-container
-            [matColumnDef]="cols.ref"
-            *ngIf="['action', 'select'].indexOf(cols.ref) == -1"
-          >
+          <ng-container [matColumnDef]="cols.ref" *ngIf="['action', 'select'].indexOf(cols.ref) == -1">
             <th
               cdk-header-cell
               [mat-sort-header]="cols.doNotSort ? null : cols.ref"
@@ -79,14 +68,20 @@
               {{ cols.name }}
             </th>
             <td cdk-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
-              <div style="display: flex; justify-content: left; align-items: center;">
+              <div style="display: flex; justify-content: left; align-items: center">
                 <div>
-                  {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
+                  {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
                 </div>
                 <button
                   *ngIf="cols.ref === 'address'"
                   mat-icon-button
-                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{ row.address?.mob1 || 'N/A' }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{getCityName(row.address.city_id)}}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{ row.address?.type===1?'Billing':'Shipping' || 'N/A' }}"
+                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{
+                    row.address?.mob1 || 'N/A'
+                  }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{
+                    getCityName(row.address.city_id)
+                  }}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{
+                    row.address?.type === 1 ? 'Billing' : 'Shipping'
+                  }}"
                   matTooltipPosition="above"
                   class="text-info"
                 >
@@ -95,7 +90,9 @@
                 <button
                   *ngIf="cols.ref === 'contact'"
                   mat-icon-button
-                  matTooltip="Name: {{ row.contact?.name || 'N/A' }}, Phone 1: {{ row.contact?.mob1 || 'N/A' }}, Phone 2: {{ row.contact?.mob2 || 'N/A' }}, "
+                  matTooltip="Name: {{ row.contact?.name || 'N/A' }}, Phone 1: {{
+                    row.contact?.mob1 || 'N/A'
+                  }}, Phone 2: {{ row.contact?.mob2 || 'N/A' }}, "
                   matTooltipPosition="above"
                   class="text-info"
                 >
@@ -106,27 +103,14 @@
           </ng-container>
 
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
-            <th
-              cdk-header-cell
-              [attr.aria-label]="cols.name"
-              *matHeaderCellDef
-              [ngStyle]="cols.style || {}"
-            >
+            <th cdk-header-cell [attr.aria-label]="cols.name" *matHeaderCellDef [ngStyle]="cols.style || {}">
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <button
-                mat-icon-button
-                class="text-info blod"
-                (click)="edit(item)"
-              >
+              <button mat-icon-button class="text-info blod" (click)="edit(item)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button
-                mat-icon-button
-                class="text-danger"
-                (click)="delete(item)"
-              >
+              <button mat-icon-button class="text-danger" (click)="delete(item)">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
@@ -143,10 +127,7 @@
     </div>
 
     <div class="pt-5">
-      <mat-spinner
-        [diameter]="20"
-        *ngIf="dataSource.loading$ | async"
-      ></mat-spinner>
+      <mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
       <mat-paginator
         [pageSize]="dataSource.paginatorTotal$ | async"
         [length]="dataSource.paginatorTotal$ | async"
@@ -154,9 +135,7 @@
 
       <div class="mat-table__floating-modal" *ngIf="selection.selected.length">
         <div class="floating-modal">
-          <p class="font-weight-bold m-0" style="font-size: 16px">
-            {{ selection.selected.length }} selected
-          </p>
+          <p class="font-weight-bold m-0" style="font-size: 16px">{{ selection.selected.length }} selected</p>
           <div class="floating-modal__divider"></div>
         </div>
       </div>

@@ -23,8 +23,8 @@ class UpdateVendorRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255|unique:vendors,name,' . $this->route('vendor')->id,
-            'contact_id' => 'sometimes|nullable|exists:contacts,id',
-            'address_id' => 'sometimes|nullable|exists:addresses,id',
+            'contact_id' => 'sometimes|required|exists:contacts,id',
+            'address_id' => 'sometimes|required|exists:addresses,id',
         ];
     }
 }

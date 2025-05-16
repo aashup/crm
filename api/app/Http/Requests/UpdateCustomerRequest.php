@@ -23,8 +23,8 @@ class UpdateCustomerRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255|unique:customers,name,' . $this->route('customer')->id,
-            'contact_id' => 'sometimes|nullable|exists:contacts,id',
-            'address_id' => 'sometimes|nullable|exists:addresses,id',
+            'contact_id' => 'sometimes|required|exists:contacts,id',
+            'address_id' => 'sometimes|required|exists:addresses,id',
         ];
     }
 }
