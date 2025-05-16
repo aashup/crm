@@ -63,7 +63,7 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
+          this.isEdit ? 'Unit has been updated.' : 'Unit has been created.'
         );
         this.dialogRef.close(true);
       },

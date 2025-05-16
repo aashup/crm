@@ -23,6 +23,7 @@ import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { AddCustomersComponent } from './add-customers/add-customers.component';
 import { CityService } from '../../settings/city/city.service';
+import { AuthService } from '../../auth';
 
 @Component({
     selector: 'app-customers',
@@ -68,12 +69,14 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: CustomersService,
     private commonService: CommonService,
     private cityService: CityService,
+    private authService: AuthService,
   ) {
     this.dataSource = new CustomersDatasource(this.service);
   }
   ngOnInit(): void {
     this.getAllCities()
     this.loadData();
+    this.checkPermissions()
     this.commonService.page.updateTitle('Customer List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
@@ -126,8 +129,8 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; // Include contact and address
-      this.filter.cols = ['id', 'name', 'contact_id', 'address_id', 'created_at', 'updated_at']; // Specify required columns
+      this.filter.with = ['contact', 'address']; 
+      this.filter.cols = ['id', 'name', 'contact_id', 'address_id', 'created_at', 'updated_at']; 
       this.dataSource.find(_.pickBy(this.filter));
     }
   masterToggle() {
@@ -143,6 +146,11 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  checkPermissions() {
+    const userData = this.authService.getCurrentUser(); 
+   console.log(userData.permissions);
+   
+  }
   isAllSelected(): boolean {
     return (
       this.dataSource.originalData.data.length ===
@@ -154,8 +162,8 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Country',
-          body: `Are you sure you want to delete this country <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete Customer',
+          body: `Are you sure you want to delete this Customer <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
@@ -164,7 +172,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
-              this.commonService.toastr.success('Country has been deleted.');
+              this.commonService.toastr.success('Customer has been deleted.');
               this.loadData();
             },
             error: (err) => this.commonService.handleError(err),

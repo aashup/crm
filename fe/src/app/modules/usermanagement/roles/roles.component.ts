@@ -148,7 +148,7 @@ loadData() {
       .open(ConfirmationDialogComponent, {
         data: {
           title: 'Delete Roles',
-          body: `Are you sure you want to delete this Roles <span class="text-danger bold">${item.name}?</span>`,
+          body: `Are you sure you want to delete this Role <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
@@ -157,7 +157,7 @@ loadData() {
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
-              this.commonService.toastr.success('Roles has been deleted.');
+              this.commonService.toastr.success('Role has been deleted.');
               this.loadData();
             },
             error: (err) => this.commonService.handleError(err),

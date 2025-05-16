@@ -124,7 +124,7 @@ loadData() {
       .open(ConfirmationDialogComponent, {
         data: {
           title: 'Delete Country',
-          body: `Are you sure you want to delete this country <span class="text-danger bold">${item.name}?</span>`,
+          body: `Are you sure you want to delete this Country <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })

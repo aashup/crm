@@ -144,8 +144,8 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Users',
-          body: `Are you sure you want to delete this Users <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete User',
+          body: `Are you sure you want to delete this User <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
