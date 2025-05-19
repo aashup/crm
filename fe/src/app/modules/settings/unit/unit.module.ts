@@ -4,6 +4,7 @@ import { UnitComponent } from './unit.component';
 import { AddUnitComponent } from './add-unit/add-unit.component';
 import { SharedMaterialModuleModule } from '../../shared-material-module/shared-material-module.module';
 import { RouterModule } from '@angular/router';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 
 
@@ -15,7 +16,8 @@ import { RouterModule } from '@angular/router';
     RouterModule.forChild([{
       path: '',
       component: UnitComponent
-    }])
+    }]),
+    NgxPermissionsModule.forChild(),
   ]
 })
 export class UnitModule { }

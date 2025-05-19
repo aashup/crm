@@ -11,7 +11,7 @@
     </div>
     <div class="card-toolbar">
       <div class="d-flex justify-content-end">
-        <button mat-flat-button class="bg-success" (click)="add()">
+        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['city.create']">
           Add New
         </button>
         <button mat-icon-button (click)="loadData()">

@@ -8,8 +8,10 @@ use App\Models\City;
 use App\Models\Contact;
 use App\Models\Country;
 use App\Models\Menu;
+use App\Models\Product;
 use App\Models\Role;
 use App\Models\State;
+use App\Models\Unit;
 use App\Models\Vendor;
 use Illuminate\Support\Str;
 
@@ -94,6 +96,22 @@ class FindController extends Controller
         $model = $model->select('id', 'address');
 
         return BaseResponse::success($model->orderBy('address', 'desc')->limit(250)->get());
+    }
+
+    public function product()
+    {
+        $model = new Product();
+        $model = $model->select('id', 'name');
+
+        return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
+    }
+
+    public function unit()
+    {
+        $model = new Unit();
+        $model = $model->select('id', 'name');
+
+        return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
     }
 
 }

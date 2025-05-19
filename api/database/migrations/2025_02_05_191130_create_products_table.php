@@ -153,7 +153,7 @@ return new class extends Migration
                 $table->unique(['product_id', 'unit_id']);
             });
 
-            Schema::create('inventry', function (Blueprint $table) {
+            Schema::create('inventories', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('unit_id');
@@ -169,6 +169,7 @@ return new class extends Migration
                 $table->boolean(column: 'status')->default(true);
                 $table->foreign('product_id')->references('id')->on('products');
                 $table->foreign('unit_id')->references('id')->on('units');
+                $table->foreign('created_by')->references('id')->on('users');
             });
 
             Schema::create('sales', function (Blueprint $table) {

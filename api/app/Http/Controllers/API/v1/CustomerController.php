@@ -47,13 +47,13 @@ class CustomerController extends Controller
         $model->fill($request->all());
         $model->save();
 
-        return $this->success("Vendor created successfully!", $model);
+        return $this->success("Customer created successfully!", $model);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Customer $customer, Request $request)
+    public function show(Customer $customer)
     {
         $this->authorize('view', Customer::class);
 
@@ -80,7 +80,7 @@ class CustomerController extends Controller
         $model->fill($request->all());
         $model->save();
 
-        return $this->success("Vendor updated successfully!", $model);
+        return $this->success("Customer updated successfully!", $model);
     }
 
     /**
@@ -91,9 +91,9 @@ class CustomerController extends Controller
         $this->authorize('delete', $customer);
 
         try {
-            return $this->success("Permission deleted successfully!", $customer->delete());
+            return $this->success("Customer deleted successfully!", $customer->delete());
         } catch (\Exception $e) {
-            return $this->error("Vendor cannot be deleted! : " . $e->getMessage(), 500);
+            return $this->error("Customer cannot be deleted! : " . $e->getMessage(), 500);
         }
     }
 }

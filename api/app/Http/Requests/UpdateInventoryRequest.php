@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateInventoryRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'product_id' => 'sometimes|required|integer|exists:products,id',
+            'unit_id' => 'sometimes|required|integer|exists:units,id',
+            'qty' => 'sometimes|required|integer|min:0',
+            'rem_qty' => 'sometimes|required|integer|min:0',
+            'purchase_price' => 'sometimes|required|numeric|min:0',
+            'sale_price' => 'sometimes|required|numeric|min:0',
+            'notes' => 'sometimes|nullable|string|max:255',
+            'status' => 'sometimes|required|boolean',
+        ];
+    }
+}

@@ -34,5 +34,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('address', controller: 'App\Http\Controllers\API\v1\AddressController');
         Route::apiResource('vendor', controller: 'App\Http\Controllers\API\v1\VendorController');
         Route::apiResource('customer', controller: 'App\Http\Controllers\API\v1\CustomerController');
+        Route::apiResource('inventory', controller: 'App\Http\Controllers\API\v1\InventoryController');
     });
 });
