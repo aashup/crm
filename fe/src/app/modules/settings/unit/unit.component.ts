@@ -120,8 +120,8 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Menu',
-          body: `Are you sure you want to delete this Menu <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete Unit',
+          body: `Are you sure you want to delete this Unit <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
@@ -130,7 +130,7 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
-              this.commonService.toastr.success('Menu has been deleted.');
+              this.commonService.toastr.success('Unit has been deleted.');
               this.loadData();
             },
             error: (err) => this.commonService.handleError(err),

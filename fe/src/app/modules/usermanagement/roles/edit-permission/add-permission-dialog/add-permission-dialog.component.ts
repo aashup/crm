@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AddPermissionComponent } from '../../../permission/add-permission/add-permission.component';
 import { ActivatedRoute } from '@angular/router';
 import { PermissionService } from '../../../permission/permission.service';
+import { CommonService } from 'src/app/modules/core/common.service';
 
 @Component({
   selector: 'app-add-permission-dialog',
@@ -22,10 +23,10 @@ export class AddPermissionDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { menu_id: string },
     private route: ActivatedRoute,
     private permissionService: PermissionService,
+    private commonService: CommonService,
   ) {
   }
   ngOnInit(): void {
- 
     this.route.paramMap.subscribe(params => {
       console.log("menu id : ",params);
       const id = params.get('id'); 
@@ -36,7 +37,6 @@ export class AddPermissionDialogComponent {
   }
 
   savePermission() {
-    console.log("hellow");
     const payload = {
       description: this.description,
       guard_name: this.guard_name,  
@@ -47,6 +47,7 @@ export class AddPermissionDialogComponent {
      console.log(payload);
      this.permissionService.create(payload).subscribe((response: any) => {
       this.dialogRef.close({ message: 'Permission created successfully' }); 
+      this.commonService.toastr.success('Permission created successfully');
      },(error: any) => {
       this.error = error.error.message;
      })

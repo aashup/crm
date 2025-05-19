@@ -74,8 +74,8 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
           Validators.maxLength(200),
         ],
       ],
-      contact_id: [model.contact_id, []],
-      address_id: [model.address_id, []],
+      contact_id: [model.contact_id, [Validators.required]],
+      address_id: [model.address_id, [Validators.required]],
      
     });
     this.clone = this.form.value;
@@ -94,7 +94,7 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'State has been updated.' : 'State has been created.'
+          this.isEdit ? 'Customer has been updated.' : 'Customer has been created.'
         );
         this.dialogRef.close(true);
       },

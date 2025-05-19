@@ -146,8 +146,8 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Country',
-          body: `Are you sure you want to delete this country <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete Contact',
+          body: `Are you sure you want to delete this Contact <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
@@ -156,7 +156,7 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
-              this.commonService.toastr.success('Country has been deleted.');
+              this.commonService.toastr.success('Contact has been deleted.');
               this.loadData();
             },
             error: (err) => this.commonService.handleError(err),

@@ -23,6 +23,7 @@ export class EditPermissionComponent implements AfterViewInit, OnInit {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private dialog: MatDialog,
+
   ) { }
   searchQuery: string = '';
   selectAll: boolean = false;
@@ -37,7 +38,6 @@ export class EditPermissionComponent implements AfterViewInit, OnInit {
     
       (response: any) => {
         if (response.status) {
-          debugger
           this.role = response.data;  
           this.sections.forEach((section: any) => {
             section.permissions.forEach((permission: any) => {
@@ -109,7 +109,7 @@ export class EditPermissionComponent implements AfterViewInit, OnInit {
   copyText(text: string) {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text)
-        .then(() => alert('Copied to clipboard!'))
+        .then(() => this.commonService.toastr.success('Copied to clipboard!'))
         .catch(err => console.error('Failed to copy text: ', err));
     } else {
       alert('Clipboard API not supported in this browser.');

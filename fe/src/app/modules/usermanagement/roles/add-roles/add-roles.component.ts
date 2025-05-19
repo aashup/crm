@@ -90,7 +90,7 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'State has been updated.' : 'State has been created.'
+          this.isEdit ? 'Roles has been updated.' : 'Roles has been created.'
         );
         this.dialogRef.close(true);
       },

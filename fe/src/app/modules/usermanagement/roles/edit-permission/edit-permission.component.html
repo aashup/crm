@@ -29,6 +29,7 @@
               color="primary"
               (click)="addNewPermission(section)"
               style="margin:20px;"
+              *ngxPermissionsOnly="['permission.create']"
             >
               + New
             </button>
@@ -43,7 +44,7 @@
               style="margin-left: 8px;"
               matTooltip="Copy"
               class="small-button"
-              (click)="copyText(permission.description)"
+              (click)="copyText(permission.name)"
             >
               <mat-icon>content_copy</mat-icon>
             </button>

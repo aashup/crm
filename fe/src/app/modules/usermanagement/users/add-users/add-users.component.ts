@@ -51,7 +51,7 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
     this.find.getRoles().subscribe(
       (data) => {
         this.fechedRoles = data.data;
-        console.log('Roles:', this.fechedRoles);
+        
       },
       (error) => {
         console.error('Error fetching roles:', error);
@@ -106,7 +106,7 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'State has been updated.' : 'State has been created.'
+          this.isEdit ? 'User has been updated.' : 'User has been created.'
         );
         this.dialogRef.close(true);
       },
