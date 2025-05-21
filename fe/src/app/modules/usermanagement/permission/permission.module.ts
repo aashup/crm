@@ -5,6 +5,7 @@ import { SharedMaterialModuleModule } from '../../shared-material-module/shared-
 import { RouterModule } from '@angular/router';
 import { PermissionComponent } from './permission.component';
 import { AddPermissionComponent } from './add-permission/add-permission.component';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [PermissionComponent, AddPermissionComponent],
@@ -15,6 +16,7 @@ import { AddPermissionComponent } from './add-permission/add-permission.componen
       { path: '', component: PermissionComponent },
       { path: 'add', component: AddPermissionComponent },
     ]),
+    NgxPermissionsModule.forChild()
   ],
 })
 export class PermissionModule {}

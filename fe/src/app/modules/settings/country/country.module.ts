@@ -5,6 +5,7 @@ import { SharedModule } from 'src/app/_metronic/shared/shared.module';
 import { CountryComponent } from './country.component';
 import { AddCountryComponent } from './add-country/add-country.component';
 import { RouterModule, Routes } from '@angular/router';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 const routes: Routes = [
   { path: '', component: CountryComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
     CommonModule,
     SharedMaterialModuleModule,
     RouterModule.forChild(routes),
+    NgxPermissionsModule.forChild()
   ],
 })
 export class CountryModule {}

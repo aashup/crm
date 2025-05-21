@@ -8,6 +8,7 @@ import { SharedModule } from 'src/app/_metronic/shared/shared.module';
 import { ProductUnitComponent } from './product-unit/product-unit.component';
 import { StepperComponent } from './stepper/stepper.component';
 import { AddProductUnitComponent } from './add-product-unit/add-product-unit.component';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent, AddProductUnitComponent],
@@ -19,6 +20,7 @@ import { AddProductUnitComponent } from './add-product-unit/add-product-unit.com
       { path: 'add', component: StepperComponent },
       { path: 'add/:id', component: StepperComponent },
     ]),
+     NgxPermissionsModule.forChild(),
     SharedModule
   ],
 })
