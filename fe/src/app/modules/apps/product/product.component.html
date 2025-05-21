@@ -1,7 +1,7 @@
 <div class="card text-center">
   <div class="card-header">
     <div class="w-100 my-auto d-flex flex-row-reverse">
-      <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['product.create']">
+      <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['products.create']">
         Add New
       </button>
       <button mat-icon-button (click)="loadData()">
@@ -86,7 +86,7 @@
                 mat-icon-button
                 class="text-info blod"
                 (click)="edit(item)"
-                *ngxPermissionsOnly="['product.update']"
+                *ngxPermissionsOnly="['products.update']"
               >
                 <mat-icon>edit</mat-icon>
               </button>
@@ -94,7 +94,7 @@
                 mat-icon-button
                 class="text-danger"
                 (click)="delete(item)"
-                *ngxPermissionsOnly="['product.delete']"
+                *ngxPermissionsOnly="['products.delete']"
               >
                 <mat-icon>delete</mat-icon>
               </button>

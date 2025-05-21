@@ -4,6 +4,7 @@ import { SharedMaterialModuleModule } from '../../shared-material-module/shared-
 import { RouterModule } from '@angular/router';
 import { AddressComponent } from './address.component';
 import { AddAddressComponent } from './add-address/add-address.component';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 
 
@@ -15,7 +16,8 @@ import { AddAddressComponent } from './add-address/add-address.component';
     RouterModule.forChild([{
       path: '',
       component: AddressComponent
-    }])
+    }]),
+    NgxPermissionsModule.forChild()
   ]
 })
 export class AddressModule { }

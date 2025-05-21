@@ -4,6 +4,7 @@ import { MenuComponent } from './menu.component';
 import { AddMenuComponent } from './add-menu/add-menu.component';
 import { SharedMaterialModuleModule } from '../../shared-material-module/shared-material-module.module';
 import { RouterModule } from '@angular/router';
+import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [MenuComponent, AddMenuComponent],
@@ -14,6 +15,7 @@ import { RouterModule } from '@angular/router';
       { path: '', component: MenuComponent },
       { path: 'add', component: AddMenuComponent },
     ]),
+    NgxPermissionsModule.forChild()
   ],
 })
 export class MenuModule {}
