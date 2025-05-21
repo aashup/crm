@@ -23,6 +23,9 @@ import { InventoryDatasource } from './inventory.datasource';
 import { InventoryModel } from './inventory.model';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { InventoryService } from './inventory.service';
+import { ProductService } from '../product/product.service';
+import { UnitService } from '../../settings/unit/unit.service';
+import { UsersService } from '../../usermanagement/users/users.service';
 
 
 @Component({
@@ -37,6 +40,9 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: InventoryDatasource;
   selection = new SelectionModel<InventoryModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
+  productCache: { [key: string]: string } = {};
+  unitCache: { [key: string]: string } = {};
+  userCache: { [key: string]: string } = {};
   readonly dialog = inject(MatDialog);
   cities: any = [];
   search: any = { all: '' };
@@ -52,9 +58,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     'purchase_price',
     'sale_price',
     'notes',
-    'created_at',
-    'updated_at',
-    'deleted_at',
+    
     'status',
     'action',
   ];
@@ -65,18 +69,19 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
-    { ref: 'product_id', name: 'Product ID' },
-    { ref: 'unit_id', name: 'Unit ID' },
-    { ref: 'created_by', name: 'Created By' },
+    { ref: 'product_id', name: 'Product Name', mutator: (row: any) => this.getProductName(row.product_id) },
+
+    { ref: 'unit_id', name: 'Unit ID'
+      , mutator: (row: any) => this.getUnitName(row.unit_id)  
+     },
+    { ref: 'created_by', name: 'Created By',mutator: (row: any) => this.getUserName(row.created_by) },
     { ref: 'qty', name: 'Quantity' },
     { ref: 'rem_qty', name: 'Remaining Quantity' },
     { ref: 'purchase_price', name: 'Purchase Price' },
     { ref: 'sale_price', name: 'Sale Price' },
     { ref: 'notes', name: 'Notes' },
-    { ref: 'created_at', name: 'Created At' },
-    { ref: 'updated_at', name: 'Updated At' },
-    { ref: 'deleted_at', name: 'Deleted At' },
-    { ref: 'status', name: 'Status' },
+   
+    { ref: 'status', name: 'Status', mutator: (row: any) => row.status === 1 ? 'Active' : 'Inactive'  },
     { ref: 'action', name: 'Actions' },
   ];
 
@@ -84,13 +89,17 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private service: InventoryService,
     private commonService: CommonService,
-    private cityService: CityService,
+    private productService: ProductService,
+    private unitService: UnitService,
+    private userService: UsersService,
   ) {
     this.dataSource = new InventoryDatasource(this.service);
   }
   ngOnInit(): void {
-    this.getAllCities()
     this.loadData();
+    this.prefetchProductNames()
+    this.prefetchUnitNames()
+    this.prefetchUserNames();
     this.commonService.page.updateTitle('Inventory List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
@@ -106,20 +115,46 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       .subscribe();
   }
-  getAllCities() {
-    this.cityService.find({}).subscribe((res:any) => {
-      console.log(res.data);
-      if(res.data.length){
-        this.cities=res.data
-      }
-    }
-    );
+  prefetchProductNames() {
+    this.productService.find().subscribe((products: any) => {
+      products.data.forEach((product:any) => {
+        this.productCache[product.id] = product.name;
+      });
+    });
+  }
+  
+  getProductName(id: any): string {
+    return this.productCache[id] || 'Loading...';
   }
 
-  getCityName(id:any){
-    const city = this.cities.find((city:any) => city.id === id);
-    return city ? city.name : '';
+  prefetchUnitNames() {
+    this.unitService.find().subscribe((units: any) => {
+      units.data.forEach((unit:any) => {
+        this.unitCache[unit.id] = unit.name;
+      });
+    });
   }
+  
+  getUnitName(id: any): string {
+    return this.unitCache[id] || 'Loading...';
+  }
+  prefetchUserNames() {
+    this.userService.find({}).subscribe((users: any) => {
+      console.log("-----------");
+      console.log(users);
+      console.log("-----------");
+      
+      
+      users.data.forEach((user:any) => {
+        this.userCache[user.id] = user.name;
+      });
+    });
+  }
+  
+  getUserName(id: any): string {
+    return this.userCache[id] || 'N/A';
+  }
+ 
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }

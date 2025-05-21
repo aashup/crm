@@ -26,7 +26,7 @@ export class InventoryModel {
     this.created_at = null;
     this.updated_at = null;
     this.deleted_at = null;
-    this.status = true; // Default to true as per the table structure
+    this.status = true; 
   }
 
   clear() {

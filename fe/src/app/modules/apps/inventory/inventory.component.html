@@ -75,13 +75,7 @@
                 <button
                   *ngIf="cols.ref === 'address'"
                   mat-icon-button
-                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{
-                    row.address?.mob1 || 'N/A'
-                  }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{
-                    getCityName(row.address.city_id)
-                  }}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{
-                    row.address?.type === 1 ? 'Billing' : 'Shipping'
-                  }}"
+                 
                   matTooltipPosition="above"
                   class="text-info"
                 >
