@@ -114,7 +114,7 @@ export class ProductComponent implements OnInit, OnDestroy, AfterViewInit {
       .open(ConfirmationDialogComponent, {
         data: {
           title: 'Delete Menu',
-          body: `Are you sure you want to delete this Menu <span class="text-danger bold">${item.name}?</span>`,
+          body: `Are you sure you want to delete this Product <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
@@ -123,7 +123,7 @@ export class ProductComponent implements OnInit, OnDestroy, AfterViewInit {
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
-              this.commonService.toastr.success('Menu has been deleted.');
+              this.commonService.toastr.success('Product has been deleted.');
               this.loadData();
             },
             error: (err) => this.commonService.handleError(err),

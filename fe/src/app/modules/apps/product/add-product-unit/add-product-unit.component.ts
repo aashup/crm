@@ -74,12 +74,20 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    this.service.create(this.data.product.id, this.form.value).subscribe({
+    debugger
+    this.service.create(8, this.form.value).subscribe({
       complete: () => {
+        console.log("called");
+        
         this.commonService.toastr.success("Unit has been added.");
         this.dialogRef.close(true);
       },
-      error: err => this.commonService.handleError(err)
+      error: err => {
+        console.log("faild");
+        
+        this.commonService.toastr.error(err);
+                this.commonService.handleError(err)
+      }
     })
   }
 

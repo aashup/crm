@@ -47,6 +47,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     this.initForm(this.model);
   }
 
+ 
   ngAfterViewInit(): void {
 
   }
@@ -73,10 +74,11 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
-        this.commonService.toastr.success(
-          this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
-        );
         this.next();
+
+        this.commonService.toastr.success(
+          this.isEdit ? 'Product has been updated.' : 'Product has been created.'
+        );
       },
       error: (err) => this.commonService.handleError(err),
     });
