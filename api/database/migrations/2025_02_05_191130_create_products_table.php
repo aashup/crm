@@ -210,7 +210,7 @@ return new class extends Migration
                 $table->foreign('product_id')->references('id')->on('products');
             });
 
-            Schema::create('purchase', callback: function (Blueprint $table) {
+            Schema::create('purchases', callback: function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger( 'contact_id');
                 $table->unsignedBigInteger('unit_id');

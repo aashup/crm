@@ -32,7 +32,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('product/{product}/product-unit', controller: 'App\Http\Controllers\API\v1\ProductUnitController');
         Route::apiResource('contact', controller: 'App\Http\Controllers\API\v1\ContactController');
         Route::apiResource('address', controller: 'App\Http\Controllers\API\v1\AddressController');
-        Route::apiResource('vendor', controller: 'App\Http\Controllers\API\v1\VendorController');
+        Route::apiResource('supplier', controller: 'App\Http\Controllers\API\v1\SupplierController');
         Route::apiResource('customer', controller: 'App\Http\Controllers\API\v1\CustomerController');
         Route::apiResource('inventory', controller: 'App\Http\Controllers\API\v1\InventoryController');
     });

@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreVendorRequest;
-use App\Http\Requests\UpdateVendorRequest;
-use App\Models\Vendor;
+use App\Http\Requests\StoreSupplierRequest;
+use App\Http\Requests\UpdateSupplierRequest;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
-class VendorController extends Controller
+class SupplierController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Vendor::class);
+        $this->authorize('viewAny', Supplier::class);
 
         $pageSize = null;
         if (intval($request->pageSize)) {
             $pageSize = intval($request->get('pageSize', 1000));
         }
-        $model = new Vendor();
+        $model = new Supplier();
         $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
             ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
 
@@ -39,11 +39,11 @@ class VendorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreVendorRequest $request)
+    public function store(StoreSupplierRequest $request)
     {
-        $this->authorize('create', Vendor::class);
+        $this->authorize('create', Supplier::class);
 
-        $model = new Vendor();
+        $model = new Supplier();
         $model->fill($request->all());
         $model->save();
 
@@ -53,18 +53,18 @@ class VendorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Vendor $vendor)
+    public function show(Supplier $supplier)
     {
-        $this->authorize('view', Vendor::class);
+        $this->authorize('view', Supplier::class);
 
-        $vendor->load($vendor->getWith(request()->with));
-        return $this->success("", $vendor);
+        $supplier->load($supplier->getWith(request()->with));
+        return $this->success("", $supplier);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Vendor $vendor)
+    public function edit(Supplier $supplier)
     {
         //
     }
@@ -72,11 +72,11 @@ class VendorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateVendorRequest $request, Vendor $vendor)
+    public function update(UpdateSupplierRequest $request, Supplier $supplier)
     {
-        $this->authorize('update', $vendor);
+        $this->authorize('update', $supplier);
 
-        $model = $vendor;
+        $model = $supplier;
         $model->fill($request->all());
         $model->save();
 
@@ -86,12 +86,12 @@ class VendorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Vendor $vendor)
+    public function destroy(Supplier $supplier)
     {
-        $this->authorize('delete', $vendor);
+        $this->authorize('delete', $supplier);
 
         try {
-            return $this->success("Permission deleted successfully!", $vendor->delete());
+            return $this->success("Permission deleted successfully!", $supplier->delete());
         } catch (\Exception $e) {
             return $this->error("Vendor cannot be deleted! : " . $e->getMessage(), 500);
         }
