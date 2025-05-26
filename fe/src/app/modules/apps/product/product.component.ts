@@ -11,7 +11,6 @@ import { merge, tap, take } from 'rxjs';
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
-import { AddUnitComponent } from '../../settings/unit/add-unit/add-unit.component';
 import { Router } from '@angular/router';
 
 @Component({

@@ -6,10 +6,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
-import { AddUnitComponent } from 'src/app/modules/settings/unit/add-unit/add-unit.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { ICreateAccount, inits } from 'src/app/modules/wizards/create-account.helper';
+import { Subscription } from 'rxjs';
+
 
 @Component({
     selector: 'app-add-product',
@@ -45,13 +44,20 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       this.model = ( new ProductModel()).clear();
     }
     this.initForm(this.model);
+    console.log(this.product);
+    
   }
-
- 
   ngAfterViewInit(): void {
 
   }
-
+ gotoNext() {
+  this.product={
+    ...this.product,
+    ...this.form.value,
+  }
+  console.log(this.product);
+  
+ }
   initForm(model: ProductModel) {
     this.form = this.fb.group({
       id: [this.model.id, []],
@@ -73,8 +79,15 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       return;
     }
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
+      
       complete: () => {
         this.next();
+       
+        this.product={
+          ...this.product,
+          ...this.form.value,
+        }
+        console.log(this.product);
 
         this.commonService.toastr.success(
           this.isEdit ? 'Product has been updated.' : 'Product has been created.'
@@ -83,7 +96,6 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       error: (err) => this.commonService.handleError(err),
     });
   }
-
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }

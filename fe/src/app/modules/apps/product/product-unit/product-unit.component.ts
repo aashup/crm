@@ -43,11 +43,14 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+
+    console.log(this.product);
+    
     this.loadUnit();
   }
 
   loadUnit() {
-    this.service.find(8).subscribe({
+    this.service.find(9).subscribe({
       next: (resp: any) => {
         this.productUnits = resp.data;
         this.cdr.detectChanges();

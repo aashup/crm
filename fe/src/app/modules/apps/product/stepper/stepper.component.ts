@@ -43,7 +43,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   product: ProductModel;
   productId: number = 0;
   loadCompleted = false;
-
+  
   constructor(
     private fb: FormBuilder,
     private service: ProductService,

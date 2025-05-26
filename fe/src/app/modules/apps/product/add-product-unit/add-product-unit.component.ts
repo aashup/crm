@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ProductUnitModel } from '../product-unit/product-unit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -7,7 +7,6 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { ProductModel } from '../product.model';
-import { ProductService } from '../product.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { take } from 'rxjs';
 import { UnitModel } from 'src/app/modules/settings/unit/unit.model';
@@ -25,7 +24,9 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   isEdit: boolean = false;
   private unsubscribe = new SubscriptionHandler();
   units: UnitModel[];
+  @Input() product: ProductModel | null;
   readonly dialogRef = inject(MatDialogRef<AddProductUnitComponent>);
+
   readonly data = inject<{
     product: ProductModel;
     isEdit: boolean;
@@ -43,6 +44,8 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    console.log(this.product);
+    
     this.model = new ProductUnitModel().clear();
     this.initForm(this.model);
     this.loadUnits()
@@ -72,13 +75,20 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     });
     this.clone = this.form.value;
   }
-
+  gotoNext() {
+    this.product={
+      ...this.product,
+      ...this.form.value,
+    }
+    console.log(this.product);
+    
+   }
   submit() {
-    debugger
-    this.service.create(8, this.form.value).subscribe({
+    
+    this.service.create(1, this.form.value).subscribe({
       complete: () => {
         console.log("called");
-        
+        this.gotoNext()
         this.commonService.toastr.success("Unit has been added.");
         this.dialogRef.close(true);
       },

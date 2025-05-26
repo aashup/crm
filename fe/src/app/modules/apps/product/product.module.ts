@@ -12,9 +12,23 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { AddInventoryComponent } from '../inventory/add-inventory/add-inventory.component';
 import { AddProductInventryComponent } from './add-product-inventry /add-product-inventry.component';
 import { ProductInventryComponent } from './product-inventry/product-inventry.component';
+import { ProductSellerComponent } from './product-seller/product-seller.component';
+import { AddProductSellerComponent } from './add-product-seller/add-product-seller.component';
+import { CompleteComponent } from './complete/complete.component';
 
 @NgModule({
-  declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent, AddProductUnitComponent,AddProductInventryComponent,ProductInventryComponent],
+  declarations: [
+    ProductComponent,
+    AddProductComponent,
+    ProductUnitComponent,
+    StepperComponent,
+    AddProductUnitComponent,
+    AddProductInventryComponent,
+    ProductInventryComponent,
+    ProductSellerComponent,
+    AddProductSellerComponent,
+    CompleteComponent
+  ],
   imports: [
     CommonModule,
     SharedMaterialModuleModule,
@@ -23,8 +37,8 @@ import { ProductInventryComponent } from './product-inventry/product-inventry.co
       { path: 'add', component: StepperComponent },
       { path: 'add/:id', component: StepperComponent },
     ]),
-     NgxPermissionsModule.forChild(),
-    SharedModule
+    NgxPermissionsModule.forChild(),
+    SharedModule,
   ],
 })
 export class ProductModule {}

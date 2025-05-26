@@ -75,7 +75,7 @@ export class AddProductInventryComponent implements OnInit, OnDestroy {
 
   submit() {
     debugger
-    this.service.create(8, this.form.value).subscribe({
+    this.service.create(9, this.form.value).subscribe({
       complete: () => {
         console.log("called");
         
