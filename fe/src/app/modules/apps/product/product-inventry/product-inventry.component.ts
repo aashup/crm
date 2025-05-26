@@ -16,25 +16,25 @@ import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { MatDialog } from '@angular/material/dialog';
-import { AddProductUnitComponent } from '../add-product-unit/add-product-unit.component';
-import { ProductUnitModel } from './product-inventry.model';
-import { ProductUnitService } from './product-inventry.service';
+import { ProductInventoryModel } from './product-inventry.model';
+import { ProductInventryService } from './product-inventry.service';
+import { AddProductInventryComponent } from '../add-product-inventry /add-product-inventry.component';
 
 @Component({
-  selector: 'app-product-unit',
-  templateUrl: './product-unit.component.html',
-  styleUrl: './product-unit.component.scss',
+  selector: 'app-product-inventry',
+  templateUrl: './product-inventry.component.html',
+  styleUrl: './product-inventry.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductUnitComponent implements OnInit, OnDestroy {
+export class ProductInventryComponent implements OnInit, OnDestroy {
   @Input() product: ProductModel;
-  productUnits: ProductUnitModel[];
+  productInventry: ProductInventoryModel[];
   private unsubscribe = new SubscriptionHandler();
   @Input() next: () => void;
   @Input() prev: () => void;
 
   constructor(
-    private service: ProductUnitService,
+    private service: ProductInventryService,
     private find: FindService,
     private commonService: CommonService,
     private cdr: ChangeDetectorRef,
@@ -43,13 +43,13 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadUnit();
+    this.loadInventry();
   }
 
-  loadUnit() {
+  loadInventry() {
     this.service.find(8).subscribe({
       next: (resp: any) => {
-        this.productUnits = resp.data;
+        this.productInventry = resp.data;
         this.cdr.detectChanges();
       },
       error: (err) => this.commonService.handleError(err),
@@ -58,30 +58,30 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
 
   add() {
     this.unsubscribe.subscribe = this.dialog
-      .open(AddProductUnitComponent, {
+      .open(AddProductInventryComponent, {
         data: {
           product: this.product,
         },
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadUnit());
+      .subscribe((v) => v && this.loadInventry());
   }
 
   update() {
     this.unsubscribe.subscribe = this.dialog
-      .open(AddProductUnitComponent, {
+      .open(AddProductInventryComponent, {
         data: {
           product: this.product,
         },
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadUnit());
+      .subscribe((v) => v && this.loadInventry());
   }
 
-  delete(unit_id: number) {
-    this.service.delete(this.product.id, { id: unit_id }).subscribe({
+  delete(inventry_id: number) {
+    this.service.delete(this.product.id, { id: inventry_id }).subscribe({
       complete: () =>
-        this.commonService.toastr.success('Unit has been detached.') && this.loadUnit(),
+        this.commonService.toastr.success('Inventry has been detached.') && this.loadInventry(),
       error: (err) => this.commonService.handleError(err),
     });
   }

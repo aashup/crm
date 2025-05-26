@@ -181,7 +181,7 @@
 
         <ng-container *ngIf="currentStep$.value === 3"> 
           <ng-container *ngIf="this.loadCompleted">
-            <app-product-unit [product]="product" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-unit>
+            <app-product-inventry [product]="product" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-inventry>
           </ng-container>
         </ng-container>
 

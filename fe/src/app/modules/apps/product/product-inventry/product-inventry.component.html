@@ -21,14 +21,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of productUnits">
-          <td scope="row">{{ item?.unit?.name }}</td>
+        <tr *ngFor="let item of productInventry">
+          <td scope="row">{{ 1 }}</td>
           <td scope="row">{{ item.sale_price }}</td>
           <td scope="row">{{ item.purchase_price }}</td>
           <td scope="row">{{ item.status ? 'Active' : 'In-Active' }}</td>
           <td scope="row">{{ item.notes }}</td>
           <td>
-            <button mat-icon-button class="text-danger" (click)="delete(item.id)">
+            <button mat-icon-button class="text-danger" (click)="delete(4)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

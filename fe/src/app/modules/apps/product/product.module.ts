@@ -9,9 +9,12 @@ import { ProductUnitComponent } from './product-unit/product-unit.component';
 import { StepperComponent } from './stepper/stepper.component';
 import { AddProductUnitComponent } from './add-product-unit/add-product-unit.component';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { AddInventoryComponent } from '../inventory/add-inventory/add-inventory.component';
+import { AddProductInventryComponent } from './add-product-inventry /add-product-inventry.component';
+import { ProductInventryComponent } from './product-inventry/product-inventry.component';
 
 @NgModule({
-  declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent, AddProductUnitComponent],
+  declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent, AddProductUnitComponent,AddProductInventryComponent,ProductInventryComponent],
   imports: [
     CommonModule,
     SharedMaterialModuleModule,

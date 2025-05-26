@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class ProductUnitService {
+export class ProductInventryService {
 
 readonly endpoint = 'product';
 
