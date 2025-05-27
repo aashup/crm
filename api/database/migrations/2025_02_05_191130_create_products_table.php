@@ -236,7 +236,7 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
                 
-                $table->foreign('purchase_id')->references('id')->on('purchase');
+                $table->foreign('purchase_id')->references('id')->on('purchases');
                 $table->foreign('unit_id')->references('id')->on('units');
                 $table->foreign('product_id')->references('id')->on('products');
             });
