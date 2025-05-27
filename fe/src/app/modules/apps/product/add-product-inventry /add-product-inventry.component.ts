@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -23,6 +23,8 @@ export class AddProductInventryComponent implements OnInit, OnDestroy {
   model: ProductInventoryModel;
   clone: any;
   isEdit: boolean = false;
+  @Input() product: any;
+  @Output() formSubmit = new EventEmitter<any>();
   private unsubscribe = new SubscriptionHandler();
   inventries: ProductInventoryModel[];
   readonly dialogRef = inject(MatDialogRef<AddProductInventryComponent>);
@@ -74,21 +76,25 @@ export class AddProductInventryComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    debugger
-    this.service.create(9, this.form.value).subscribe({
-      complete: () => {
-        console.log("called");
-        
-        this.commonService.toastr.success("Inventry has been added.");
+    this.formSubmit.emit(this.form.value);
+    this.commonService.toastr.success("Inventry has been added.");
         this.dialogRef.close(true);
-      },
-      error: err => {
-        console.log("faild");
+    // this.service.create(9, this.form.value).subscribe({
+    //   complete: () => {
+    //     console.log("called");
         
-        this.commonService.toastr.error(err);
-                this.commonService.handleError(err)
-      }
-    })
+    //     this.commonService.toastr.success("Inventry has been added.");
+    //     this.dialogRef.close(true);
+    //   },
+    //   error: err => {
+    //     console.log("faild");
+        
+    //     this.commonService.toastr.error(err);
+    //             this.commonService.handleError(err)
+    //   }
+    // })
+    console.log(this.form.value);
+
   }
 
   ngOnDestroy() {

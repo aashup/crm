@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -23,6 +23,8 @@ export class AddProductSellerComponent implements OnInit, OnDestroy {
   isEdit: boolean = false;
   private unsubscribe = new SubscriptionHandler();
   sellers: ProductSellerModel[];
+  @Input() product: any;
+  @Output() formSubmit = new EventEmitter<any>();
   readonly dialogRef = inject(MatDialogRef<AddProductSellerComponent>);
   readonly data = inject<{
     product: ProductModel;
@@ -64,21 +66,25 @@ export class AddProductSellerComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    debugger
-    this.service.create(9, this.form.value).subscribe({
-      complete: () => {
-        console.log("called");
+    this.formSubmit.emit(this.form.value);
+    this.commonService.toastr.success("Seller has been added.");
+    console.log(this.form.value);
+
+    this.dialogRef.close(true);
+    // this.service.create(9, this.form.value).subscribe({
+    //   complete: () => {
+    //     console.log("called");
         
-        this.commonService.toastr.success("Seller has been added.");
-        this.dialogRef.close(true);
-      },
-      error: err => {
-        console.log("faild");
+    //     this.commonService.toastr.success("Seller has been added.");
+    //     this.dialogRef.close(true);
+    //   },
+    //   error: err => {
+    //     console.log("faild");
         
-        this.commonService.toastr.error(err);
-                this.commonService.handleError(err)
-      }
-    })
+    //     this.commonService.toastr.error(err);
+    //             this.commonService.handleError(err)
+    //   }
+    // })
   }
 
   ngOnDestroy() {

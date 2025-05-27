@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ProductUnitModel } from '../product-unit/product-unit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -25,6 +25,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   private unsubscribe = new SubscriptionHandler();
   units: UnitModel[];
   @Input() product: ProductModel | null;
+  @Output() formSubmit = new EventEmitter<any>();
   readonly dialogRef = inject(MatDialogRef<AddProductUnitComponent>);
 
   readonly data = inject<{
@@ -44,7 +45,6 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.product);
     
     this.model = new ProductUnitModel().clear();
     this.initForm(this.model);
@@ -75,30 +75,26 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     });
     this.clone = this.form.value;
   }
-  gotoNext() {
-    this.product={
-      ...this.product,
-      ...this.form.value,
-    }
-    console.log(this.product);
-    
-   }
+
   submit() {
+    this.formSubmit.emit(this.form.value);
+    console.log(this.form.value);
     
-    this.service.create(1, this.form.value).subscribe({
-      complete: () => {
-        console.log("called");
-        this.gotoNext()
-        this.commonService.toastr.success("Unit has been added.");
-        this.dialogRef.close(true);
-      },
-      error: err => {
-        console.log("faild");
+    this.commonService.toastr.success("Unit has been added.");
+    this.dialogRef.close(true);
+    // this.service.create(1, this.form.value).subscribe({
+    //   complete: () => {
+    //     console.log("called");
+    //     this.commonService.toastr.success("Unit has been added.");
+    //     this.dialogRef.close(true);
+    //   },
+    //   error: err => {
+    //     console.log("faild");
         
-        this.commonService.toastr.error(err);
-                this.commonService.handleError(err)
-      }
-    })
+    //     this.commonService.toastr.error(err);
+    //             this.commonService.handleError(err)
+    //   }
+    // })
   }
 
   ngOnDestroy() {

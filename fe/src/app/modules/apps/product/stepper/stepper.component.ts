@@ -30,7 +30,15 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
-
+  formData: any = {
+    product: null,
+    unitDetails: null,
+    inventoryDetails: null,
+    sellerDetails: null,
+  };
+  updateFormData(step: string, data: any) {
+    this.formData[step] = data;
+  }
   formsCount = 5;
   account$: BehaviorSubject<ICreateAccount> =
     new BehaviorSubject<ICreateAccount>(inits);

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -24,7 +24,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @Input() product: ProductModel |  null;
   @Input() next: () => void;
-
+  @Output() formSubmit = new EventEmitter<any>();
   private unsubscribe: Subscription[] = [];
 
   constructor(
@@ -44,20 +44,13 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       this.model = ( new ProductModel()).clear();
     }
     this.initForm(this.model);
-    console.log(this.product);
+ 
     
   }
   ngAfterViewInit(): void {
 
   }
- gotoNext() {
-  this.product={
-    ...this.product,
-    ...this.form.value,
-  }
-  console.log(this.product);
-  
- }
+
   initForm(model: ProductModel) {
     this.form = this.fb.group({
       id: [this.model.id, []],
@@ -69,6 +62,9 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   submit() {
+    this.formSubmit.emit(this.form.value);
+    console.log(this.form.value);
+    
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
@@ -83,10 +79,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       complete: () => {
         this.next();
        
-        this.product={
-          ...this.product,
-          ...this.form.value,
-        }
+        this.formSubmit.emit(this.product);
         console.log(this.product);
 
         this.commonService.toastr.success(
