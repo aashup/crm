@@ -1,0 +1,124 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Purchase</h2>
+
+<div mat-dialog-content class="purchase-dialog-content" style="width: 100%;">
+  <div class="card m-auto">
+    <div class="card-body">
+      <form class="form" [formGroup]="form" *ngIf="form">
+        <div class="row">
+          <!-- Contact Name -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Contact Name</mat-label>
+              <mat-select formControlName="contact_id">
+                <mat-option *ngFor="let contact of contacts" [value]="contact.id">
+                  {{ contact.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error>Contact Name is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Unit -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Unit</mat-label>
+              <mat-select formControlName="unit_id">
+                <mat-option *ngFor="let unit of units" [value]="unit.id">
+                  {{ unit.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error>Unit is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Supplier -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Supplier</mat-label>
+              <mat-select formControlName="supplier_id">
+                <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
+                  {{ supplier.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error>Supplier is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Amount -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Amount</mat-label>
+              <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
+              <mat-error>Amount is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Notes -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Notes</mat-label>
+              <textarea matInput formControlName="notes" placeholder="Enter Notes"></textarea>
+            </mat-form-field>
+          </div>
+
+          <!-- Purchase Details -->
+          <div formArrayName="purchaseDetails" class="col-12">
+            <div *ngFor="let detail of purchaseDetails.controls; let i = index" [formGroupName]="i" class="row align-items-end mb-3">
+              <!-- Product -->
+              <div class="col-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Product</mat-label>
+                  <mat-select formControlName="product_id">
+                    <mat-option *ngFor="let product of products" [value]="product.id">
+                      {{ product.name }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>Product is <strong>required</strong></mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Unit -->
+              <div class="col-3">
+                <mat-form-field class="w-100">
+                  <mat-label>Unit</mat-label>
+                  <mat-select formControlName="unit_id">
+                    <mat-option *ngFor="let unit of units" [value]="unit.id">
+                      {{ unit.name }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>Unit is <strong>required</strong></mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Amount -->
+              <div class="col-3">
+                <mat-form-field class="w-100">
+                  <mat-label>Amount</mat-label>
+                  <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
+                  <mat-error>Amount is <strong>required</strong></mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="col-2 d-flex justify-content-start align-items-center " style="margin-bottom: 30px;">
+                <button mat-icon-button color="primary" (click)="addPurchaseDetail()" type="button">
+                  <mat-icon>add_circle</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="removePurchaseDetail(i)" type="button" [disabled]="purchaseDetails.length === 1">
+                  <mat-icon>remove_circle</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">Cancel</button>
+  <button mat-raised-button color="accent" [disabled]="form.invalid" (click)="onSubmit()">
+    {{ isEdit ? 'Update' : 'Create' }}
+  </button>
+</div>
