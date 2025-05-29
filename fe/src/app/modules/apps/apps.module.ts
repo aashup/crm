@@ -37,6 +37,10 @@ import { RouterModule } from '@angular/router';
         path: 'purchase',
         loadChildren: () => import('./purchase/purchase.module').then((m) =>m.PurchaseModule),
       },
+      {
+        path: 'sale',
+        loadChildren: () => import('./sale/sale.module').then((m) =>m.SaleModule),
+      },
     ])
   ]
 })
