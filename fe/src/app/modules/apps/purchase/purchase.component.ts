@@ -41,25 +41,40 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   cities: any = [];
   search: any = { all: '' };
   filter: any = {};
-  displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
-
+  displayableCol = [
+    'select',
+    'id',
+    'amount',
+    'notes',
+    'unit',
+    'supplier',
+    'created_at',
+    'action'
+  ];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'select', style: { width: '70px' } },
+    { ref: 'select', name: 'Select', style: { width: '70px' } },
+    { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
+    { ref: 'amount', name: 'Amount' },
+    { ref: 'notes', name: 'Notes' },
     {
-      ref: 'id',
-      name: 'ID',
-      style: { 'max-width': '30px' },
+      ref: 'unit',
+      name: 'Unit',
+      mutator: (item: any) => item?.unit?.name || item.unit_id,
     },
-    { ref: 'name', name: 'Name' },
-    { ref: 'address', name: 'Address Name', mutator: (item: any) => item?.address?.address },
     {
-      ref: 'contact',
-      name: 'Contact Person',
-      mutator: (item: any) => item?.contact?.name,
+      ref: 'supplier',
+      name: 'Supplier',
+      mutator: (item: any) => item?.supplier?.name || item.supplier_id,
+    },
+    {
+      ref: 'created_at',
+      name: 'Created At',
+      mutator: (item: any) =>
+        new Date(item.created_at).toLocaleString(),
     },
     { ref: 'action', name: 'Actions' },
   ];
@@ -74,7 +89,6 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dataSource = new PurchaseDatasource(this.service);
   }
   ngOnInit(): void {
-    this.getAllCities()
     this.loadData();
     this.checkPermissions()
     this.commonService.page.updateTitle('Purchase List');
@@ -92,20 +106,9 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       .subscribe();
   }
-  getAllCities() {
-    this.cityService.find({}).subscribe((res:any) => {
-      console.log(res.data);
-      if(res.data.length){
-        this.cities=res.data
-      }
-    }
-    );
-  }
 
-  getCityName(id:any){
-    const city = this.cities.find((city:any) => city.id === id);
-    return city ? city.name : '';
-  }
+
+ 
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
@@ -129,10 +132,20 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; 
-      this.filter.cols = ['id', 'name', 'contact_id', 'address_id', 'created_at', 'updated_at']; 
+      this.filter.with = ['contact', 'unit', 'supplier','purchaseDetails'];  // Added `unit`, `supplier`
+      this.filter.cols = [
+        'id',
+        'amount',
+        'notes',
+        'contact_id',
+        'unit_id',
+        'supplier_id',
+        'created_at',
+        'updated_at',
+      ]; 
       this.dataSource.find(_.pickBy(this.filter));
     }
+    
   masterToggle() {
     if (
       this.selection.selected.length ===

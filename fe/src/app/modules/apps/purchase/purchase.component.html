@@ -83,7 +83,7 @@
                 <div>
                   {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
                 </div>
-                <button
+                <!-- <button
                   *ngIf="cols.ref === 'address'"
                   mat-icon-button
                   matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{ row.address?.mob1 || 'N/A' }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{getCityName(row.address.city_id)}}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{ row.address?.type===1?'Billing':'Shipping' || 'N/A' }}"
@@ -91,7 +91,7 @@
                   class="text-info"
                 >
                   <mat-icon>info</mat-icon>
-                </button>
+                </button> -->
                 <button
                   *ngIf="cols.ref === 'contact'"
                   mat-icon-button

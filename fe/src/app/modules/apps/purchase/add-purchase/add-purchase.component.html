@@ -36,9 +36,10 @@
             <mat-form-field class="w-100">
               <mat-label>Supplier</mat-label>
               <mat-select formControlName="supplier_id">
-                <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
+                <!-- <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
                   {{ supplier.name }}
-                </mat-option>
+                </mat-option> -->
+                <mat-option [value]="1">Pawan Dixit</mat-option>
               </mat-select>
               <mat-error>Supplier is <strong>required</strong></mat-error>
             </mat-form-field>

@@ -12,6 +12,7 @@ export class SaleModel {
   updated_at: Date | null;
   deleted_at: Date | null;
   status: number; // 1 = active, 0 = inactive or deleted
+  saleDetails:any[]
 
   constructor() {
     this.id = null;
@@ -27,6 +28,7 @@ export class SaleModel {
     this.updated_at = null;
     this.deleted_at = null;
     this.status = 1; // Active by default
+    this.saleDetails=[]
   }
 
   clear() {
@@ -42,6 +44,7 @@ export class SaleModel {
     this.updated_at = null;
     this.deleted_at = null;
     this.status = 1;
+    this.saleDetails=[]
     return this;
   }
 }
