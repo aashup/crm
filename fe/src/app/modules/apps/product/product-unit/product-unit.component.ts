@@ -19,6 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddProductUnitComponent } from '../add-product-unit/add-product-unit.component';
 import { ProductUnitModel } from './product-unit.model';
 import { ProductUnitService } from './product-unit.service';
+import { AppStateManager } from '../stepper/state.manager';
 
 @Component({
   selector: 'app-product-unit',
@@ -27,11 +28,12 @@ import { ProductUnitService } from './product-unit.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductUnitComponent implements OnInit, OnDestroy {
-  @Input() product: ProductModel;
+  @Input() state: AppStateManager;
   productUnits: ProductUnitModel[];
   private unsubscribe = new SubscriptionHandler();
   @Input() next: () => void;
   @Input() prev: () => void;
+  product: ProductModel;
 
   constructor(
     private service: ProductUnitService,
@@ -43,6 +45,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.product = this.state.get('product') as ProductModel;
     this.loadUnit();
   }
 

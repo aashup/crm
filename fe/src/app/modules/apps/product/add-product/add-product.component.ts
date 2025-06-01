@@ -10,6 +10,7 @@ import { AddUnitComponent } from 'src/app/modules/settings/unit/add-unit/add-uni
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { ICreateAccount, inits } from 'src/app/modules/wizards/create-account.helper';
+import { AppStateManager } from '../stepper/state.manager';
 
 @Component({
     selector: 'app-add-product',
@@ -22,9 +23,11 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
+  isSubmitted: boolean = false;
 
   @Input() product: ProductModel |  null;
   @Input() next: () => void;
+  @Input() state: AppStateManager;
 
   private unsubscribe: Subscription[] = [];
 
@@ -38,12 +41,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if(this.product && this.product.id) {
-      this.isEdit = true;
-      this.model = this.product;
-    } else {
-      this.model = ( new ProductModel()).clear();
-    }
+    this.model = this.state.get('product') as ProductModel;
     this.initForm(this.model);
   }
 
@@ -71,12 +69,18 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+    this.isSubmitted = true;
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
+      next: ({ data }: any) => {
+          this.product = data;
+          this.state.set('product', data);
+      },
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
+          this.isEdit ? 'Product has been updated.' : 'Product has been created.'
         );
         this.next();
+        this.commonService.app.tick();
       },
       error: (err) => this.commonService.handleError(err),
     });
@@ -86,4 +90,8 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
 
+  nextStep() {
+    this.submit();
+    this.next();
+  }
 }

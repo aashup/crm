@@ -18,6 +18,7 @@ import {
 } from 'src/app/modules/wizards/create-account.helper';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
+import { AppStateManager, AppState } from './state.manager';
 
 @Component({
   selector: 'app-stepper',
@@ -30,6 +31,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
+  state: AppStateManager = new AppStateManager();
 
   formsCount = 5;
   account$: BehaviorSubject<ICreateAccount> =
@@ -56,17 +58,22 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.productId = Number(this.ar.snapshot.paramMap.get('id'));
-    this.productId
-      ? this.loadProduct(this.productId)
-      : (this.loadCompleted = true);
+    if(this.productId)
+      this.loadProduct(this.productId)
+    else {
+      this.product = new ProductModel();
+      this.product.clear();
+      this.state.set('product', this.product);
+      (this.loadCompleted = true);
+    }
   }
 
   loadProduct(productId: number) {
     this.service.get({ id: productId, with: ['units'] }).subscribe({
       next: ({ data }: any) => {
         this.product = data;
+        this.state.set('product', data);
         this.cdr.markForCheck();
-        console.log(data);
         this.loadCompleted = true;
       },
       error: (err) => this.commonService.handleError(err),
@@ -104,6 +111,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
+    this.state.complete();
   }
 
   gotoStep(i: number) {

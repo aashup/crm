@@ -169,13 +169,13 @@
       <div class="current">
         <ng-container *ngIf="currentStep$.value === 1">
           <ng-container *ngIf="this.loadCompleted">
-            <app-add-product [product]="product" [next]="nextStep.bind(this)"></app-add-product>
+            <app-add-product [next]="nextStep.bind(this)" [state]="state"></app-add-product>
           </ng-container>
         </ng-container>
 
         <ng-container *ngIf="currentStep$.value === 2">
           <ng-container *ngIf="this.loadCompleted">
-            <app-product-unit [product]="product" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-unit>
+            <app-product-unit [state]="state" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-unit>
           </ng-container>
         </ng-container>
 
