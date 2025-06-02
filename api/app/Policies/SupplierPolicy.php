@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Supplier;
 use App\Models\User;
-use App\Models\Vendor;
 use Illuminate\Auth\Access\Response;
 
-class VendorPolicy
+class SupplierPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class VendorPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Vendor $vendor): bool
+    public function view(User $user, Supplier $supplier): bool
     {
         return true;
     }
@@ -35,7 +35,7 @@ class VendorPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Vendor $vendor): bool
+    public function update(User $user, Supplier $supplier): bool
     {
         return true;
     }
@@ -43,7 +43,7 @@ class VendorPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Vendor $vendor): bool
+    public function delete(User $user, Supplier $supplier): bool
     {
         return true;
     }
@@ -51,7 +51,7 @@ class VendorPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Vendor $vendor): bool
+    public function restore(User $user, Supplier $supplier): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class VendorPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Vendor $vendor): bool
+    public function forceDelete(User $user, Supplier $supplier): bool
     {
         return false;
     }

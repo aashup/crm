@@ -39,8 +39,8 @@ return new class extends Migration
                     'children' => [],
                 ],
                 [
-                    'name' => "Vendors",
-                    'page' => "/app/vendor",
+                    'name' => "Suppliers",
+                    'page' => "/app/supplier",
                     'icon' => "element-11",
                     'root' => 1,
                     'status' => 1,

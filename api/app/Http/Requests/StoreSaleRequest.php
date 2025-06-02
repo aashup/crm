@@ -11,7 +11,7 @@ class StoreSaleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,21 @@ class StoreSaleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'contact_id' => 'required|integer',
+            'unit_id' => 'required|integer',
+            'amount' => 'required|numeric',
+            'discount_amount' => 'nullable|numeric',
+            'discount_type' => 'nullable|integer|in:1,2', // Assuming 1 for flat and 2 for percentage amount
+            'net_total' => 'required|numeric',
+            'notes' => 'nullable|string|max:255',
+            'status' => 'required|integer|in:1,2', // Assuming 1: active, 2: inactive
+            'saleDetails' => 'required|array',
+            'saleDetails.*.product_id' => 'required|integer',
+            'saleDetails.*.unit_id' => 'required|integer',
+            'saleDetails.*.amount' => 'required|numeric',
+            'saleDetails.*.discount_amount' => 'nullable|numeric',
+            'saleDetails.*.discount_type' => 'nullable|integer|in:1,2', // Assuming 1 for flat and 2 for percentage amount
+            'saleDetails.*.net' => 'required|numeric',
         ];
     }
 }

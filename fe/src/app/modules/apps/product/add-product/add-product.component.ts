@@ -7,7 +7,9 @@ import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { ICreateAccount, inits } from 'src/app/modules/wizards/create-account.helper';
+import { AppStateManager } from '../stepper/state.manager';
 
 
 @Component({
@@ -21,9 +23,12 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
+  isSubmitted: boolean = false;
 
   @Input() product: ProductModel |  null;
   @Input() next: () => void;
+  @Input() state: AppStateManager;
+
   @Output() formSubmit = new EventEmitter<any>();
   private unsubscribe: Subscription[] = [];
 
@@ -37,12 +42,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if(this.product && this.product.id) {
-      this.isEdit = true;
-      this.model = this.product;
-    } else {
-      this.model = ( new ProductModel()).clear();
-    }
+    this.model = this.state.get('product') as ProductModel;
     this.initForm(this.model);
  
     
@@ -74,7 +74,12 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+    this.isSubmitted = true;
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
+      next: ({ data }: any) => {
+          this.product = data;
+          this.state.set('product', data);
+      },
       
       complete: () => {
         this.next();
@@ -85,6 +90,8 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
         this.commonService.toastr.success(
           this.isEdit ? 'Product has been updated.' : 'Product has been created.'
         );
+        this.next();
+        this.commonService.app.tick();
       },
       error: (err) => this.commonService.handleError(err),
     });
@@ -93,4 +100,8 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
 
+  nextStep() {
+    this.submit();
+    this.next();
+  }
 }
