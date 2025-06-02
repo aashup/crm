@@ -33,7 +33,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   private unsubscribe = new SubscriptionHandler();
   @Input() next: () => void;
   @Input() prev: () => void;
-  product: ProductModel;
+  @Input()product: ProductModel;
 
   constructor(
     private service: ProductUnitService,
