@@ -27,19 +27,11 @@ import { AppStateManager, AppState } from './state.manager';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
-  form: FormGroup;
+  form!: FormGroup;
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
-  formData: any = {
-    product: null,
-    unitDetails: null,
-    inventoryDetails: null,
-    sellerDetails: null,
-  };
-  updateFormData(step: string, data: any) {
-    this.formData[step] = data;
-  }  state: AppStateManager = new AppStateManager();
+  
 
   formsCount = 5;
   account$: BehaviorSubject<ICreateAccount> =
@@ -62,25 +54,50 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
     private router: Router,
     private ar: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    
+  }
 
   async ngOnInit(): Promise<void> {
+    this.form = this.fb.group({
+      productInfo: this.fb.group({
+        name: ['', [Validators.required]],
+        status: ['',  [Validators.required]],
+        slug: ['']
+      }),
+      unitInfo: this.fb.group({
+        name: ['', [Validators.required]],
+        status: ['', [Validators.required]],
+        notes: ['', [Validators.required]],
+        product_id: [0, [Validators.required]],
+        purchase_price: [0, [Validators.required]],
+        sale_price: [0, [Validators.required]],
+        unit_id: [0, [Validators.required]],
+      })
+    });
     this.productId = Number(this.ar.snapshot.paramMap.get('id'));
     if(this.productId)
       this.loadProduct(this.productId)
     else {
       this.product = new ProductModel();
       this.product.clear();
-      this.state.set('product', this.product);
+      
       (this.loadCompleted = true);
     }
   }
 
+  get productInfo(): FormGroup {
+    return this.form.get('productInfo') as FormGroup;
+  }
+  
+  get unitInfo(): FormGroup {
+    return this.form.get('unitInfo') as FormGroup;
+  }
   loadProduct(productId: number) {
     this.service.get({ id: productId, with: ['units'] }).subscribe({
       next: ({ data }: any) => {
         this.product = data;
-        this.state.set('product', data);
+        
         this.cdr.markForCheck();
         this.loadCompleted = true;
       },
@@ -119,7 +136,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
-    this.state.complete();
+   
   }
 
   gotoStep(i: number) {

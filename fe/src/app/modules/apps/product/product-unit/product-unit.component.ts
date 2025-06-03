@@ -28,12 +28,14 @@ import { AppStateManager } from '../stepper/state.manager';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductUnitComponent implements OnInit, OnDestroy {
-  @Input() state: AppStateManager;
+  
   productUnits: ProductUnitModel[];
+  
   private unsubscribe = new SubscriptionHandler();
+  @Input()form!: FormGroup;
   @Input() next: () => void;
   @Input() prev: () => void;
-  @Input()product: ProductModel;
+  
 
   constructor(
     private service: ProductUnitService,
@@ -46,14 +48,14 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    console.log(this.product);
+    console.log(this.form);
     
-    this.product = this.state.get('product') as ProductModel;
+   
     this.loadUnit();
   }
 
   loadUnit() {
-    this.service.find(9).subscribe({
+    this.service.find(1).subscribe({
       next: (resp: any) => {
         this.productUnits = resp.data;
         this.cdr.detectChanges();
@@ -65,9 +67,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   add() {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
-        data: {
-          product: this.product,
-        },
+        data: this.form,
       })
       .afterClosed()
       .subscribe((v) => v && this.loadUnit());
@@ -77,7 +77,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
         data: {
-          product: this.product,
+          product: this.form,
         },
       })
       .afterClosed()
@@ -85,7 +85,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   }
 
   delete(unit_id: number) {
-    this.service.delete(this.product.id, { id: unit_id }).subscribe({
+    this.service.delete(this.form.value.id, { id: unit_id }).subscribe({
       complete: () =>
         this.commonService.toastr.success('Unit has been detached.') && this.loadUnit(),
       error: (err) => this.commonService.handleError(err),

@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ProductModel } from '../product.model';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-complete',
@@ -8,6 +9,7 @@ import { ProductModel } from '../product.model';
   styleUrl: './complete.component.scss'
 })
 export class CompleteComponent  implements AfterViewInit, OnInit, OnDestroy {
+  @Input() form!: FormGroup;
    @Input() product: ProductModel;
    @Input() next: () => void;
    @Input() prev: () => void;
@@ -18,6 +20,7 @@ export class CompleteComponent  implements AfterViewInit, OnInit, OnDestroy {
 
 ngOnInit(): void {
   
+    console.log(this.form);
     
 }
 

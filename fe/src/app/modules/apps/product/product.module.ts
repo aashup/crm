@@ -27,7 +27,7 @@ import { CompleteComponent } from './complete/complete.component';
     ProductInventryComponent,
     ProductSellerComponent,
     AddProductSellerComponent,
-    CompleteComponent
+    CompleteComponent,
   ],
   imports: [
     CommonModule,

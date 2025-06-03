@@ -19,18 +19,10 @@ import { AppStateManager } from '../stepper/state.manager';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
-  form: FormGroup;
-  model: ProductModel;
-  clone: any;
-  isEdit: boolean = false;
-  isSubmitted: boolean = false;
+ 
+  @Input()form!:FormGroup
+  @Input() next:() => void = () => {};
 
-  @Input() product: ProductModel |  null;
-  @Input() next: () => void;
-  @Input() state: AppStateManager;
-
-  @Output() formSubmit = new EventEmitter<any>();
-  private unsubscribe: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -42,66 +34,20 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.model = this.state.get('product') as ProductModel;
-    this.initForm(this.model);
- 
-    
+   
   }
   ngAfterViewInit(): void {
 
   }
 
-  initForm(model: ProductModel) {
-    this.form = this.fb.group({
-      id: [this.model.id, []],
-      name: [this.model.name, [Validators.required]],
-      slug: [this.model.slug],
-      status: [this.model.status],
-    });
-    this.clone = this.form.value;
-  }
+ 
 
   submit() {
-    this.formSubmit.emit(this.form.value);
-    console.log(this.form.value);
     
-    this.commonService.markFormGroupTouched(this.form);
-    if (!this.form.valid) {
-      this.commonService.toastr.error('Please fix all errors.');
-      return;
-    }
-    if (_.isEqual(this.form.value, this.clone)) {
-      this.commonService.toastr.error('Nothing changed.');
-      return;
-    }
-    this.isSubmitted = true;
-    this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
-      next: ({ data }: any) => {
-          this.product = data;
-          this.state.set('product', data);
-      },
-      
-      complete: () => {
-        this.next();
-       
-        this.formSubmit.emit(this.product);
-        console.log(this.product);
-
-        this.commonService.toastr.success(
-          this.isEdit ? 'Product has been updated.' : 'Product has been created.'
-        );
-        this.next();
-        this.commonService.app.tick();
-      },
-      error: (err) => this.commonService.handleError(err),
-    });
   }
   ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+   
   }
 
-  nextStep() {
-    this.submit();
-    this.next();
-  }
+  
 }
