@@ -24,8 +24,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   isEdit: boolean = false;
   private unsubscribe = new SubscriptionHandler();
   units: UnitModel[];
-  @Input() product: ProductModel | null;
-  @Output() formSubmit = new EventEmitter<any>();
+
   readonly dialogRef = inject(MatDialogRef<AddProductUnitComponent>);
 
   readonly data = inject<{
@@ -44,8 +43,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     private dialog: MatDialog
   ) {}
 
-  ngOnInit(): void {
-    
+  ngOnInit(): void { 
     this.model = new ProductUnitModel().clear();
     this.initForm(this.model);
     this.loadUnits()
@@ -77,11 +75,8 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    this.formSubmit.emit(this.form.value);
-    console.log(this.form.value);
-    
     this.commonService.toastr.success("Unit has been added.");
-    this.dialogRef.close(true);
+    this.dialogRef.close(this.form.value);
     // this.service.create(1, this.form.value).subscribe({
     //   complete: () => {
     //     console.log("called");

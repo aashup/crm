@@ -30,6 +30,7 @@ export class ProductInventryComponent implements OnInit, OnDestroy {
   @Input() product: ProductModel;
   productInventry: ProductInventoryModel[];
   private unsubscribe = new SubscriptionHandler();
+  @Input() form!: FormGroup;
   @Input() next: () => void;
   @Input() prev: () => void;
 
@@ -64,7 +65,13 @@ export class ProductInventryComponent implements OnInit, OnDestroy {
         },
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadInventry());
+      .subscribe((result) => {
+        if (result) {
+          this.loadInventry();
+          this.form.patchValue(result)
+          this.commonService.toastr.success('Inventry has been attached.');
+        }
+      });
   }
 
   update() {

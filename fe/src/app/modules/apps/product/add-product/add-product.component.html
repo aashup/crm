@@ -33,7 +33,7 @@
           Save
         </button>
        
-        <button type="button" class="btn btn-outline-primary" (click)="next()">Next</button>
+        <button type="button" class="btn btn-outline-primary" [disabled]="!form.valid" (click)="next()">Next</button>
       </div>
     </form>
   </div>

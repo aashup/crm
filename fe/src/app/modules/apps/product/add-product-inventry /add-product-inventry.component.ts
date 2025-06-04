@@ -78,7 +78,7 @@ export class AddProductInventryComponent implements OnInit, OnDestroy {
   submit() {
     this.formSubmit.emit(this.form.value);
     this.commonService.toastr.success("Inventry has been added.");
-        this.dialogRef.close(true);
+        this.dialogRef.close(this.form.value);
     // this.service.create(9, this.form.value).subscribe({
     //   complete: () => {
     //     console.log("called");

@@ -70,7 +70,7 @@ export class AddProductSellerComponent implements OnInit, OnDestroy {
     this.commonService.toastr.success("Seller has been added.");
     console.log(this.form.value);
 
-    this.dialogRef.close(true);
+    this.dialogRef.close(this.form.value);
     // this.service.create(9, this.form.value).subscribe({
     //   complete: () => {
     //     console.log("called");

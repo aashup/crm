@@ -65,14 +65,32 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
         status: ['',  [Validators.required]],
         slug: ['']
       }),
-      unitInfo: this.fb.group({
-        name: ['', [Validators.required]],
-        status: ['', [Validators.required]],
-        notes: ['', [Validators.required]],
-        product_id: [0, [Validators.required]],
-        purchase_price: [0, [Validators.required]],
-        sale_price: [0, [Validators.required]],
-        unit_id: [0, [Validators.required]],
+      unitInfo: this.form = this.fb.group({
+        id: ["", [Validators.required]],
+        product_id: ["",[Validators.required]],
+        unit_id: ["",[Validators.required]],
+        sale_price: ["", [Validators.required]],
+        purchase_price: [""],
+        notes: [""],
+        status: [""],
+      }),
+      inventoryInfo:this.form = this.fb.group({
+        id: ["", []],
+        product_id: ["", [Validators.required]],
+        unit_id: ["", [Validators.required]],
+        sale_price: ["", [Validators.required]],
+        purchase_price: [""],
+        notes: [""],
+        status: [""],
+      }),
+      sellerInfo:this.fb.group({
+        id: ["", []],
+        product_id: ["", [Validators.required]],
+        unit_id: ["", [Validators.required]],
+        sale_price: ["", [Validators.required]],
+        purchase_price: [""],
+        notes: [""],
+        status: [""],
       })
     });
     this.productId = Number(this.ar.snapshot.paramMap.get('id'));
@@ -93,6 +111,13 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   get unitInfo(): FormGroup {
     return this.form.get('unitInfo') as FormGroup;
   }
+  get inventoryInfo(): FormGroup {
+    return this.form.get('inventoryInfo') as FormGroup;
+  }
+  get sellerInfo(): FormGroup {
+    return this.form.get('sellerInfo') as FormGroup;
+  }
+
   loadProduct(productId: number) {
     this.service.get({ id: productId, with: ['units'] }).subscribe({
       next: ({ data }: any) => {

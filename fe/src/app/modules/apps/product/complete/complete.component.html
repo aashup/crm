@@ -6,8 +6,9 @@
       <mat-card class="mb-3">
         <mat-card-title>Product</mat-card-title>
         <mat-card-content>
-          <p><strong>Name:</strong>  Product Name</p>
-          <p><strong>Status:</strong> Active</p>
+          <p><strong>Name:</strong>  {{productInfo.name}}</p>
+          <p><strong>Status:</strong> {{productInfo.status=="1"?"Active":
+          "Inactive"}}</p>
         </mat-card-content>
       </mat-card>
   
@@ -15,7 +16,7 @@
       <mat-card class="mb-3">
         <mat-card-title>Unit Details</mat-card-title>
         <mat-card-content>
-          <p><strong>Unit Type:</strong>  Unit Type</p>
+          <p><strong>Unit Name:</strong> {{ unitName }}</p>
           <p><strong>Quantity:</strong> 100</p>
         </mat-card-content>
       </mat-card>

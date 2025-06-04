@@ -32,9 +32,9 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   productUnits: ProductUnitModel[];
   
   private unsubscribe = new SubscriptionHandler();
-  @Input()form!: FormGroup;
-  @Input() next: () => void;
-  @Input() prev: () => void;
+  @Input() form!: FormGroup;
+  @Input() next!: () => void;
+  @Input() prev!: () => void;
   
 
   constructor(
@@ -67,10 +67,16 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   add() {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
-        data: this.form,
+        data: null,
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadUnit());
+      .subscribe((result) => {
+        console.log("result is ",result);
+        this.form.patchValue(result);
+        console.log("form",this.form);
+      });
+     
+      
   }
 
   update() {

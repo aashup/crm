@@ -31,6 +31,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy {
   @Input() product: ProductModel;
   productSeller: ProductSellerModel[];
   private unsubscribe = new SubscriptionHandler();
+  @Input() form!: FormGroup;
   @Input() next: () => void;
   @Input() prev: () => void;
 
@@ -68,7 +69,14 @@ export class ProductSellerComponent implements OnInit, OnDestroy {
         },
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadSeller());
+      .subscribe((result) => 
+      {
+        if (result) {
+          this.loadSeller();
+          this.form.patchValue(result)
+        }
+      }
+      );
   }
 
   update() {
