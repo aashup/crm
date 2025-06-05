@@ -30,6 +30,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   readonly data = inject<{
     product: ProductModel;
     isEdit: boolean;
+    productId: number;
   }>(MAT_DIALOG_DATA);
 
   constructor(
@@ -46,7 +47,9 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   ngOnInit(): void { 
     this.model = new ProductUnitModel().clear();
     this.initForm(this.model);
+   
     this.loadUnits()
+
   }
 
   loadUnits() {
@@ -75,21 +78,24 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    this.commonService.toastr.success("Unit has been added.");
-    this.dialogRef.close(this.form.value);
-    // this.service.create(1, this.form.value).subscribe({
-    //   complete: () => {
-    //     console.log("called");
-    //     this.commonService.toastr.success("Unit has been added.");
-    //     this.dialogRef.close(true);
-    //   },
-    //   error: err => {
-    //     console.log("faild");
+  
+    
+    this.service.create(this.data.productId, this.form.value).subscribe({
+      complete: () => {
+        console.log("called");
+        this.commonService.toastr.success("Unit has been added.");
+        this.loadUnits()
+        this.form.value.product_id = this.data.productId;
         
-    //     this.commonService.toastr.error(err);
-    //             this.commonService.handleError(err)
-    //   }
-    // })
+        this.dialogRef.close(this.form.value);
+      },
+      error: err => {
+        console.log("faild");
+        
+        this.commonService.toastr.error(err);
+                this.commonService.handleError(err)
+      }
+    })
   }
 
   ngOnDestroy() {

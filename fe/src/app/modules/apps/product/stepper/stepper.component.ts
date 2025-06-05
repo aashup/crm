@@ -18,7 +18,6 @@ import {
 } from 'src/app/modules/wizards/create-account.helper';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
-import { AppStateManager, AppState } from './state.manager';
 
 @Component({
   selector: 'app-stepper',

@@ -29,11 +29,11 @@
         </div>
       </div>
       <div class="d-flex justify-content-center">
-        <button type="button" class="btn btn-outline-primary" (click)="submit()">
+        <button type="button" class="btn btn-outline-primary" [disabled]="!form.valid" (click)="submit()">
           Save
         </button>
        
-        <button type="button" class="btn btn-outline-primary" [disabled]="!form.valid" (click)="next()">Next</button>
+        <button type="button" class="btn btn-outline-primary"  (click)="next()">Next</button>
       </div>
     </form>
   </div>

@@ -43,7 +43,30 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
  
 
   submit() {
-    
+    let id:any;
+    this.service.create(this.form.value).subscribe({
+      
+      next: (res:any) => {
+        this.commonService.toastr.success('Product created successfully');
+        console.log(res);
+        id = res.data.id;
+        this.form.value.id = res.data.id;
+      }
+      , complete: () => {
+        this.form.markAsPristine();
+        this.form.markAsUntouched();
+        this.form.markAsPending();
+        this.form.updateValueAndValidity();
+        this.form.disable();
+        this.form.get('productInfo')?.disable();
+        this.next()
+        this.router.navigate([`/app/product/add/${id}`])
+       
+      }
+      , error: (err) => {
+        this.commonService.toastr.error('Failed to create product');
+      }
+    });
   }
   ngOnDestroy() {
    

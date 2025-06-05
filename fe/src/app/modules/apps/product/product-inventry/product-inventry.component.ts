@@ -29,6 +29,7 @@ import { AddProductInventryComponent } from '../add-product-inventry /add-produc
 export class ProductInventryComponent implements OnInit, OnDestroy {
   @Input() product: ProductModel;
   productInventry: ProductInventoryModel[];
+  productId: number = 0;
   private unsubscribe = new SubscriptionHandler();
   @Input() form!: FormGroup;
   @Input() next: () => void;
@@ -44,11 +45,13 @@ export class ProductInventryComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.productId = Number(this.ar.snapshot.paramMap.get('id'));
     this.loadInventry();
+    
   }
 
   loadInventry() {
-    this.service.find(8).subscribe({
+    this.service.find(this.productId).subscribe({
       next: (resp: any) => {
         this.productInventry = resp.data;
         this.cdr.detectChanges();

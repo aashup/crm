@@ -48,6 +48,8 @@ export class AddProductInventryComponent implements OnInit, OnDestroy {
     this.model = new ProductInventoryModel().clear();
     this.initForm(this.model);
     this.loadInventry()
+    console.log(this.inventries);
+    
   }
 
   loadInventry() {

@@ -64,6 +64,7 @@ ngOnInit(): void {
   setTimeout(()=>{
     console.log(this.findUnitById(this.unitInfo.unit_id).name);
     this.unitName= this.findUnitById(this.unitInfo.unit_id).name
+    this.cdr.detectChanges();
   },1000)
   this.cdr.detectChanges();
 }

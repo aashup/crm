@@ -17,7 +17,11 @@
         <mat-card-title>Unit Details</mat-card-title>
         <mat-card-content>
           <p><strong>Unit Name:</strong> {{ unitName }}</p>
-          <p><strong>Quantity:</strong> 100</p>
+          <p><strong>Sale Price:</strong> {{unitInfo.sale_price}}</p>
+          <p><strong>Purchase Price:</strong> {{unitInfo.purchase_price}}</p>
+          <p><strong>Status:</strong> {{unitInfo.status=="1"?"Active":
+            "Inactive"}}</p>
+            <p><strong>Notes:</strong> {{unitInfo.notes}}</p>
         </mat-card-content>
       </mat-card>
   
@@ -25,8 +29,12 @@
       <mat-card class="mb-3">
         <mat-card-title>Inventory Details</mat-card-title>
         <mat-card-content>
-          <p><strong>Stock Available:</strong> 50</p>
-          <p><strong>Warehouse Location:</strong>  Warehouse Location</p>
+          <p><strong>Inventory Name:</strong> {{ unitName }}</p>
+          <p><strong>Sale Price:</strong> {{inventoryInfo.sale_price}}</p>
+          <p><strong>Purchase Price:</strong> {{inventoryInfo.purchase_price}}</p>
+          <p><strong>Status:</strong> {{inventoryInfo.status=="1"?"Active":
+            "Inactive"}}</p>
+            <p><strong>Notes:</strong> {{unitInfo.notes}}</p>
         </mat-card-content>
       </mat-card>
   
