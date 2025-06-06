@@ -3,6 +3,7 @@ import { ProductModel } from '../product.model';
 import { FormGroup } from '@angular/forms';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { set } from 'lodash';
+import { ProductSellerService } from '../product-seller/product-seller.service';
 
 @Component({
   selector: 'app-complete',
@@ -13,28 +14,36 @@ import { set } from 'lodash';
 export class CompleteComponent  implements AfterViewInit, OnInit, OnDestroy {
   @Input() form!: FormGroup;
   units: any[] = [];
+  sellers: any[] = [];
   productInfo: any ;
   unitInfo:any;
   inventoryInfo:any;
   sellerInfo:any;
   unitName:"Unknown" 
-
+  sellerName: string = "Unknown";
   constructor(
     private  unitService: UnitService,
+    private sellerService: ProductSellerService,
     private cdr: ChangeDetectorRef
   ) {}
   findUnitById(id: string): any {
-    debugger
-    console.log(this.units);
-    
     return this.units.find((unit) => unit.id === id);
   }
+
   getAllUnits(){
     this.unitService.find({}).subscribe((result:any) => {
       this.units = result.data;      
     });
   }
+  findSellerById(id: string): any {
+    return this.sellers.find((seller) => seller.id === id);
+  }
 
+  getAllSellers(){
+    this.sellerService.getAll().subscribe((result:any) => {
+      this.sellers = result.data;      
+    });
+  }
 ngOnInit(): void {
   console.log("final details", this.form.value);
   
@@ -64,6 +73,7 @@ ngOnInit(): void {
   setTimeout(()=>{
     console.log(this.findUnitById(this.unitInfo.unit_id).name);
     this.unitName= this.findUnitById(this.unitInfo.unit_id).name
+    this.sellerName = this.findSellerById(this.sellerInfo.seller_id).name;
     this.cdr.detectChanges();
   },1000)
   this.cdr.detectChanges();

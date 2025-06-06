@@ -9,7 +9,7 @@
               <mat-label>Inventry </mat-label>
               <mat-select placeholder="Inventry" formControlName="inventry_id">
                 <mat-option *ngFor="let item of inventries" [value]="item.id">
-                  {{ item.id }}
+                  {{ item.notes }}
                 </mat-option>
               </mat-select>
               <mat-error>Inventry is <strong>required</strong> </mat-error>

@@ -49,7 +49,9 @@ export class AddProductSellerComponent implements OnInit, OnDestroy {
   }
 
   loadSellers() {
-   
+   this.service.getAll().pipe(take(1)).subscribe((res:any)=>{
+      this.sellers = res.data;
+   }); 
   }
 
   initForm(model: ProductSellerModel) {

@@ -42,8 +42,12 @@
       <mat-card class="mb-3">
         <mat-card-title>Seller Details</mat-card-title>
         <mat-card-content>
-          <p><strong>Seller Name:</strong>  Seller Name</p>
-          <p><strong>Contact:</strong> +1234567890</p>
+          <p><strong>Seller Name:</strong> {{ sellerName }}</p>
+          <p><strong>Sale Price:</strong> {{sellerInfo.sale_price}}</p>
+          <p><strong>Purchase Price:</strong> {{sellerInfo.purchase_price}}</p>
+          <p><strong>Status:</strong> {{sellerInfo.status=="1"?"Active":
+            "Inactive"}}</p>
+            <p><strong>Notes:</strong> {{sellerInfo.notes}}</p>
         </mat-card-content>
       </mat-card>
   

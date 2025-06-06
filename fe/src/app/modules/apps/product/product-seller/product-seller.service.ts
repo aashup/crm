@@ -8,12 +8,15 @@ import { environment } from 'src/environments/environment';
 })
 export class ProductSellerService {
 
-readonly endpoint = 'product';
+readonly endpoint = 'supplier';
 
     constructor(
         private http: HttpClient,
     ) { }
 
+    getAll(){
+        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}`)
+    }
     find(pid: number, params = {}) {
         return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit`, {
             params: HttpUtils.toHttpParams(params)
