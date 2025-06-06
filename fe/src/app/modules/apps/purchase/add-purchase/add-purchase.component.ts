@@ -22,6 +22,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
   suppliers:any = []; 
   products:any = [];
   isEdit = false; 
+  isLoading = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddPurchaseComponent>);
   readonly data = inject<{
@@ -132,39 +133,56 @@ getAllProduct(){
   }
 
   loadDropdownData(): void {
-    // Load contacts, units, suppliers, and products data here
-    // Example:
+   
     
   }
   ngAfterViewInit(): void {
-  
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+    });
   }
  
   
   onSubmit(): void {
-    if(this.isEdit&& this.data.model){
-      const payload=this.form.value
-      payload.id=this.data.model.id
-      this.purchaseService.update(this.form.value).subscribe((res)=>{
-        if(res){
-          this.commonService.toastr.success("Purchase Updated")
-          this.dialogRef.close(this.data.model)
-        }
-      })
-      return
+    this.commonService.markFormGroupTouched(this.form);
+  
+    if (!this.form.valid) {
+      this.commonService.toastr.error('Please fix all errors.');
+      return;
     }
-    if (this.form.valid) {
-      const purchaseData = this.form.value;
-      this.purchaseService.create(this.form.value).subscribe((res)=>{
-        if(res){
-          this.commonService.toastr.success("Purchase Item Created")
-
-          this.dialogRef.close(purchaseData);
-          window.location.reload()
-        }
-      })
-     
+  
+    this.isLoading = true;
+  
+    if (this.isEdit && this.data.model) {
+      const payload = this.form.value;
+      payload.id = this.data.model.id;
+  
+      this.purchaseService.update(payload).subscribe({
+        complete: () => {
+          this.commonService.toastr.success('Purchase Updated');
+          this.dialogRef.close(this.data.model); 
+          this.isLoading = false; 
+        },
+        error: (err) => {
+          this.commonService.handleError(err);
+          this.isLoading = false; 
+        },
+      });
+      return;
     }
+  
+    const purchaseData = this.form.value;
+    this.purchaseService.create(purchaseData).subscribe({
+      complete: () => {
+        this.commonService.toastr.success('Purchase Item Created');
+        this.dialogRef.close(purchaseData); 
+        this.isLoading = false; 
+      },
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+      },
+    });
   }
 
   

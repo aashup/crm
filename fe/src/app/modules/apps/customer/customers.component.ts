@@ -41,6 +41,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   cities: any = [];
   search: any = { all: '' };
   filter: any = {};
+  isLoading = false
   displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -175,9 +176,12 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
               this.commonService.toastr.success('Customer has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+            },
           });
         }
+        this.isLoading = false; 
       });
   }
 
@@ -191,9 +195,13 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+        }
+        this.isLoading = false; 
+      });
   }
-
   edit(item: CustomersModel) {
     this.dialog
       .open(AddCustomersComponent, {
@@ -204,6 +212,11 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+        }
+        this.isLoading = false; 
+      });
   }
 }

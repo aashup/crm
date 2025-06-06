@@ -75,7 +75,7 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
         ],
       ],
       contact_id: [model.contact_id, [Validators.required]],
-      address_id: [model.address_id, [ Validators.required]],
+      address_id: [model.billing_address_id, [ Validators.required]],
      
     });
     this.clone = this.form.value;

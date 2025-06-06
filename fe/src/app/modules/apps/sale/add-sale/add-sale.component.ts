@@ -20,6 +20,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   contacts: any[] = [];
   units: any[] = [];
   products: any[] = [];
+  isLoading = false;
   isEdit = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddSaleComponent>);
@@ -51,6 +52,9 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isEdit = this.data.isEdit;
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+    });
   }
 
   getAllContact() {
@@ -197,37 +201,46 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.valid) {
-      const payload = {
-        ...this.form.getRawValue(),
-        id: this.data.model.id
-      };
-
-      if (this.isEdit) {
-        this.saleService.update(payload).subscribe({
-          next: (res) => {
-            this.commonService.toastr.success("Updated Successfully");
-            this.dialogRef.close(true);
-          },
-          error: (err) => {
-            console.error('Error updating sale:', err);
-          }
-        });
-      } else {
-        this.saleService.create(payload).subscribe({
-          next: (res) => {
-            this.commonService.toastr.success("Sale Created Successfully");
-            this.dialogRef.close(true);
-            window.location.reload();
-          },
-          error: (err) => {
-            console.error('Error creating sale:', err);
-          }
-        });
-      }
+    this.commonService.markFormGroupTouched(this.form);
+  
+    if (!this.form.valid) {
+      this.commonService.toastr.error('Please fix all errors.');
+      return;
+    }
+  
+    this.isLoading = true; 
+  
+    const payload = {
+      ...this.form.getRawValue(),
+      id: this.data.model?.id || null,
+    };
+  
+    if (this.isEdit) {
+      this.saleService.update(payload).subscribe({
+        next: () => {
+          this.commonService.toastr.success('Updated Successfully');
+          this.dialogRef.close(true); 
+          this.isLoading = false; 
+        },
+        error: (err) => {
+          console.error('Error updating sale:', err);
+          this.commonService.handleError(err);
+          this.isLoading = false;
+        },
+      });
     } else {
-      console.warn('Form is invalid:', this.form.value);
-      console.error('Validation errors:', this.form.errors);
+      this.saleService.create(payload).subscribe({
+        next: () => {
+          this.commonService.toastr.success('Sale Created Successfully');
+          this.dialogRef.close(true);
+          this.isLoading = false; 
+        },
+        error: (err) => {
+          console.error('Error creating sale:', err);
+          this.commonService.handleError(err);
+          this.isLoading = false; 
+        },
+      });
     }
   }
 }

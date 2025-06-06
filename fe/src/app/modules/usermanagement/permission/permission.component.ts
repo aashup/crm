@@ -24,6 +24,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: PermissionDatasource;
   selection = new SelectionModel<PermissionModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
+  isLoading = false;
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
   filter: any = {};
@@ -119,6 +120,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: PermissionModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -128,15 +130,24 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Permission has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+            },
           });
+        } else {
+          this.isLoading = false; 
         }
       });
   }

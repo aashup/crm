@@ -74,7 +74,7 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.getAllCities()
     this.loadData();
-    this.commonService.page.updateTitle('Vendor List');
+    this.commonService.page.updateTitle('Suppliers List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -126,8 +126,8 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; // Include contact and address
-      this.filter.cols = ['id', 'name', 'contact_id', 'address_id', 'created_at', 'updated_at']; // Specify required columns
+      this.filter.with = ['contact', 'address']; 
+      this.filter.cols = ['id', 'name', 'contact_id', 'shipping_address_id', 'shipping_address_id','created_at', 'updated_at']; 
       this.dataSource.find(_.pickBy(this.filter));
     }
   masterToggle() {

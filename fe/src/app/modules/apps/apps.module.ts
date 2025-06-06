@@ -26,7 +26,7 @@ import { RouterModule } from '@angular/router';
         loadChildren: () => import('./customer/customers.module').then((m) => m.CustomersModule),
       },
       {
-        path: 'vendor',
+        path: 'supplier',
         loadChildren: () => import('./vendor/vendor.module').then((m) => m.VendorModule),
       },
       {

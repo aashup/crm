@@ -83,7 +83,6 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private service: PurchaseService,
     private commonService: CommonService,
-    private cityService: CityService,
     private authService: AuthService,
   ) {
     this.dataSource = new PurchaseDatasource(this.service);
@@ -187,6 +186,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
             complete: () => {
               this.commonService.toastr.success('Purchase has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
             },
             error: (err) => this.commonService.handleError(err),
           });
@@ -197,7 +197,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   add() {
     this.dialog
       .open(AddPurchaseComponent, {
-        width:"1000px",
+        width: "1000px",
         data: {
           model: new PurchaseModel().clear(),
           isEdit: false,
@@ -205,7 +205,12 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 
   edit(item: PurchaseModel) {
@@ -218,6 +223,11 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 }

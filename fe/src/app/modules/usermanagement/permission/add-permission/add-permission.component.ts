@@ -19,6 +19,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   model: PermissionModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   menus:any = [];
   readonly dialogRef = inject(MatDialogRef<AddPermissionComponent>);
   readonly data = inject<{
@@ -38,11 +39,14 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+    });
+  
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
   }
-
   initForm(model: PermissionModel) {
     this.form = this.fb.group({
       id: [this.model.id, []],
@@ -64,22 +68,31 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
     
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+      },
     });
   }
 }

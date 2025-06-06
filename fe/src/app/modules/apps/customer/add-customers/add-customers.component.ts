@@ -22,6 +22,7 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
   isEdit: boolean = false;
   contacts: any = [];
   addresses: any = [];
+  isLoading = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddCustomersComponent>);
   readonly data = inject<{
@@ -91,14 +92,20 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; // Start loader
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'Customer has been updated.' : 'Customer has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(); 
+        this.isLoading = false; 
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+      },
     });
   }
 }

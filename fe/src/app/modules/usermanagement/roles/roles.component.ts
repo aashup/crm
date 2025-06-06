@@ -29,7 +29,7 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<RolesModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-      
+  isLoading = false; 
   
   search: any = { all: '' };
   filter: any = {};
@@ -144,24 +144,34 @@ loadData() {
     this.router.navigate([`/app/usermanagement/roles/edit-permission/${id}`]);
   }
   delete(item: RolesModel) {
+   
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Roles',
+          title: 'Delete Role',
           body: `Are you sure you want to delete this Role <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Role has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+            },
           });
+        } else {
+          this.isLoading = false; 
         }
       });
   }
