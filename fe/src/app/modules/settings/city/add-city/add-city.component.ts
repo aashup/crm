@@ -20,6 +20,7 @@ export class AddCityComponent implements AfterViewInit, OnInit {
   model: CityModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddCityComponent>);
   readonly data = inject<{
     model: CityModel;
@@ -54,11 +55,14 @@ export class AddCityComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+    });
+  
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
   }
-
   initForm(model: CityModel) {
     this.form = this.fb.group({
       id: [model.id, []],
@@ -79,22 +83,31 @@ export class AddCityComponent implements AfterViewInit, OnInit {
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'City has been updated.' : 'City has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+      },
     });
   }
 }

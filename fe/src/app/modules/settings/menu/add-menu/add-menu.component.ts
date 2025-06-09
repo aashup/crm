@@ -20,6 +20,7 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
   model: MenuModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddMenuComponent>);
   readonly data = inject<{
     model: MenuModel;
@@ -82,14 +83,20 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
+        this.isLoading = false; 
         this.commonService.toastr.success(
           this.isEdit ? 'Menu has been updated.' : 'Menu has been created.'
         );
         this.dialogRef.close(true);
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.isLoading = false; 
+        this.commonService.handleError(err);
+      },
     });
   }
 }

@@ -19,6 +19,7 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
   model: AddressModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   cityOptions: any[] = [];
   currentUser: any;
   typeOptions: Array<{ value: number; label: string }> = [
@@ -110,7 +111,7 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
     const payload = {
       ...this.form.value,
       city_id: this.form.value.city,
-      created_by: this.currentUser.user.id, 
+      created_by: this.currentUser.user.id,
     };
   
     if (_.isEqual(payload, this.clone)) {
@@ -118,14 +119,19 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
       return;
     }
   
+    this.isLoading = true; 
     this.service[this.isEdit ? 'update' : 'create'](payload).subscribe({
       complete: () => {
+        this.isLoading = false; 
         this.commonService.toastr.success(
           this.isEdit ? 'Address has been updated.' : 'Address has been created.'
         );
         this.dialogRef.close(true);
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.isLoading = false; 
+        this.commonService.handleError(err);
+      },
     });
   }
 }

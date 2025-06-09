@@ -40,6 +40,7 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<ContactModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = ['select', 'id', 'name', 'mob1', 'mob2', 'status', 'action'];
@@ -154,12 +155,17 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         if (res) {
+          this.isLoading = true; 
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
               this.commonService.toastr.success('Contact has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.commonService.handleError(err);
+            },
           });
         }
       });

@@ -24,6 +24,7 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   dataSource: MenuDatasource;
   selection = new SelectionModel<MenuModel>(true, []);
+  isLoading = false;
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
@@ -134,12 +135,17 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         if (res) {
+          this.isLoading = true; 
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
               this.commonService.toastr.success('Menu has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.commonService.handleError(err);
+            },
           });
         }
       });

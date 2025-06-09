@@ -22,6 +22,7 @@ import { AddAddressComponent } from './add-address/add-address.component';
 export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   dataSource: AddressDatasource;
+  isLoading = false;
   selection = new SelectionModel<AddressModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
@@ -106,7 +107,7 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['roles', 'city', 'createdBy']; 
+    this.filter.with = [ 'city', 'createdBy']; 
     this.dataSource.find(_.pickBy(this.filter));
   }
   masterToggle() {
@@ -140,13 +141,19 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
               this.commonService.toastr.success('Address has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.commonService.handleError(err);
+            },
           });
         }
       });

@@ -23,6 +23,9 @@
   <div class="card-body">
     <div class="table-responsive">
       <mat-progress-bar mode="indeterminate" *ngIf="dataSource.loading$ | async"></mat-progress-bar>
+      <div *ngIf="isLoading" class="loader-overlay">
+        <mat-spinner></mat-spinner>
+      </div>
       <table
         #table
         cdk-table
