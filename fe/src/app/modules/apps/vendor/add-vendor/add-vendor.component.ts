@@ -76,12 +76,14 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
         ],
       ],
       contact_id: [model.contact_id, [Validators.required]],
-      address_id: [model.billing_address_id, [ Validators.required]],
-     
+      billing_address_id: [model.billing_address_id, [Validators.required]],
+      shipping_address_id: [model.shipping_address_id, [Validators.required]],
+      level: [model.level, [Validators.required]],
+      status: [model.status, [Validators.required]],
+      type: [model.type, [Validators.required]],
     });
     this.clone = this.form.value;
   }
-
   submit() {
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {
