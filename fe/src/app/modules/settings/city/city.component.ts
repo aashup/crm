@@ -37,6 +37,7 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
+  isLoading = false;
   filter: any = {};
   displayableCol = ['select', 'id', 'name', 'state', 'country', 'action'];
 
@@ -108,7 +109,7 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['roles'];
+    this.filter.with = ['state', 'country'];
     this.dataSource.find(_.pickBy(this.filter));
   }
 
@@ -133,6 +134,7 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: CityModel) {
+   
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -143,14 +145,22 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('City has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+            },
           });
+        } else {
+          this.isLoading = false;
         }
       });
   }

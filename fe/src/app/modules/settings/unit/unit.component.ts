@@ -25,6 +25,7 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<UnitModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = ['select', 'id', 'name', 'status', 'action'];
@@ -127,13 +128,19 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
+          
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
               this.commonService.toastr.success('Unit has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.commonService.handleError(err);
+            },
           });
         }
       });

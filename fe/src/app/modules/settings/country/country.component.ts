@@ -38,6 +38,7 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
   filter: any = {};
+  isLoading = false;
   displayableCol = ['select', 'id', 'name', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -95,7 +96,7 @@ loadData() {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['roles'];
+    this.filter.with = ['country'];
     this.dataSource.find(_.pickBy(this.filter));
   }
 
@@ -120,6 +121,7 @@ loadData() {
   }
 
   delete(item: CountryModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -131,14 +133,22 @@ loadData() {
       .afterClosed()
       .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Country has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+            },
           });
+        } else {
+          this.isLoading = false;
         }
       });
   }

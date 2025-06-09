@@ -27,6 +27,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<StateModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
+  isLoading = false; 
   search: any = { all: '' };
 
   filter: any = {};
@@ -87,7 +88,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['roles'];
+      this.filter.with = ['country'];
       this.dataSource.find(_.pickBy(this.filter));
     }
   masterToggle() {
@@ -111,6 +112,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: StateModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -121,14 +123,22 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('State has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+            },
           });
+        } else {
+          this.isLoading = false; 
         }
       });
   }

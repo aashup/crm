@@ -20,6 +20,7 @@ export class AddStateComponent implements AfterViewInit, OnInit {
   model: StateModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddStateComponent>);
   readonly data = inject<{
     model: StateModel;
@@ -43,6 +44,10 @@ export class AddStateComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+    });
+  
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
@@ -67,20 +72,32 @@ export class AddStateComponent implements AfterViewInit, OnInit {
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-    if (_.isEqual(this.form.value.name, this.clone)) {
+  
+    if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
-        this.commonService.toastr.success(this.isEdit ? 'State has been updated.' : 'State has been created.');
-        this.dialogRef.close(true);
+        this.commonService.toastr.success(
+          this.isEdit ? 'State has been updated.' : 'State has been created.'
+        );
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+      },
     });
   }
+  
 }

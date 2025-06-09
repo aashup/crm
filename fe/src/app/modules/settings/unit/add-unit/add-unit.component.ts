@@ -18,6 +18,7 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
   model: UnitModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddUnitComponent>);
   readonly data = inject<{
     model: UnitModel;
@@ -60,14 +61,21 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
+        this.isLoading = false; 
         this.commonService.toastr.success(
           this.isEdit ? 'Unit has been updated.' : 'Unit has been created.'
         );
         this.dialogRef.close(true);
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.isLoading = false; 
+        this.commonService.handleError(err);
+      },
     });
   }
+  
 }

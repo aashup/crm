@@ -40,6 +40,7 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
   cities: any = [];
   search: any = { all: '' };
   filter: any = {};
+  isLoading = false;
   displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -162,12 +163,17 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         if (res) {
+          this.isLoading = true; // Start the loader
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; // Stop the loader
               this.commonService.toastr.success('Vendor has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; // Stop the loader on error
+              this.commonService.handleError(err);
+            },
           });
         }
       });
