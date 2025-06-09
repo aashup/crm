@@ -38,7 +38,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<UsersModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-
+  isLoading = false;
   filter: any = {};
   search: any = { all: '' };
   displayableCol = ['select', 'id', 'name', 'email', 'status', 'created_at', 'roles', 'action'];
@@ -141,6 +141,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: UsersModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -152,14 +153,22 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true;
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('User has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false;
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+            },
           });
+        } else {
+          this.isLoading = false; 
         }
       });
   }

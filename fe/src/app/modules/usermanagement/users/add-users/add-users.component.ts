@@ -20,6 +20,7 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   model: UsersModel;
   clone: any;
+  isLoading: boolean = false;
   isEdit: boolean = false;
   isPasswordChanged: boolean = false;
   showPasswordFields: boolean = false; 
@@ -63,12 +64,16 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
     this.isPasswordChanged = !this.isPasswordChanged;
   }
 
-  ngAfterViewInit(): void {
-    this.model = this.data.model;
-    this.isEdit = this.data.isEdit;
-    this.isPasswordChanged = this.data.isPasswordChanged;
-    this.initForm(this.model);
-  }
+ ngAfterViewInit(): void {
+  this.dialogRef.afterClosed().subscribe(() => {
+    this.isLoading = false; // Stop loader if modal is canceled
+  });
+
+  this.model = this.data.model;
+  this.isEdit = this.data.isEdit;
+  this.isPasswordChanged = this.data.isPasswordChanged;
+  this.initForm(this.model);
+}
 
   
   initForm(model: UsersModel) {
@@ -95,22 +100,31 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; // Start loader
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'User has been updated.' : 'User has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(true); // Close modal
+        this.isLoading = false; // Stop loader
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; // Stop loader on error
+      },
     });
   }
 }

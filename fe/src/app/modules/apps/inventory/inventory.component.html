@@ -101,10 +101,10 @@
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['vendors.update']">
+              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['inventory.update']">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['vendors.delete']">
+              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['inventory.delete']">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>

@@ -20,6 +20,7 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   model: RolesModel;
   clone: any;
+  isLoading: boolean = false;
   isEdit: boolean = false;
   readonly dialogRef = inject(MatDialogRef<AddRolesComponent>);
   readonly data = inject<{
@@ -55,6 +56,10 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false;
+    });
+  
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
@@ -79,22 +84,31 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; // Start loader
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
-          this.isEdit ? 'Roles has been updated.' : 'Roles has been created.'
+          this.isEdit ? 'Role has been updated.' : 'Role has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(true); // Close modal
+        this.isLoading = false; // Stop loader
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; // Stop loader on error
+      },
     });
   }
 }

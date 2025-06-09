@@ -41,6 +41,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = [
@@ -185,33 +186,42 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: SaleModel) {
+   
     this.dialog
       .open(ConfirmationDialogComponent, {
+        
         data: {
           title: 'Delete Sale Item',
-          body: `Are you sure you want to delete this Sale Item `,
+          body: `Are you sure you want to delete this Sale Item?`,
           okBtnName: 'Delete',
         },
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Sale has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+            },
           });
+        } else {
+          this.isLoading = false; 
         }
       });
   }
 
   add() {
-    
     this.dialog
       .open(AddSaleComponent, {
-        width:"1000px",
+        width: "1000px",
         data: {
           model: new SaleModel().clear(),
           isEdit: false,
@@ -219,11 +229,15 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe(() =>this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 
-edit(item: SaleModel) {
-  
+  edit(item: SaleModel) {
     this.dialog
       .open(AddSaleComponent, {
         data: {
@@ -233,6 +247,11 @@ edit(item: SaleModel) {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe(() =>this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 }
