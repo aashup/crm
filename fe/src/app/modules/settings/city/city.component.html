@@ -129,7 +129,7 @@
         *ngIf="dataSource.loading$ | async"
       ></mat-spinner>
       <mat-paginator
-        [pageSize]="dataSource.paginatorTotal$ | async"
+        [pageSizeOptions]="[5, 10, 20, 50, 100]"
         [length]="dataSource.paginatorTotal$ | async"
       ></mat-paginator>
 
