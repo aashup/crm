@@ -44,7 +44,7 @@ class CityController extends Controller
     public function store(Request $request)
     {
         $model = new City();
-        $request->validate( $model->validationRule(), $model->validationMessage());
+        $request->validate($model->validationRule(), $model->validationMessage());
         $state = State::findOrFail($request->state_id);
         $model->fill($request->all());
         $model->country_id =  $state->country_id;
@@ -76,7 +76,7 @@ class CityController extends Controller
     public function update(Request $request, City $city)
     {
         $model = $city;
-        $request->validate( $model->validationRule(), $model->validationMessage());
+        $request->validate($model->validationRule(), $model->validationMessage());
         $state = State::findOrFail($request->state_id);
         $model->fill($request->all());
         $model->country_id =  $state->country_id;
@@ -92,8 +92,12 @@ class CityController extends Controller
      *
      * @throws
      */
-    public function destroy(City $model)
+    public function destroy(City $city)
     {
-        return BaseResponse::success($model->delete());
+        try {
+            return BaseResponse::success($city->delete());
+        } catch (\Exception $e) {
+            return BaseResponse::error($e->getMessage());
+        }
     }
 }
