@@ -75,7 +75,7 @@
                 <div>
                   {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
                 </div>
-                <button
+                <!-- <button
                   *ngIf="cols.ref === 'address'"
                   mat-icon-button
                   matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{
@@ -89,7 +89,7 @@
                   class="text-info"
                 >
                   <mat-icon>info</mat-icon>
-                </button>
+                </button> -->
                 <button
                   *ngIf="cols.ref === 'contact'"
                   mat-icon-button
@@ -110,10 +110,10 @@
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['vendors.update']">
+              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['suppliers.update']">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['vendors.delete']">
+              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['suppliers.delete']">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>

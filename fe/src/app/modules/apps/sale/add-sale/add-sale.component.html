@@ -1,6 +1,8 @@
-<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Sale</h2>
+
+
 
 <div mat-dialog-content class="Sale-dialog-content" style="width: 100%;">
+  <h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Sale</h2>
   <div class="card m-auto">
     <div class="card-body">
       <div *ngIf="isLoading" class="loader-overlay">
@@ -176,11 +178,12 @@
       </form>
     </div>
   </div>
+  <div mat-dialog-actions align="end">
+    <button mat-button [mat-dialog-close]="false">Cancel</button>
+    <button mat-raised-button color="accent"  (click)="onSubmit()">
+      {{ isEdit ? 'Update' : 'Create' }}
+    </button>
+  </div>
 </div>
 
-<div mat-dialog-actions align="end">
-  <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-raised-button color="accent"  (click)="onSubmit()">
-    {{ isEdit ? 'Update' : 'Create' }}
-  </button>
-</div>
+
