@@ -1,4 +1,7 @@
 <div class="card">
+  <ngx-spinner bdColor = "rgba(0, 0, 0, 0.6)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true">
+      <p style="color: white" > Loading... </p>
+  </ngx-spinner>
   <div class="card-header border-0 pt-6">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
@@ -29,6 +32,7 @@
       <div *ngIf="isLoading" class="loader-overlay">
         <mat-spinner></mat-spinner>
       </div>
+    
       <table
         #table
         cdk-table
