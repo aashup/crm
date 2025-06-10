@@ -9,6 +9,7 @@ import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
 import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { PurchaseService } from '../purchase.service';
+import { VendorService } from '../../vendor/vendor.service';
 @Component({
     selector: 'app-add-purchase',
     templateUrl: '././add-purchase.component.html',
@@ -38,7 +39,8 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     private unitService:UnitService,
     private productService:ProductService,
     private contactService:ContactService,
-    private purchaseService:PurchaseService
+    private purchaseService:PurchaseService,
+    private supplierService:VendorService
 
 
   ) {}
@@ -48,6 +50,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     
     this.isEdit=this.data.isEdit
     this.getAllUnits()
+    this.getAllSuppliers()
     this.getAllConntact()
     this.getAllProduct()
     this.form = this.fb.group({
@@ -69,6 +72,14 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
         this.units=res.data
       }
     })
+  }
+  getAllSuppliers(){
+    this.supplierService.find({}).subscribe((res:any)=>{  
+      if(res.data){
+        this.suppliers=res.data
+      }
+    }
+    )
   }
 
 getAllConntact(){

@@ -222,7 +222,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialog
       .open(AddSaleComponent, {
         height: 'auto',
-        width: '100px !important',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: new SaleModel().clear(),
           isEdit: false,
@@ -241,7 +242,9 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   edit(item: SaleModel) {
     this.dialog
       .open(AddSaleComponent, {
-        width:"90%",
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: item,
           isEdit: true,
