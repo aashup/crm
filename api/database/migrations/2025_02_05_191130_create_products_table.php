@@ -197,6 +197,7 @@ return new class extends Migration
                 $table->unsignedBigInteger(column: 'sale_id');
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('unit_id');
+                $table->integer('quantity')->default(1);
                 $table->decimal('amount')->nullable();
                 $table->decimal('discount_amount')->default(0);
                 $table->tinyInteger('discount_type', false, true)->default(1)
@@ -232,6 +233,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('purchase_id');
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('unit_id');
+                $table->integer('quantity')->default(1);
                 $table->decimal('amount')->nullable();
                 $table->timestamps();
                 $table->softDeletes();

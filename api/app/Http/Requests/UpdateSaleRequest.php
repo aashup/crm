@@ -33,6 +33,7 @@ class UpdateSaleRequest extends FormRequest
             'saleDetails' => 'required|array',
             'saleDetails.*.product_id' => 'required|integer',
             'saleDetails.*.unit_id' => 'required|integer',
+            'saleDetails.*.quantity' => 'required|numeric|min:0',
             'saleDetails.*.amount' => 'required|numeric',
             'saleDetails.*.discount_amount' => 'nullable|numeric',
             'saleDetails.*.discount_type' => 'nullable|integer|in:1,2', // Assuming 1 for flat and 2 for percentage amount
