@@ -117,6 +117,7 @@ getAllProduct(){
     return this.fb.group({
       product_id: [null, Validators.required],
       unit_id: [null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]], // Added quantity field
       amount: [null, Validators.required]
     });
   }
@@ -138,15 +139,13 @@ getAllProduct(){
       this.purchaseDetails.push(this.fb.group({
         product_id: [detail.product_id, Validators.required],
         unit_id: [detail.unit_id, Validators.required],
+        quantity: [detail.quantity || 1, [Validators.required, Validators.min(1)]], // Patch quantity value
         amount: [detail.amount, Validators.required]
       }));
     });
   }
 
-  loadDropdownData(): void {
-   
-    
-  }
+
   ngAfterViewInit(): void {
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
@@ -171,12 +170,12 @@ getAllProduct(){
       this.purchaseService.update(payload).subscribe({
         complete: () => {
           this.commonService.toastr.success('Purchase Updated');
-          this.dialogRef.close(this.data.model); 
-          this.isLoading = false; 
+          this.dialogRef.close(this.data.model);
+          this.isLoading = false;
         },
         error: (err) => {
           this.commonService.handleError(err);
-          this.isLoading = false; 
+          this.isLoading = false;
         },
       });
       return;
@@ -186,12 +185,12 @@ getAllProduct(){
     this.purchaseService.create(purchaseData).subscribe({
       complete: () => {
         this.commonService.toastr.success('Purchase Item Created');
-        this.dialogRef.close(purchaseData); 
-        this.isLoading = false; 
+        this.dialogRef.close(purchaseData);
+        this.isLoading = false;
       },
       error: (err) => {
         this.commonService.handleError(err);
-        this.isLoading = false; 
+        this.isLoading = false;
       },
     });
   }
