@@ -30,6 +30,7 @@ class StorePurchaseRequest extends FormRequest
             "purchaseDetails" => 'required|array',
             "purchaseDetails.*.product_id" => 'required|integer',
             "purchaseDetails.*.unit_id" => 'required|integer',
+            "purchaseDetails.*.quantity" => 'required|numeric|min:0',
             "purchaseDetails.*.amount" => 'required|numeric',
         ];
     }
