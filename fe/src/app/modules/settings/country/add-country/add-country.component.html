@@ -28,8 +28,18 @@
   </div>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-button (click)="submit()" (keyup.enter)="submit()">
-    {{ isEdit ? "Update" : "Create" }}
+  <button  [mat-dialog-close]="false" type="button" class="btn btn-primary" [disabled]="isLoading"  style="margin-right: 5px;">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="submit()" (keyup.enter)="submit()">
+    <ng-container *ngIf="!isLoading">
+      {{ isEdit ? 'Update' : 'Create' }}
+    </ng-container>
+    <ng-container *ngIf="isLoading">
+      <span clas="indicator-progress" [style.display]="'block'">
+        Please wait...{{ ' ' }}
+        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+      </span>
+    </ng-container>
   </button>
 </div>

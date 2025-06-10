@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Supplier</h2>
+<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Supplier</h2>
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
@@ -11,12 +11,7 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Suppleir Name</mat-label>
-              <input
-                matInput
-                placeholder="Enter Suppleir Name"
-                formControlName="name"
-                maxlength="200"
-              />
+              <input matInput placeholder="Enter Suppleir Name" formControlName="name" maxlength="200" />
               <mat-error>Suppleir Name is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
@@ -101,8 +96,18 @@
   </div>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-button (click)="submit()" (keyup.enter)="submit()">
-    {{ isEdit ? "Update" : "Create" }}
+  <button  [mat-dialog-close]="false" type="button" class="btn btn-primary" [disabled]="isLoading"  style="margin-right: 5px;">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="submit()" (keyup.enter)="submit()">
+    <ng-container *ngIf="!isLoading">
+      {{ isEdit ? 'Update' : 'Create' }}
+    </ng-container>
+    <ng-container *ngIf="isLoading">
+      <span clas="indicator-progress" [style.display]="'block'">
+        Please wait...{{ ' ' }}
+        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+      </span>
+    </ng-container>
   </button>
 </div>

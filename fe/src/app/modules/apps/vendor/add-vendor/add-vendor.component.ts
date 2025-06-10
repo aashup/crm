@@ -96,11 +96,12 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.isLoading = false; 
         this.commonService.toastr.success(
-          this.isEdit ? 'Vendor has been updated.' : 'Vendor has been created.'
+          this.isEdit ? 'Supplier has been updated.' : 'Supplier has been created.'
         );
         this.dialogRef.close(true);
       },
