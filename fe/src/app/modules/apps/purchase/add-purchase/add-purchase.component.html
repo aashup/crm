@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Purchase</h2>
 
-<div mat-dialog-content class="purchase-dialog-content" style="width: 100%;">
+<div mat-dialog-content class="purchase-dialog-content" style="width: 100%">
   <div class="card m-auto">
     <div class="card-body">
       <div *ngIf="isLoading" class="loader-overlay">
@@ -9,7 +9,7 @@
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
           <!-- Contact Name -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Contact Name</mat-label>
               <mat-select formControlName="contact_id">
@@ -22,7 +22,7 @@
           </div>
 
           <!-- Unit -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Unit</mat-label>
               <mat-select formControlName="unit_id">
@@ -35,21 +35,20 @@
           </div>
 
           <!-- Supplier -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Supplier</mat-label>
               <mat-select formControlName="supplier_id">
-                <!-- <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
+                <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
                   {{ supplier.name }}
-                </mat-option> -->
-                <mat-option [value]="1">Pawan Dixit</mat-option>
+                </mat-option>
               </mat-select>
               <mat-error>Supplier is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
 
           <!-- Amount -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Amount</mat-label>
               <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
@@ -66,10 +65,15 @@
           </div>
 
           <!-- Purchase Details -->
+          <h3>Purchase Details</h3>
           <div formArrayName="purchaseDetails" class="col-12">
-            <div *ngFor="let detail of purchaseDetails.controls; let i = index" [formGroupName]="i" class="row align-items-end mb-3">
+            <div
+              *ngFor="let detail of purchaseDetails.controls; let i = index"
+              [formGroupName]="i"
+              class="row align-items-center mb-3"
+            >
               <!-- Product -->
-              <div class="col-4">
+              <div class="col-12 col-md-3">
                 <mat-form-field class="w-100">
                   <mat-label>Product</mat-label>
                   <mat-select formControlName="product_id">
@@ -82,7 +86,7 @@
               </div>
 
               <!-- Unit -->
-              <div class="col-3">
+              <div class="col-12 col-md-3">
                 <mat-form-field class="w-100">
                   <mat-label>Unit</mat-label>
                   <mat-select formControlName="unit_id">
@@ -94,8 +98,16 @@
                 </mat-form-field>
               </div>
 
+              <!-- Quantity -->
+              <div class="col-12 col-md-2">
+                <mat-form-field class="w-100">
+                  <mat-label>Quantity</mat-label>
+                  <input matInput type="number" formControlName="quantity" placeholder="Enter Quantity" />
+                  <mat-error>Quantity is <strong>required</strong></mat-error>
+                </mat-form-field>
+              </div>
               <!-- Amount -->
-              <div class="col-3">
+              <div class="col-12 col-md-3">
                 <mat-form-field class="w-100">
                   <mat-label>Amount</mat-label>
                   <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
@@ -104,11 +116,20 @@
               </div>
 
               <!-- Action Buttons -->
-              <div class="col-2 d-flex justify-content-start align-items-center " style="margin-bottom: 30px;">
-                <button mat-icon-button color="primary" (click)="addPurchaseDetail()" type="button">
+              <div
+                class="col-12 col-md-1 d-flex flex-row justify-content-center align-items-end"
+                style="margin-top: -15px"
+              >
+                <button mat-icon-button color="primary" (click)="addPurchaseDetail()" type="button" class="">
                   <mat-icon>add_circle</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" (click)="removePurchaseDetail(i)" type="button" [disabled]="purchaseDetails.length === 1">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removePurchaseDetail(i)"
+                  type="button"
+                  [disabled]="purchaseDetails.length === 1"
+                >
                   <mat-icon>remove_circle</mat-icon>
                 </button>
               </div>
@@ -120,9 +141,19 @@
   </div>
 </div>
 
-<div mat-dialog-actions align="end">
-  <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-raised-button color="accent" [disabled]="form.invalid" (click)="onSubmit()">
-    {{ isEdit ? 'Update' : 'Create' }}
+<div mat-dialog-actions>
+  <button  [mat-dialog-close]="false" type="button" class="btn btn-primary" [disabled]="isLoading"  style="margin-right: 5px;">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit()" (keyup.enter)="onSubmit()">
+    <ng-container *ngIf="!isLoading">
+      {{ isEdit ? 'Update' : 'Create' }}
+    </ng-container>
+    <ng-container *ngIf="isLoading">
+      <span clas="indicator-progress" [style.display]="'block'">
+        Please wait...{{ ' ' }}
+        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+      </span>
+    </ng-container>
   </button>
 </div>

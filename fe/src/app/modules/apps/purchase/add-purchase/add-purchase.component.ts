@@ -9,6 +9,7 @@ import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
 import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { PurchaseService } from '../purchase.service';
+import { VendorService } from '../../vendor/vendor.service';
 @Component({
     selector: 'app-add-purchase',
     templateUrl: '././add-purchase.component.html',
@@ -38,7 +39,8 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     private unitService:UnitService,
     private productService:ProductService,
     private contactService:ContactService,
-    private purchaseService:PurchaseService
+    private purchaseService:PurchaseService,
+    private supplierService:VendorService
 
 
   ) {}
@@ -48,6 +50,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     
     this.isEdit=this.data.isEdit
     this.getAllUnits()
+    this.getAllSuppliers()
     this.getAllConntact()
     this.getAllProduct()
     this.form = this.fb.group({
@@ -69,6 +72,14 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
         this.units=res.data
       }
     })
+  }
+  getAllSuppliers(){
+    this.supplierService.find({}).subscribe((res:any)=>{  
+      if(res.data){
+        this.suppliers=res.data
+      }
+    }
+    )
   }
 
 getAllConntact(){
@@ -106,6 +117,7 @@ getAllProduct(){
     return this.fb.group({
       product_id: [null, Validators.required],
       unit_id: [null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]], // Added quantity field
       amount: [null, Validators.required]
     });
   }
@@ -127,15 +139,13 @@ getAllProduct(){
       this.purchaseDetails.push(this.fb.group({
         product_id: [detail.product_id, Validators.required],
         unit_id: [detail.unit_id, Validators.required],
+        quantity: [detail.quantity || 1, [Validators.required, Validators.min(1)]], // Patch quantity value
         amount: [detail.amount, Validators.required]
       }));
     });
   }
 
-  loadDropdownData(): void {
-   
-    
-  }
+
   ngAfterViewInit(): void {
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
@@ -160,12 +170,12 @@ getAllProduct(){
       this.purchaseService.update(payload).subscribe({
         complete: () => {
           this.commonService.toastr.success('Purchase Updated');
-          this.dialogRef.close(this.data.model); 
-          this.isLoading = false; 
+          this.dialogRef.close(this.data.model);
+          this.isLoading = false;
         },
         error: (err) => {
           this.commonService.handleError(err);
-          this.isLoading = false; 
+          this.isLoading = false;
         },
       });
       return;
@@ -175,12 +185,12 @@ getAllProduct(){
     this.purchaseService.create(purchaseData).subscribe({
       complete: () => {
         this.commonService.toastr.success('Purchase Item Created');
-        this.dialogRef.close(purchaseData); 
-        this.isLoading = false; 
+        this.dialogRef.close(purchaseData);
+        this.isLoading = false;
       },
       error: (err) => {
         this.commonService.handleError(err);
-        this.isLoading = false; 
+        this.isLoading = false;
       },
     });
   }

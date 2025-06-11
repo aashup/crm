@@ -76,12 +76,14 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
         ],
       ],
       contact_id: [model.contact_id, [Validators.required]],
-      address_id: [model.billing_address_id, [ Validators.required]],
-     
+      billing_address_id: [model.billing_address_id, [Validators.required]],
+      shipping_address_id: [model.shipping_address_id, [Validators.required]],
+      level: [model.level, [Validators.required]],
+      status: [model.status, [Validators.required]],
+      type: [model.type, [Validators.required]],
     });
     this.clone = this.form.value;
   }
-
   submit() {
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {
@@ -94,11 +96,12 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.isLoading = false; 
         this.commonService.toastr.success(
-          this.isEdit ? 'Vendor has been updated.' : 'Vendor has been created.'
+          this.isEdit ? 'Supplier has been updated.' : 'Supplier has been created.'
         );
         this.dialogRef.close(true);
       },

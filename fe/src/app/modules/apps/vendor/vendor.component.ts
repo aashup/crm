@@ -23,6 +23,7 @@ import { VendorDatasource } from './vendor.datasource';
 import { VendorModel } from './vendor.model';
 import { VendorService } from './vendor.service';
 import { AddVendorComponent } from './add-vendor/add-vendor.component';
+import { AddressService } from '../../settings/address/address.service';
 
 @Component({
     selector: 'app-vendor',
@@ -38,28 +39,86 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  address: any = [];
+  shippingAddress:any;
   search: any = { all: '' };
   filter: any = {};
   isLoading = false;
-  displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
+  displayableCol = [
+    'select',
+    'id',
+    'name',
+    'shipping_address_id',
+    'billing_address_id',
+    'contact',
+    'type',
+    'level',
+    'status',
+    'action',
+  ];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'select', style: { width: '70px' } },
+    { ref: 'select', name: 'Select', style: { width: '70px' } },
     {
       ref: 'id',
       name: 'ID',
       style: { 'max-width': '30px' },
     },
     { ref: 'name', name: 'Name' },
-    { ref: 'address', name: 'Address Name', mutator: (item: any) => item?.address?.address },
+    {
+      ref: 'shipping_address_id',
+      name: 'Shipping Address',
+      mutator: (item: any) => {
+        const address = this.address.find((addr: any) => addr.id === item.shipping_address_id);
+        console.log("type",address?.type);
+        
+        if(address?.type=='1')
+        return address ? address .address: 'N/A';
+        else
+        return "N/A"
+
+      },
+     
+    },
+    {
+      ref: 'billing_address_id',
+      name: 'Billing Address',   
+      mutator: (item: any) => {
+        const address = this.address.find((addr: any) => addr.id === item.billing_address_id);
+        
+        if(address?.type=='1')
+          return address ? address .address: 'N/A';
+          else
+          return "N/A"
+      },
+    },
     {
       ref: 'contact',
       name: 'Contact Person',
-      mutator: (item: any) => item?.contact?.name,
+      mutator: (item: any) => item?.contact?.name || 'N/A',
+    },
+    {
+      ref: 'type',
+      name: 'Type',
+     
+      
+    },
+    {
+      ref: 'level',
+      name: 'Level',
+   
+    },
+    {
+      ref: 'status',
+      name: 'Status',
+      mutator: (item: any) => {
+        return item.status == '1' ? 'Active' : 'Inactive';
+      },
+     
     },
     { ref: 'action', name: 'Actions' },
   ];
@@ -69,12 +128,15 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: VendorService,
     private commonService: CommonService,
     private cityService: CityService,
+    private addressService: AddressService,
   ) {
     this.dataSource = new VendorDatasource(this.service);
   }
   ngOnInit(): void {
+    this.getAllAddresses()
     this.getAllCities()
     this.loadData();
+    
     this.commonService.page.updateTitle('Suppliers List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
@@ -90,6 +152,17 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       .subscribe();
   }
+
+getAllAddresses() {
+  this.addressService.find({}).subscribe((res:any) => {
+    console.log(res.data);
+    if(res.data.length){
+      this.address=res.data
+    }
+  }
+  );
+}
+
   getAllCities() {
     this.cityService.find({}).subscribe((res:any) => {
       console.log(res.data);
@@ -128,7 +201,19 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
       this.filter.with = ['contact', 'address']; 
-      this.filter.cols = ['id', 'name', 'contact_id', 'shipping_address_id', 'shipping_address_id','created_at', 'updated_at']; 
+      this.filter.cols = [
+        'id', 
+        'name', 
+        'contact_id',
+        'shipping_address_id', 
+        'billing_address_id',
+        'notes',
+        'type',
+        'level',
+        'status',
+        'created_at', 
+        'updated_at'
+      ]; 
       this.dataSource.find(_.pickBy(this.filter));
     }
   masterToggle() {

@@ -197,7 +197,9 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   add() {
     this.dialog
       .open(AddPurchaseComponent, {
-        width: "1000px",
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: new PurchaseModel().clear(),
           isEdit: false,
@@ -216,6 +218,9 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   edit(item: PurchaseModel) {
     this.dialog
       .open(AddPurchaseComponent, {
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: item,
           isEdit: true,
