@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Supplier;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class SupplierController extends Controller
@@ -92,8 +93,11 @@ class SupplierController extends Controller
 
         try {
             return $this->success("Permission deleted successfully!", $supplier->delete());
-        } catch (\Exception $e) {
-            return $this->error("Vendor cannot be deleted! : " . $e->getMessage(), 500);
+        } catch (QueryException $e) {
+            if ($e->getCode() == '23000') {
+                return $this->error("Supplier is linked to other records and cannot be deleted.", 400);
+            }
+            return $this->error("Supplier cannot be deleted! : " . $e->getMessage(), 500);
         }
     }
 }
