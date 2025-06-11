@@ -39,6 +39,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.isLoading= false;
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
     });

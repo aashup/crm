@@ -34,7 +34,7 @@
             <mat-form-field class="w-100">
               <mat-label>Billing Address</mat-label>
               <mat-select placeholder="Select Billing Address" formControlName="billing_address_id">
-                <mat-option *ngFor="let address of addresses" [value]="address.id">
+                <mat-option *ngFor="let address of billingAddress" [value]="address.id">
                   {{ address.address }}
                 </mat-option>
               </mat-select>
@@ -47,7 +47,7 @@
             <mat-form-field class="w-100">
               <mat-label>Shipping Address</mat-label>
               <mat-select placeholder="Select Shipping Address" formControlName="shipping_address_id">
-                <mat-option *ngFor="let address of addresses" [value]="address.id">
+                <mat-option *ngFor="let address of shippingAddress" [value]="address.id">
                   {{ address.address }}
                 </mat-option>
               </mat-select>

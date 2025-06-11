@@ -111,6 +111,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+      this.isLoading = false; 
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -199,6 +200,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
         if (flag) {
           this.loadData();
         }
+        this.loadData();
         this.isLoading = false; 
       });
   }
@@ -217,6 +219,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loadData();
         }
         this.isLoading = false; 
+        this.loadData();
       });
   }
 }

@@ -147,6 +147,8 @@ getAllProduct(){
 
 
   ngAfterViewInit(): void {
+    this.isLoading = false; 
+
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
     });

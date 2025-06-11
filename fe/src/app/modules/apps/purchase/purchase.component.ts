@@ -39,6 +39,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = [
@@ -181,14 +182,20 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Purchase has been deleted.');
               this.loadData();
+              this.isLoading = false; 
               this.cdr.detectChanges(); 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+            },
           });
         }
       });

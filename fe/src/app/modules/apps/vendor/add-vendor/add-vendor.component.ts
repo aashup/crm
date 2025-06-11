@@ -22,6 +22,8 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
   isEdit: boolean = false;
   contacts: any = [];
   addresses: any = [];
+  billingAddress: any = [];
+  shippingAddress: any = [];
   isLoading = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddVendorComponent>);
@@ -55,6 +57,14 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
   getAddresses() {
     this.addressService.find().subscribe((res: any) => {
       this.addresses = res.data;
+      this.addresses.filter((address: any) => {
+        if (address.type =='2') {
+          this.billingAddress.push(address);
+        } else if (address.type == '1') {
+          this.shippingAddress.push(address);
+        }
+      }
+      );
     }
     );
   }
@@ -62,6 +72,7 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
+    this.isLoading = false; 
   }
 
   initForm(model: VendorModel) {
@@ -103,6 +114,7 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
         this.commonService.toastr.success(
           this.isEdit ? 'Supplier has been updated.' : 'Supplier has been created.'
         );
+        this.isLoading = false; 
         this.dialogRef.close(true);
       },
       error: (err) => {

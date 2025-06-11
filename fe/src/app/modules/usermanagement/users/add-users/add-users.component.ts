@@ -65,8 +65,10 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
   }
 
  ngAfterViewInit(): void {
+  this.isLoading= false;
+
   this.dialogRef.afterClosed().subscribe(() => {
-    this.isLoading = false; // Stop loader if modal is canceled
+    this.isLoading = false;
   });
 
   this.model = this.data.model;

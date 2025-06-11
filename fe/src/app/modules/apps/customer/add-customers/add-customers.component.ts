@@ -61,6 +61,7 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
   ngAfterViewInit(): void {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
+    this.isLoading = false; 
     this.initForm(this.model);
   }
 
