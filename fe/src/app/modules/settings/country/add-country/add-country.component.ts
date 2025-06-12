@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CountryService } from '../country.service';
 import { CommonService } from '../../../core/common.service';
 import _ from 'lodash';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-add-country',
@@ -27,13 +28,16 @@ export class AddCountryComponent implements AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private service: CountryService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {}
 
   ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
+      this.spinnerService.hide()
     });
   
     this.model = this.data.model;
@@ -69,6 +73,7 @@ export class AddCountryComponent implements AfterViewInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show()
   
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
@@ -77,10 +82,12 @@ export class AddCountryComponent implements AfterViewInit {
         );
         this.dialogRef.close(true); 
         this.isLoading = false;
+        this.spinnerService.hide()
       },
       error: (err) => {
         this.commonService.handleError(err);
         this.isLoading = false; 
+        this.spinnerService.hide()
       },
     });
   }

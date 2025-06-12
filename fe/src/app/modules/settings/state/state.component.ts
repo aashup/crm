@@ -14,6 +14,7 @@ import { StateService } from './state.service';
 import { AddStateComponent } from './add-state/add-state.component';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-state',
@@ -52,7 +53,8 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: StateService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new StateDatasource(this.service);
   }
@@ -71,6 +73,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   }
    ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -125,6 +128,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
@@ -132,14 +136,17 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
               this.loadData();
               this.cdr.detectChanges(); 
               this.isLoading = false; 
+              this.spinnerService.hide()
             },
             error: (err) => {
               this.commonService.handleError(err);
               this.isLoading = false;
+              this.spinnerService.hide()
             },
           });
         } else {
           this.isLoading = false; 
+          this.spinnerService.hide()
         }
       });
   }

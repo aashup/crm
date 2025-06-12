@@ -8,6 +8,7 @@ import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
 import { SaleService } from '../sale.service';
 import { CommonService } from 'src/app/modules/core/common.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-add-sale',
@@ -35,7 +36,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     private unitService: UnitService,
     private productService: ProductService,
     private saleService: SaleService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -53,8 +55,10 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   ngAfterViewInit(): void {
     this.isEdit = this.data.isEdit;
     this.isLoading = false; 
+    this.spinnerService.hide(); 
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
+      this.spinnerService.hide();
     });
   }
 
@@ -212,6 +216,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show();
   
     const payload = {
       ...this.form.getRawValue(),
@@ -224,11 +229,13 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
           this.commonService.toastr.success('Updated Successfully');
           this.dialogRef.close(true); 
           this.isLoading = false; 
+          this.spinnerService.hide();
         },
         error: (err) => {
           console.error('Error updating sale:', err);
           this.commonService.handleError(err);
           this.isLoading = false;
+          this.spinnerService.hide();
         },
       });
     } else {
@@ -237,11 +244,13 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
           this.commonService.toastr.success('Sale Created Successfully');
           this.dialogRef.close(true);
           this.isLoading = false; 
+          this.spinnerService.hide();
         },
         error: (err) => {
           console.error('Error creating sale:', err);
           this.commonService.handleError(err);
           this.isLoading = false; 
+          this.spinnerService.hide();
         },
       });
     }

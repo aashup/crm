@@ -25,6 +25,7 @@ import { SaleModel } from './sale.model';
 import { SaleService } from './sale.service';
 import { AddSaleComponent } from './add-sale/add-sale.component';
 import { AddressModel } from '../../settings/address/address.model';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 
 @Component({
@@ -87,6 +88,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private cityService: CityService,
     private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new SaleDatasource(this.service);
   }
@@ -127,6 +129,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
     ngAfterViewInit(): void {
       this.isLoading = false; 
+      this.spinnerService.hide();
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -200,6 +203,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
@@ -207,14 +211,18 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
               this.loadData();
               this.cdr.detectChanges(); 
               this.isLoading = false; 
+              this.spinnerService.hide();
+
             },
             error: (err) => {
               this.commonService.handleError(err);
               this.isLoading = false; 
+              this.spinnerService.hide();
             },
           });
         } else {
           this.isLoading = false; 
+          this.spinnerService.hide();
         }
       });
   }

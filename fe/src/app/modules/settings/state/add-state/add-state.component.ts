@@ -8,6 +8,7 @@ import { FindService } from 'src/app/modules/core/find.service';
 import { take } from 'rxjs';
 import { ErrorStateMatcher } from '@angular/material/core';
 import _ from 'lodash';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-add-state',
@@ -33,7 +34,8 @@ export class AddStateComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: StateService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -45,8 +47,10 @@ export class AddStateComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
+      this.spinnerService.hide()
     });
   
     this.model = this.data.model;
@@ -85,6 +89,7 @@ export class AddStateComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show()
   
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
@@ -93,10 +98,12 @@ export class AddStateComponent implements AfterViewInit, OnInit {
         );
         this.dialogRef.close(true); 
         this.isLoading = false; 
+        this.spinnerService.hide()
       },
       error: (err) => {
         this.commonService.handleError(err);
         this.isLoading = false; 
+        this.spinnerService.hide()
       },
     });
   }

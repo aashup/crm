@@ -24,6 +24,7 @@ import { PurchaseDatasource } from './purchase.datasource';
 import { PurchaseModel } from './purchase.model';
 import { PurchaseService } from './purchase.service';
 import { AddPurchaseComponent } from './add-purchase/add-purchase.component';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-purchase',
@@ -85,6 +86,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: PurchaseService,
     private commonService: CommonService,
     private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new PurchaseDatasource(this.service);
   }
@@ -183,6 +185,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show();
 
         if (res) {
           this.service.delete(item).subscribe({
@@ -190,11 +193,13 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
               this.commonService.toastr.success('Purchase has been deleted.');
               this.loadData();
               this.isLoading = false; 
+              this.spinnerService.hide();
               this.cdr.detectChanges(); 
             },
             error: (err) => {
               this.commonService.handleError(err);
               this.isLoading = false; 
+              this.spinnerService.hide();
             },
           });
         }

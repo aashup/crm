@@ -24,6 +24,7 @@ import { VendorModel } from './vendor.model';
 import { VendorService } from './vendor.service';
 import { AddVendorComponent } from './add-vendor/add-vendor.component';
 import { AddressService } from '../../settings/address/address.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-vendor',
@@ -33,6 +34,7 @@ import { AddressService } from '../../settings/address/address.service';
     standalone: false
 })
 export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
+
   _ = _;
   dataSource: VendorDatasource;
   selection = new SelectionModel<VendorModel>(true, []);
@@ -128,6 +130,7 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private cityService: CityService,
     private addressService: AddressService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new VendorDatasource(this.service);
   }
@@ -172,6 +175,7 @@ getAllAddresses() {
   }
     ngAfterViewInit(): void {
       this.isLoading = false; 
+      this.spinnerService.hide();
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -240,14 +244,17 @@ getAllAddresses() {
       .subscribe((res) => {
         if (res) {
           this.isLoading = true; 
+          this.spinnerService.show();
           this.service.delete(item).subscribe({
             complete: () => {
               this.isLoading = false; 
+              this.spinnerService.hide();
               this.commonService.toastr.success('Vendor has been deleted.');
               this.loadData();
             },
             error: (err) => {
               this.isLoading = false; 
+              this.spinnerService.hide();
               console.log("err",err.error.message);
               this.commonService.toastr.error(err.error.message || 'Some error occurred.');
               // this.commonService.handleError(err.error.message);

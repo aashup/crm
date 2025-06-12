@@ -24,6 +24,7 @@ import { UsersService } from './users.service';
 import { AddUsersComponent } from './add-users/add-users.component';
 import { DatePipe } from '@angular/common';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-users',
@@ -86,16 +87,17 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: UsersService,
     private commonService: CommonService,
     private datePipe: DatePipe,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new UsersDatasource(this.service);
   }
   ngOnInit(): void {
     this.dataSource.loading$.subscribe((isLoading) => {
       if (isLoading) {
-        this.spinner.show();
+        this.spinnerService.show();
       } else {
-        this.spinner.hide();
+        this.spinnerService.hide();
       }
     });
 
@@ -116,6 +118,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide();
     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
       .pipe(
         debounceTime(500),
@@ -164,6 +167,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(take(1))
       .subscribe((res) => {
         this.isLoading = true;
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
@@ -171,14 +175,17 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
               this.loadData();
               this.cdr.detectChanges();
               this.isLoading = false;
+              this.spinnerService.hide();
             },
             error: (err) => {
               this.commonService.handleError(err);
               this.isLoading = false;
+              this.spinnerService.hide();
             },
           });
         } else {
           this.isLoading = false;
+          this.spinnerService.hide();
         }
       });
   }

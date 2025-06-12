@@ -12,6 +12,7 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { SubscriptionHandler } from '../../core/subscription.handler';
 import { AddressService } from './address.service';
 import { AddAddressComponent } from './add-address/add-address.component';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-address',
@@ -63,7 +64,8 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: AddressService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new AddressDatasource(this.service);
   }
@@ -142,16 +144,19 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show()
 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.toastr.success('Address has been deleted.');
               this.loadData();
             },
             error: (err) => {
               this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.handleError(err);
             },
           });

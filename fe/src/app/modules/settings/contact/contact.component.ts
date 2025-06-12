@@ -26,6 +26,7 @@ import { ContactDatasource } from './contact.datasource';
 import { ContactService } from './contact.service';
 import { AddContactComponent } from './add-contact/add-contact.component';
 import { ContactModel } from './contact.model';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-contact',
@@ -75,7 +76,8 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: ContactService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new ContactDatasource(this.service);
   }
@@ -101,6 +103,7 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
   }
    ngAfterViewInit(): void {
     this.isLoading = false; 
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -157,14 +160,17 @@ export class ContactComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((res) => {
         if (res) {
           this.isLoading = true; 
+          this.spinnerService.show()
           this.service.delete(item).subscribe({
             complete: () => {
               this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.toastr.success('Contact has been deleted.');
               this.loadData();
             },
             error: (err) => {
               this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.handleError(err);
             },
           });

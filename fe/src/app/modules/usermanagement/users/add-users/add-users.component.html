@@ -2,9 +2,7 @@
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
-      <div *ngIf="isLoading" class="loader-overlay">
-        <mat-spinner></mat-spinner>
-      </div>
+      
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
           <!-- Name Input -->
@@ -36,7 +34,7 @@
           </div>
 
           <!-- Mobile Input -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <!-- <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Enter Mobile</mat-label>
               <input
@@ -47,7 +45,7 @@
               />
               <mat-error>Mobile is <strong>required</strong></mat-error>
             </mat-form-field>
-          </div>
+          </div> -->
 
           <!-- Password Fields -->
           <div class="col-12 kt-margin-bottom-20-mobile">

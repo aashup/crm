@@ -12,6 +12,7 @@ import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
 import { AddPermissionComponent } from './add-permission/add-permission.component';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-permission',
@@ -51,7 +52,8 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: PermissionService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new PermissionDatasource(this.service);
   }
@@ -77,6 +79,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -134,6 +137,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(take(1))
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
@@ -141,14 +145,17 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
               this.loadData();
               this.cdr.detectChanges(); 
               this.isLoading = false; 
+              this.spinnerService.hide()
             },
             error: (err) => {
               this.commonService.handleError(err);
               this.isLoading = false;
+              this.spinnerService.hide()
             },
           });
         } else {
           this.isLoading = false; 
+          this.spinnerService.hide()
         }
       });
   }
