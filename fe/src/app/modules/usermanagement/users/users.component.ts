@@ -23,6 +23,7 @@ import { UsersModel } from './users.model';
 import { UsersService } from './users.service';
 import { AddUsersComponent } from './add-users/add-users.component';
 import { DatePipe } from '@angular/common';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-users',
@@ -84,11 +85,20 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private service: UsersService,
     private commonService: CommonService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private spinner: NgxSpinnerService
   ) {
     this.dataSource = new UsersDatasource(this.service);
   }
   ngOnInit(): void {
+    this.dataSource.loading$.subscribe((isLoading) => {
+      if (isLoading) {
+        this.spinner.show();
+      } else {
+        this.spinner.hide();
+      }
+    });
+
     this.loadData();
     this.commonService.page.updateTitle('Users List');
 
@@ -142,7 +152,6 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: UsersModel) {
-    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -160,16 +169,16 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
             complete: () => {
               this.commonService.toastr.success('User has been deleted.');
               this.loadData();
-              this.cdr.detectChanges(); 
+              this.cdr.detectChanges();
               this.isLoading = false;
             },
             error: (err) => {
               this.commonService.handleError(err);
-              this.isLoading = false; 
+              this.isLoading = false;
             },
           });
         } else {
-          this.isLoading = false; 
+          this.isLoading = false;
         }
       });
   }
