@@ -29,9 +29,7 @@
         mode="indeterminate"
         *ngIf="dataSource.loading$ | async"
       ></mat-progress-bar>
-      <div *ngIf="isLoading" class="loader-overlay">
-        <mat-spinner></mat-spinner>
-      </div>
+     
     
       <table
         #table

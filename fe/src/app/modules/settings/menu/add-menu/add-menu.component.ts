@@ -8,6 +8,7 @@ import { take } from 'rxjs';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { StateModel } from '../../state/state.model';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-add-menu',
@@ -33,7 +34,8 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: MenuService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +57,7 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isLoading = false; 
+    this.spinnerService.hide()
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
@@ -86,9 +89,11 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show()
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.isLoading = false; 
+        this.spinnerService.hide()
         this.commonService.toastr.success(
           this.isEdit ? 'Menu has been updated.' : 'Menu has been created.'
         );
@@ -96,6 +101,7 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
       },
       error: (err) => {
         this.isLoading = false; 
+        this.spinnerService.hide()
         this.commonService.handleError(err);
       },
     });

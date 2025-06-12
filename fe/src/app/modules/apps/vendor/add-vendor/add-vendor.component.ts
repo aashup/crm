@@ -9,6 +9,7 @@ import { ContactService } from 'src/app/modules/settings/contact/contact.service
 import { AddressService } from 'src/app/modules/settings/address/address.service';
 import { VendorModel } from '../vendor.model';
 import { VendorService } from '../vendor.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 @Component({
     selector: 'app-add-vendor',
     templateUrl: '././add-vendor.component.html',
@@ -41,6 +42,7 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     private commonService: CommonService,
     private contactService: ContactService,
     private addressService: AddressService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -73,6 +75,7 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
     this.isLoading = false; 
+    this.spinnerService.hide();
   }
 
   initForm(model: VendorModel) {
@@ -107,18 +110,22 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show();
 
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.isLoading = false; 
+        this.spinnerService.hide();
         this.commonService.toastr.success(
           this.isEdit ? 'Supplier has been updated.' : 'Supplier has been created.'
         );
         this.isLoading = false; 
+        this.spinnerService.hide();
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.isLoading = false; 
+        this.spinnerService.hide();
         this.commonService.handleError(err);
       },
     });

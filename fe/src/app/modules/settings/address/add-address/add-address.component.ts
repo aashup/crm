@@ -8,6 +8,7 @@ import { FindService } from 'src/app/modules/core/find.service';
 import { AddressModel } from '../address.model';
 import { AddressService } from '../address.service';
 import { AuthService } from 'src/app/modules/auth';
+import { SpinnerService } from 'src/app/services/spinner.service';
 @Component({
     selector: 'app-add-address',
     templateUrl: './add-address.component.html',
@@ -38,6 +39,7 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
     private find: FindService,
     private commonService: CommonService,
     private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -120,9 +122,11 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show()
     this.service[this.isEdit ? 'update' : 'create'](payload).subscribe({
       complete: () => {
         this.isLoading = false; 
+        this.spinnerService.hide()
         this.commonService.toastr.success(
           this.isEdit ? 'Address has been updated.' : 'Address has been created.'
         );
@@ -130,6 +134,7 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
       },
       error: (err) => {
         this.isLoading = false; 
+        this.spinnerService.hide()
         this.commonService.handleError(err);
       },
     });

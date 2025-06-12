@@ -12,6 +12,7 @@ import { merge, tap, take, debounceTime, distinctUntilChanged, fromEvent } from 
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-unit',
@@ -49,7 +50,8 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: UnitService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new UnitDatasource(this.service);
   }
@@ -75,6 +77,7 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.isLoading = false; 
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -130,16 +133,19 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           
           this.service.delete(item).subscribe({
             complete: () => {
               this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.toastr.success('Unit has been deleted.');
               this.loadData();
             },
             error: (err) => {
               this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.handleError(err);
             },
           });

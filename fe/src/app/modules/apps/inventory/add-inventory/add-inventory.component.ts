@@ -9,6 +9,7 @@ import { InventoryService } from '../inventory.service';
 import { ProductService } from '../../product/product.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { AuthService } from 'src/app/modules/auth';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-add-inventory',
@@ -41,7 +42,8 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     private commonService: CommonService,
     private productService: ProductService,
     private unitService: UnitService,
-    private authService: AuthService
+    private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +80,7 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     this.isLoading = false; 
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
+      this.spinnerService.hide();
     });
   }
 
@@ -109,15 +112,18 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     }
 
     this.isLoading = true;
+    this.spinnerService.show();
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(this.isEdit ? 'Inventory has been updated.' : 'Inventory has been created.');
         this.isLoading = false;
+        this.spinnerService.hide();
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.commonService.handleError(err);
         this.isLoading = false;
+        this.spinnerService.hide();
       },
     });
   }

@@ -7,6 +7,7 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { PermissionService } from '../permission.service';
 import { MenuService } from 'src/app/modules/settings/menu/menu.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-add-permission',
@@ -32,6 +33,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
     private service: PermissionService,
     private find: FindService,
     private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -40,8 +42,10 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
+      this.spinnerService.hide()
     });
   
     this.model = this.data.model;
@@ -81,6 +85,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show()
   
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
@@ -89,10 +94,12 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
         );
         this.dialogRef.close(true); 
         this.isLoading = false; 
+        this.spinnerService.hide()
       },
       error: (err) => {
         this.commonService.handleError(err);
         this.isLoading = false; 
+        this.spinnerService.hide()
       },
     });
   }

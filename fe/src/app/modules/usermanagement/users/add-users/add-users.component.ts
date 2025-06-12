@@ -9,6 +9,7 @@ import { UsersModel } from '../users.model';
 import { UsersService } from '../users.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-add-users',
@@ -45,10 +46,11 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
     private service: UsersService,
     private find: FindService,
     private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
-
+    
     this.find.getRoles().subscribe(
       (data) => {
         this.fechedRoles = data.data;
@@ -66,9 +68,10 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
 
  ngAfterViewInit(): void {
   this.isLoading= false;
-
+  this.spinnerService.hide();
   this.dialogRef.afterClosed().subscribe(() => {
     this.isLoading = false;
+    this.spinnerService.hide();
   });
 
   this.model = this.data.model;
@@ -78,25 +81,28 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
 }
 
   
-  initForm(model: UsersModel) {
-    this.form = this.fb.group({
-      id: [model.id, []],
-      name: [
-        model.name,
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(200),
-        ],
+initForm(model: UsersModel) {
+  this.form = this.fb.group({
+    id: [model.id || null, []], 
+    name: [
+      model.name || '', 
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(200),
       ],
-      status: [model.status, [Validators.required]],
-      email: [model.email, [Validators.required, Validators.email]],
-      password: [model.password],
-      cpassword: [model.cpassword],
-      roles: [model.roles, [Validators.required]],
-    });
-    this.clone = this.form.value;
-  }
+    ],
+    status: [model.status || 1, [Validators.required]], 
+    email: [model.email || '', [Validators.required, Validators.email]], 
+    password: [model.password || null], 
+    cpassword: [model.cpassword || null], 
+    roles: [
+      model.roles ? model.roles.map((role: any) => role.id) : [], 
+      [Validators.required],
+    ],
+  });
+  this.clone = this.form.value;
+}
 
 
 
@@ -113,19 +119,22 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
       return;
     }
   
-    this.isLoading = true; // Start loader
+    this.isLoading = true; 
+    this.spinnerService.show();
   
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'User has been updated.' : 'User has been created.'
         );
-        this.dialogRef.close(true); // Close modal
-        this.isLoading = false; // Stop loader
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
+        this.spinnerService.hide();
       },
       error: (err) => {
         this.commonService.handleError(err);
-        this.isLoading = false; // Stop loader on error
+        this.isLoading = false;
+        this.spinnerService.hide(); 
       },
     });
   }

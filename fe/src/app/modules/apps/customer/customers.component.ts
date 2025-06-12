@@ -24,6 +24,7 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { AddCustomersComponent } from './add-customers/add-customers.component';
 import { CityService } from '../../settings/city/city.service';
 import { AuthService } from '../../auth';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-customers',
@@ -71,6 +72,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private cityService: CityService,
     private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new CustomersDatasource(this.service);
   }
@@ -171,17 +173,22 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading=true;
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Customer has been deleted.');
               this.loadData();
+              this.spinnerService.hide();
+              this.isLoading = false;
             },
             error: (err) => {
               this.commonService.handleError(err);
             },
           });
         }
+        this.spinnerService.hide();
         this.isLoading = false; 
       });
   }

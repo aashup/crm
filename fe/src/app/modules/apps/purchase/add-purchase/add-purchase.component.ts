@@ -10,6 +10,7 @@ import { ProductService } from '../../product/product.service';
 import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { PurchaseService } from '../purchase.service';
 import { VendorService } from '../../vendor/vendor.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 @Component({
     selector: 'app-add-purchase',
     templateUrl: '././add-purchase.component.html',
@@ -40,7 +41,8 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     private productService:ProductService,
     private contactService:ContactService,
     private purchaseService:PurchaseService,
-    private supplierService:VendorService
+    private supplierService:VendorService,
+    private spinnerService: SpinnerService
 
 
   ) {}
@@ -148,9 +150,11 @@ getAllProduct(){
 
   ngAfterViewInit(): void {
     this.isLoading = false; 
+    this.spinnerService.hide();
 
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
+      this.spinnerService.hide();
     });
   }
  
@@ -164,6 +168,7 @@ getAllProduct(){
     }
   
     this.isLoading = true;
+    this.spinnerService.show();
   
     if (this.isEdit && this.data.model) {
       const payload = this.form.value;
@@ -174,10 +179,12 @@ getAllProduct(){
           this.commonService.toastr.success('Purchase Updated');
           this.dialogRef.close(this.data.model);
           this.isLoading = false;
+          this.spinnerService.hide();
         },
         error: (err) => {
           this.commonService.handleError(err);
           this.isLoading = false;
+          this.spinnerService.hide();
         },
       });
       return;
@@ -189,10 +196,12 @@ getAllProduct(){
         this.commonService.toastr.success('Purchase Item Created');
         this.dialogRef.close(purchaseData);
         this.isLoading = false;
+        this.spinnerService.hide();
       },
       error: (err) => {
         this.commonService.handleError(err);
         this.isLoading = false;
+        this.spinnerService.hide();
       },
     });
   }

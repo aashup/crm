@@ -8,6 +8,7 @@ import { FindService } from "src/app/modules/core/find.service";
 
 import { RolesModel } from "../roles.model";
 import { RolesService } from "../roles.service";
+import { SpinnerService } from "src/app/services/spinner.service";
 
 
 @Component({
@@ -35,7 +36,8 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: RolesService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -57,8 +59,10 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false;
+      this.spinnerService.hide()
     });
   
     this.model = this.data.model;
@@ -96,19 +100,22 @@ export class AddRolesComponent implements AfterViewInit, OnInit {
       return;
     }
   
-    this.isLoading = true; // Start loader
+    this.isLoading = true; 
+    this.spinnerService.show()
   
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'Role has been updated.' : 'Role has been created.'
         );
-        this.dialogRef.close(true); // Close modal
-        this.isLoading = false; // Stop loader
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
+        this.spinnerService.hide()
       },
       error: (err) => {
         this.commonService.handleError(err);
-        this.isLoading = false; // Stop loader on error
+        this.isLoading = false; 
+        this.spinnerService.hide()
       },
     });
   }

@@ -6,6 +6,7 @@ import { ContactService } from '../contact.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import _, { take } from 'lodash';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 
 @Component({
@@ -35,13 +36,15 @@ form: FormGroup;
       private fb: FormBuilder,
       private service: ContactService,
       private find: FindService,
-      private commonService: CommonService
+      private commonService: CommonService,
+      private spinnerService:SpinnerService
     ) {}
   
     
   
     ngAfterViewInit(): void {
       this.isLoading = false; 
+      this.spinnerService.hide()
       this.model = this.data.model;
       this.isEdit = this.data.isEdit;
       this.initForm(this.model);
@@ -91,9 +94,11 @@ form: FormGroup;
       }
     
       this.isLoading = true; 
+      this.spinnerService.show()
       this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
         complete: () => {
           this.isLoading = false; 
+          this.spinnerService.hide()
           this.commonService.toastr.success(
             this.isEdit ? 'Contact has been updated.' : 'Contact has been created.'
           );
@@ -101,6 +106,7 @@ form: FormGroup;
         },
         error: (err) => {
           this.isLoading = false; 
+          this.spinnerService.hide()
           this.commonService.handleError(err);
         },
       });

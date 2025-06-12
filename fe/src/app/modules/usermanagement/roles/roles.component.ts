@@ -14,6 +14,7 @@ import { RolesService } from "./roles.service";
 import { AddRolesComponent } from "./add-roles/add-roles.component";
 import { DatePipe } from "@angular/common";
 import { Router } from "@angular/router";
+import { SpinnerService } from "src/app/services/spinner.service";
 
 
 @Component({
@@ -74,7 +75,8 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: RolesService,
     private router: Router,
     private commonService: CommonService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new RolesDatasource(this.service);
   }
@@ -100,6 +102,7 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
    ngAfterViewInit(): void {
     this.isLoading= false;
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -158,6 +161,7 @@ loadData() {
       .pipe(take(1))
       .subscribe((res) => {
         this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
@@ -165,14 +169,17 @@ loadData() {
               this.loadData();
               this.cdr.detectChanges(); 
               this.isLoading = false; 
+              this.spinnerService.hide()
             },
             error: (err) => {
               this.commonService.handleError(err);
               this.isLoading = false;
+              this.spinnerService.hide()
             },
           });
         } else {
           this.isLoading = false; 
+          this.spinnerService.hide()
         }
       });
   }

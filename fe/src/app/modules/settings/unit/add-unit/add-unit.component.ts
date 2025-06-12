@@ -6,6 +6,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-add-unit',
@@ -29,7 +30,8 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private service: UnitService,
     private find: FindService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +42,7 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isLoading = false; 
+    this.spinnerService.hide()
   }
 
   initForm(model: UnitModel) {
@@ -63,16 +66,19 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
     }
   
     this.isLoading = true; 
+    this.spinnerService.show()
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.isLoading = false; 
+        this.spinnerService.hide()
         this.commonService.toastr.success(
           this.isEdit ? 'Unit has been updated.' : 'Unit has been created.'
         );
         this.dialogRef.close(true);
       },
       error: (err) => {
-        this.isLoading = false; 
+        this.isLoading = false;
+        this.spinnerService.hide() 
         this.commonService.handleError(err);
       },
     });
