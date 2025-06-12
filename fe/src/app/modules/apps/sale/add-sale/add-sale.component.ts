@@ -52,6 +52,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isEdit = this.data.isEdit;
+    this.isLoading = false; 
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
     });

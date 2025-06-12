@@ -39,7 +39,7 @@ export class AddUnitComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
-
+    this.isLoading = false; 
   }
 
   initForm(model: UnitModel) {

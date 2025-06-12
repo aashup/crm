@@ -75,8 +75,9 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
+    this.isLoading = false; 
     this.dialogRef.afterClosed().subscribe(() => {
-      this.isLoading = false; // Stop loader if modal is canceled
+      this.isLoading = false; 
     });
   }
 

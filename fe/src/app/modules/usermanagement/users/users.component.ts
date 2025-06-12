@@ -105,6 +105,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
   ngAfterViewInit(): void {
+    this.isLoading= false;
     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
       .pipe(
         debounceTime(500),

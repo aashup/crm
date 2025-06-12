@@ -54,6 +54,7 @@ export class AddMenuComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.isLoading = false; 
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);

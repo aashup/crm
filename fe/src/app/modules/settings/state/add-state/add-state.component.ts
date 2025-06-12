@@ -44,6 +44,7 @@ export class AddStateComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.isLoading= false;
     this.dialogRef.afterClosed().subscribe(() => {
       this.isLoading = false; 
     });

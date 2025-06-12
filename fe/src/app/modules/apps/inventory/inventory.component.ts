@@ -41,6 +41,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<InventoryModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   productCache: { [key: string]: string } = {};
+  isLoading = false;
   unitCache: { [key: string]: string } = {};
   userCache: { [key: string]: string } = {};
   readonly dialog = inject(MatDialog);
@@ -159,6 +160,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+      this.isLoading = false; 
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -227,13 +229,18 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Inventory has been deleted.');
               this.loadData();
+              this.isLoading = false; 
             },
-            error: (err:any) => this.commonService.handleError(err),
+            error: (err:any) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+            },
           });
         }
       });

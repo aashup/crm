@@ -73,11 +73,9 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'shipping_address_id',
       name: 'Shipping Address',
       mutator: (item: any) => {
-        const address = this.address.find((addr: any) => addr.id === item.shipping_address_id);
-        console.log("type",address?.type);
-        
-        if(address?.type=='1')
-        return address ? address .address: 'N/A';
+        const res = this.address.find((addr: any) => addr.id === item.shipping_address_id);        
+        if(res?.type=='1')
+        return res ? res .address: 'N/A';
         else
         return "N/A"
 
@@ -88,10 +86,11 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'billing_address_id',
       name: 'Billing Address',   
       mutator: (item: any) => {
-        const address = this.address.find((addr: any) => addr.id === item.billing_address_id);
+        const res = this.address.find((addr: any) => addr.id === item.billing_address_id);
         
-        if(address?.type=='1')
-          return address ? address .address: 'N/A';
+        
+        if(res?.type=='2')
+          return res ? res .address: 'N/A';
           else
           return "N/A"
       },
@@ -141,16 +140,7 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
-    this.subscriptionHandler.subscribe = merge(
-      this.sort.sortChange,
-      this.paginator.page
-    )
-      .pipe(
-        tap(() => {
-          this.loadData();
-        })
-      )
-      .subscribe();
+   
   }
 
 getAllAddresses() {
@@ -181,6 +171,7 @@ getAllAddresses() {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+      this.isLoading = false; 
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -240,24 +231,26 @@ getAllAddresses() {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Vendor',
-          body: `Are you sure you want to delete this Vendor <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete Supplier',
+          body: `Are you sure you want to delete this Supplier <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
       .afterClosed()
       .subscribe((res) => {
         if (res) {
-          this.isLoading = true; // Start the loader
+          this.isLoading = true; 
           this.service.delete(item).subscribe({
             complete: () => {
-              this.isLoading = false; // Stop the loader
+              this.isLoading = false; 
               this.commonService.toastr.success('Vendor has been deleted.');
               this.loadData();
             },
             error: (err) => {
-              this.isLoading = false; // Stop the loader on error
-              this.commonService.handleError(err);
+              this.isLoading = false; 
+              console.log("err",err.error.message);
+              this.commonService.toastr.error(err.error.message || 'Some error occurred.');
+              // this.commonService.handleError(err.error.message);
             },
           });
         }
@@ -273,8 +266,13 @@ getAllAddresses() {
         },
       })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .pipe(
+        take(1),
+        tap(() => {
+          this.loadData(); 
+        })
+      )
+      .subscribe();
   }
 
   edit(item: VendorModel) {
@@ -286,7 +284,12 @@ getAllAddresses() {
         },
       })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .pipe(
+        take(1),
+        tap(() => {
+          this.loadData(); 
+        })
+      )
+      .subscribe();
   }
 }
