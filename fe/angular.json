@@ -45,7 +45,7 @@
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss",
               "node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css",
-              
+              "node_modules/tippy.js/dist/tippy.css",
               "node_modules/ngx-spinner/animations/ball-spin-fade-rotating.css"
             ],
             "scripts": [

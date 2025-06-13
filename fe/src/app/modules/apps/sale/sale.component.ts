@@ -26,7 +26,8 @@ import { SaleService } from './sale.service';
 import { AddSaleComponent } from './add-sale/add-sale.component';
 import { AddressModel } from '../../settings/address/address.model';
 import { SpinnerService } from 'src/app/services/spinner.service';
-
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 @Component({
     selector: 'app-sale',
@@ -226,7 +227,18 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
   }
-
+  showContactTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Contact Name :</strong> ${data.name}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
+  }
   add() {
     this.dialog
       .open(AddSaleComponent, {

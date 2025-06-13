@@ -85,20 +85,18 @@
                   {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, "") }}
                 </div>
                 <button
+                  mat-icon-button 
                   *ngIf="cols.ref === 'address'"
-                  mat-icon-button
-                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{ row.address?.mob1 || 'N/A' }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{getCityName(row.address.city_id)}}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{ row.address?.type===1?'Billing':'Shipping' || 'N/A' }}"
-                  matTooltipPosition="above"
                   class="text-info"
+                  [attr.id]="'id'+row.address.id"   (mouseover)="showAddressTooltip(row.address)"
                 >
                   <mat-icon>info</mat-icon>
                 </button>
                 <button
                   *ngIf="cols.ref === 'contact'"
                   mat-icon-button
-                  matTooltip="Name: {{ row.contact?.name || 'N/A' }}, Phone 1: {{ row.contact?.mob1 || 'N/A' }}, Phone 2: {{ row.contact?.mob2 || 'N/A' }}, "
-                  matTooltipPosition="above"
                   class="text-info"
+                  [attr.id]="'id'+row.contact.id"   (mouseover)="showContactTooltip(row.contact)"
                 >
                   <mat-icon>info</mat-icon>
                 </button>
@@ -132,10 +130,11 @@
               >
                 <mat-icon>delete</mat-icon>
               </button>
+            
             </td>
           </ng-container>
         </ng-container>
-
+      
         <tr cdk-header-row *cdkHeaderRowDef="displayableCol"></tr>
         <tr cdk-row *cdkRowDef="let row; columns: displayableCol"></tr>
       </table>
