@@ -114,6 +114,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
     ngAfterViewInit(): void {
       this.isLoading = false; 
+      this.spinnerService.hide()
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
