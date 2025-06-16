@@ -73,21 +73,23 @@
                 <div>
                   {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
                 </div>
-                <!-- <button
-                  *ngIf="cols.ref === 'address'"
+                <button
+                  *ngIf="cols.ref === 'shipping_address_id'"
                   mat-icon-button
-                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{
-                    row.address?.mob1 || 'N/A'
-                  }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{
-                    getCityName(row.address.city_id)
-                  }}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{
-                    row.address?.type === 1 ? 'Billing' : 'Shipping'
-                  }}"
-                  matTooltipPosition="above"
-                  class="text-info"
+                  class="text-info" 
+                  [attr.id]="'id'+row.shipping_address.id"   (mouseover)="showAddressTooltip(row.shipping_address)"
                 >
                   <mat-icon>info</mat-icon>
-                </button> -->
+                </button>
+                <button
+                  *ngIf="cols.ref === 'billing_address_id'"
+                  mat-icon-button
+                  class="text-info" 
+                  [attr.id]="'id'+row.billing_address.id"   (mouseover)="showAddressTooltip(row.billing_address)"
+                >
+                  <mat-icon>info</mat-icon>
+                </button>
+               
                 <button
                 *ngIf="cols.ref === 'contact'"
                 mat-icon-button

@@ -75,28 +75,13 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       ref: 'shipping_address_id',
       name: 'Shipping Address',
-      mutator: (item: any) => {
-        const res = this.address.find((addr: any) => addr.id === item.shipping_address_id);        
-        if(res?.type=='1')
-        return res ? res .address: 'N/A';
-        else
-        return "N/A"
-
-      },
+      mutator: (item: any) => item?.shipping_address?.address || 'N/A',
      
     },
     {
       ref: 'billing_address_id',
       name: 'Billing Address',   
-      mutator: (item: any) => {
-        const res = this.address.find((addr: any) => addr.id === item.billing_address_id);
-        
-        
-        if(res?.type=='2')
-          return res ? res .address: 'N/A';
-          else
-          return "N/A"
-      },
+      mutator: (item: any) => item?.billing_address?.address || 'N/A',
     },
     {
       ref: 'contact',
@@ -196,7 +181,7 @@ getAllAddresses() {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; 
+      this.filter.with = ['contact', 'BillingAddress',"ShippingAddress"]; 
       this.filter.cols = [
         'id', 
         'name', 
@@ -299,6 +284,20 @@ getAllAddresses() {
         })
       )
       .subscribe();
+  }
+  showAddressTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Address Name :</strong> ${data.address}</br>
+      <strong>City :</strong> ${this.getCityName(data.city_id)}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      <strong>Pin :</strong> ${data.pin}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
   }
   showContactTooltip(data:any){
     tippy(`#id${data.id}`, {
