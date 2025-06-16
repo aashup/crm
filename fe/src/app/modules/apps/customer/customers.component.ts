@@ -25,6 +25,8 @@ import { AddCustomersComponent } from './add-customers/add-customers.component';
 import { CityService } from '../../settings/city/city.service';
 import { AuthService } from '../../auth';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 @Component({
     selector: 'app-customers',
@@ -44,7 +46,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   filter: any = {};
   isLoading = false
   displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
-
+  name="Pawan"
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
@@ -77,6 +79,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dataSource = new CustomersDatasource(this.service);
   }
   ngOnInit(): void {
+   
     this.getAllCities()
     this.loadData();
     this.checkPermissions()
@@ -113,7 +116,9 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+     
       this.isLoading = false; 
+      this.spinnerService.hide()
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -162,6 +167,34 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
+  showAddressTooltip(data:any){
+
+    
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Address Name :</strong> ${data.address}</br>
+      <strong>City :</strong> ${this.getCityName(data.city_id)}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      <strong>Pin :</strong> ${data.pin}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
+  }
+  showContactTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Contact Name :</strong> ${data.name}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
+  }
   delete(item: CustomersModel) {
     this.dialog
       .open(ConfirmationDialogComponent, {
@@ -228,5 +261,26 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isLoading = false; 
         this.loadData();
       });
+  }
+  getAddressTooltip(row: any): string {
+    const address = row?.address || {};
+    const city = this.getCityName(address.city_id);
+    return `
+      <strong>Address Name:</strong> ${address.address || 'N/A'}<br>
+      <strong>Phone 1:</strong> ${address.mob1 || 'N/A'}<br>
+      <strong>Phone 2:</strong> ${address.mob2 || 'N/A'}<br>
+      <strong>City:</strong> ${city}<br>
+      <strong>Zip Code:</strong> ${address.pin || 'N/A'}<br>
+      <strong>Type:</strong> ${address.type === 1 ? 'Billing' : 'Shipping'}
+    `;
+  }
+  
+  getContactTooltip(row: any): string {
+    const contact = row?.contact || {};
+    return `
+      <strong>Name:</strong> ${contact.name || 'N/A'}<br>
+      <strong>Phone 1:</strong> ${contact.mob1 || 'N/A'}<br>
+      <strong>Phone 2:</strong> ${contact.mob2 || 'N/A'}
+    `;
   }
 }

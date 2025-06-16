@@ -89,14 +89,11 @@
                   <mat-icon>info</mat-icon>
                 </button> -->
                 <button
-                  *ngIf="cols.ref === 'contact'"
-                  mat-icon-button
-                  matTooltip="Name: {{ row.contact?.name || 'N/A' }}, Phone 1: {{
-                    row.contact?.mob1 || 'N/A'
-                  }}, Phone 2: {{ row.contact?.mob2 || 'N/A' }}, "
-                  matTooltipPosition="above"
-                  class="text-info"
-                >
+                *ngIf="cols.ref === 'contact'"
+                mat-icon-button
+                class="text-info"
+                [attr.id]="'id'+row.contact.id"   (mouseover)="showContactTooltip(row.contact)"
+              >
                   <mat-icon>info</mat-icon>
                 </button>
               </div>

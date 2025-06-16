@@ -25,7 +25,8 @@ import { VendorService } from './vendor.service';
 import { AddVendorComponent } from './add-vendor/add-vendor.component';
 import { AddressService } from '../../settings/address/address.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
-
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 @Component({
     selector: 'app-vendor',
     templateUrl: './vendor.component.html',
@@ -298,5 +299,17 @@ getAllAddresses() {
         })
       )
       .subscribe();
+  }
+  showContactTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Contact Name :</strong> ${data.name}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
   }
 }
