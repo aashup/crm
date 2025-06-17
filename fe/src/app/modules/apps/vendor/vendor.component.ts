@@ -28,14 +28,13 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 @Component({
-    selector: 'app-vendor',
-    templateUrl: './vendor.component.html',
-    styleUrl: './vendor.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-vendor',
+  templateUrl: './vendor.component.html',
+  styleUrl: './vendor.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
-
   _ = _;
   dataSource: VendorDatasource;
   selection = new SelectionModel<VendorModel>(true, []);
@@ -43,7 +42,7 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   cities: any = [];
   address: any = [];
-  shippingAddress:any;
+  shippingAddress: any;
   search: any = { all: '' };
   filter: any = {};
   isLoading = false;
@@ -76,11 +75,10 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'shipping_address_id',
       name: 'Shipping Address',
       mutator: (item: any) => item?.shipping_address?.address || 'N/A',
-     
     },
     {
       ref: 'billing_address_id',
-      name: 'Billing Address',   
+      name: 'Billing Address',
       mutator: (item: any) => item?.billing_address?.address || 'N/A',
     },
     {
@@ -91,13 +89,10 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       ref: 'type',
       name: 'Type',
-     
-      
     },
     {
       ref: 'level',
       name: 'Level',
-   
     },
     {
       ref: 'status',
@@ -105,7 +100,6 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       mutator: (item: any) => {
         return item.status == '1' ? 'Active' : 'Inactive';
       },
-     
     },
     { ref: 'action', name: 'Actions' },
   ];
@@ -121,100 +115,99 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dataSource = new VendorDatasource(this.service);
   }
   ngOnInit(): void {
-    this.getAllAddresses()
-    this.getAllCities()
+    this.paginator.pageSize = 20; 
+  this.paginator.pageIndex = 0;
+    this.getAllAddresses();
+    this.getAllCities();
     this.loadData();
-    
     this.commonService.page.updateTitle('Suppliers List');
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
-      () => (this.paginator.pageIndex = 0)
-    );
-   
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+    });
+
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => {
+          this.loadData();
+        })
+      )
+      .subscribe();
   }
 
-getAllAddresses() {
-  this.addressService.find({}).subscribe((res:any) => {
-    console.log(res.data);
-    if(res.data.length){
-      this.address=res.data
-    }
+  getAllAddresses() {
+    this.addressService.find({}).subscribe((res: any) => {
+      console.log(res.data);
+      if (res.data.length) {
+        this.address = res.data;
+      }
+    });
   }
-  );
-}
 
   getAllCities() {
-    this.cityService.find({}).subscribe((res:any) => {
+    this.cityService.find({}).subscribe((res: any) => {
       console.log(res.data);
-      if(res.data.length){
-        this.cities=res.data
+      if (res.data.length) {
+        this.cities = res.data;
       }
-    }
-    );
+    });
   }
 
-  getCityName(id:any){
-    const city = this.cities.find((city:any) => city.id === id);
+  getCityName(id: any) {
+    const city = this.cities.find((city: any) => city.id === id);
     return city ? city.name : '';
   }
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
-    ngAfterViewInit(): void {
-      this.isLoading = false; 
-      this.spinnerService.hide();
-      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-        .pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          tap(() => {
-            this.paginator.pageIndex = 0;
-            this.search.all = this.searchElementRef.nativeElement.value;
-            this.loadData();
-          })
-        )
-        .subscribe();
-    }
+  ngAfterViewInit(): void {
+    this.isLoading = false;
+    this.spinnerService.hide();
 
-    loadData() {
-      this.filter.orderField = this.sort.active;
-      this.filter.orderBy = this.sort.direction;
-      this.filter.page = this.paginator.pageIndex + 1;
-      this.filter.pageSize = this.paginator.pageSize || 20;
-      this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'BillingAddress',"ShippingAddress"]; 
-      this.filter.cols = [
-        'id', 
-        'name', 
-        'contact_id',
-        'shipping_address_id', 
-        'billing_address_id',
-        'notes',
-        'type',
-        'level',
-        'status',
-        'created_at', 
-        'updated_at'
-      ]; 
-      this.dataSource.find(_.pickBy(this.filter));
-    }
+    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.search.all = this.searchElementRef.nativeElement.value;
+          this.loadData();
+        })
+      )
+      .subscribe();
+  }
+
+  loadData(): void {
+    this.filter.orderField = this.sort.active;
+    this.filter.orderBy = this.sort.direction;
+    this.filter.page = this.paginator.pageIndex + 1;
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.with = ['contact', 'BillingAddress', 'ShippingAddress'];
+    this.filter.cols = [
+      'id',
+      'name',
+      'contact_id',
+      'shipping_address_id',
+      'billing_address_id',
+      'notes',
+      'type',
+      'level',
+      'status',
+      'created_at',
+      'updated_at',
+    ];
+    this.dataSource.find(_.pickBy(this.filter));
+  }
   masterToggle() {
-    if (
-      this.selection.selected.length ===
-      this.dataSource.originalData.data.length
-    ) {
+    if (this.selection.selected.length === this.dataSource.originalData.data.length) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: VendorModel) =>
-        this.selection.select(row)
-      );
+      this.dataSource.originalData.data.forEach((row: VendorModel) => this.selection.select(row));
     }
   }
 
   isAllSelected(): boolean {
-    return (
-      this.dataSource.originalData.data.length ===
-      this.selection.selected.length
-    );
+    return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
 
   delete(item: VendorModel) {
@@ -229,19 +222,19 @@ getAllAddresses() {
       .afterClosed()
       .subscribe((res) => {
         if (res) {
-          this.isLoading = true; 
+          this.isLoading = true;
           this.spinnerService.show();
           this.service.delete(item).subscribe({
             complete: () => {
-              this.isLoading = false; 
+              this.isLoading = false;
               this.spinnerService.hide();
-              this.commonService.toastr.success('Vendor has been deleted.');
+              this.commonService.toastr.success('Supplier has been deleted.');
               this.loadData();
             },
             error: (err) => {
-              this.isLoading = false; 
+              this.isLoading = false;
               this.spinnerService.hide();
-              console.log("err",err.error.message);
+              console.log('err', err.error.message);
               this.commonService.toastr.error(err.error.message || 'Some error occurred.');
               // this.commonService.handleError(err.error.message);
             },
@@ -262,7 +255,7 @@ getAllAddresses() {
       .pipe(
         take(1),
         tap(() => {
-          this.loadData(); 
+          this.loadData();
         })
       )
       .subscribe();
@@ -280,12 +273,12 @@ getAllAddresses() {
       .pipe(
         take(1),
         tap(() => {
-          this.loadData(); 
+          this.loadData();
         })
       )
       .subscribe();
   }
-  showAddressTooltip(data:any){
+  showAddressTooltip(data: any) {
     tippy(`#id${data.id}`, {
       content: `
       <strong>Address Name :</strong> ${data.address}</br>
@@ -296,10 +289,10 @@ getAllAddresses() {
       `,
       placement: 'top',
       animation: 'scale',
-      allowHTML: true
+      allowHTML: true,
     });
   }
-  showContactTooltip(data:any){
+  showContactTooltip(data: any) {
     tippy(`#id${data.id}`, {
       content: `
       <strong>Contact Name :</strong> ${data.name}</br>
@@ -308,7 +301,7 @@ getAllAddresses() {
       `,
       placement: 'top',
       animation: 'scale',
-      allowHTML: true
+      allowHTML: true,
     });
   }
 }

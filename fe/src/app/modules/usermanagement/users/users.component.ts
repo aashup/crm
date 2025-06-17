@@ -134,9 +134,10 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   loadData() {
     this.filter.orderField = this.sort.active;
-    this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize || 20;
+      this.filter.orderBy = this.sort.direction;
+      this.filter.page = this.paginator.pageIndex + 1;
+      this.filter.pageSize = this.paginator.pageSize || 20;
+      this.filter.filter = JSON.stringify(_.pickBy(this.search));
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
     this.filter.with = ['roles'];
     this.dataSource.find(_.pickBy(this.filter));
