@@ -74,7 +74,12 @@
 <div class="app-navbar-item" [ngClass]="itemClass">
   <!--begin::Menu wrapper-->
   <div class="cursor-pointer symbol" [ngClass]="userAvatarClass" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-    <img src="./assets/media/avatars/300-3.jpg" />
+    <div 
+      style="width: 40px; height: 40px; border-radius: 50%; background-color: rgb(206, 233, 243); color: #007bff; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; text-transform: uppercase; gap: 4px;"
+      *ngIf="loggedInUser?.name">
+      {{ loggedInUser?.name?.split(' ')?.[0]?.charAt(0)?.toUpperCase() }}
+      {{ loggedInUser?.name?.split(' ')?.[1]?.charAt(0)?.toUpperCase() }}
+    </div>
   </div>
   <app-user-inner data-kt-menu='true'></app-user-inner>
   <!--end::Menu wrapper-->

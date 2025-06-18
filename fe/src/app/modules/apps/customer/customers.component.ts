@@ -168,8 +168,6 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   showAddressTooltip(data:any){
-
-    
     tippy(`#id${data.id}`, {
       content: `
       <strong>Address Name :</strong> ${data.address}</br>

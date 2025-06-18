@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 // const BODY_CLASSES = ['bgi-size-cover', 'bgi-position-center', 'bgi-no-repeat'];
 
@@ -12,10 +13,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 export class AuthComponent implements OnInit, OnDestroy {
   today: Date = new Date();
 
-  constructor() {}
+  constructor(private titleService: Title) {}
 
   ngOnInit(): void {
     // BODY_CLASSES.forEach((c) => document.body.classList.add(c));
+    this.titleService.setTitle('Login');
   }
 
   ngOnDestroy() {
