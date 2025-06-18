@@ -18,54 +18,54 @@ export class PageInfo {
   providedIn: 'root',
 })
 export class PageInfoService {
-  public title: BehaviorSubject<string> = new BehaviorSubject<string>(
-    'Dashboard'
-  );
+  public title: BehaviorSubject<string> = new BehaviorSubject<string>('Dashboard');
   public description: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  public breadcrumbs: BehaviorSubject<Array<PageLink>> = new BehaviorSubject<
-    Array<PageLink>
-  >([]);
+  public breadcrumbs: BehaviorSubject<Array<PageLink>> = new BehaviorSubject<Array<PageLink>>([]);
 
-  constructor(
-    private titleService: Title,
-  ) {}
+  constructor(private titleService: Title) {}
 
-  public setTitle(_title: string) {
+  public setTitle(_title: string): void {
     this.titleService.setTitle(_title);
     this.title.next(_title);
   }
 
-  public updateTitle(_title: string) {
+  public updateTitle(_title: string): void {
     this.titleService.setTitle(_title);
     setTimeout(() => {
       this.setTitle(_title);
     }, 1);
   }
 
-  public setDescription(_title: string) {
-    this.description.next(_title);
+  public resetTitleToDefault(): void {
+    const defaultTitle = 'Dashboard'; // Default title after logout
+    this.setTitle(defaultTitle);
   }
 
-  public updateDescription(_description: string) {
+  public setDescription(_description: string): void {
+    this.description.next(_description);
+  }
+
+  public updateDescription(_description: string): void {
     setTimeout(() => {
       this.setDescription(_description);
     }, 1);
   }
 
-  public setBreadcrumbs(_bs: Array<PageLink>) {
+  public setBreadcrumbs(_bs: Array<PageLink>): void {
     this.breadcrumbs.next(_bs);
   }
 
-  public updateBreadcrumbs(_bs: Array<PageLink>) {
+  public updateBreadcrumbs(_bs: Array<PageLink>): void {
     setTimeout(() => {
       this.setBreadcrumbs(_bs);
     }, 20);
   }
 
-  public calculateTitle() {
+  public calculateTitle(): void {
     const asideTitle = this.calculateTitleInMenu('kt_app_sidebar');
     const headerTitle = this.calculateTitleInMenu('kt_app_header_wrapper');
-    const title = asideTitle || headerTitle || '';
+    const title = asideTitle || headerTitle;
+    if(title)
     this.setTitle(title);
   }
 
@@ -93,7 +93,7 @@ export class PageInfoService {
     return titleSpan.innerText;
   }
 
-  public calculateBreadcrumbs() {
+  public calculateBreadcrumbs(): void {
     const asideBc = this.calculateBreadcrumbsInMenu('kt_app_sidebar');
     const headerBc = this.calculateBreadcrumbsInMenu('kt_app_header_wrapper');
     const bc = asideBc && asideBc.length > 0 ? asideBc : headerBc;
@@ -105,9 +105,7 @@ export class PageInfoService {
     this.setBreadcrumbs(bc);
   }
 
-  public calculateBreadcrumbsInMenu(
-    menuId: string
-  ): Array<PageLink> | undefined {
+  public calculateBreadcrumbsInMenu(menuId: string): Array<PageLink> | undefined {
     const result: Array<PageLink> = [];
     const menu = document.getElementById(menuId);
     if (!menu) {
@@ -142,7 +140,7 @@ export class PageInfoService {
         isSeparator: false,
         isActive: false,
       });
-      // add separator
+      // Add separator
       result.push({
         title: '',
         path: '',

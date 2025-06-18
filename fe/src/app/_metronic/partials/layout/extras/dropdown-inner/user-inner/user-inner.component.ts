@@ -7,6 +7,7 @@ import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { SnackBarService } from 'src/app/modules/core/snack-bar.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-user-inner',
@@ -32,6 +33,7 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     private toast: ToastrService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private titleService: Title
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +49,7 @@ export class UserInnerComponent implements OnInit, OnDestroy {
         this.tokenService.clearToken();
         this.toast.success('Logout Successfully.');
         this.router.navigateByUrl('auth/login');
+        this.titleService.setTitle('Login');
         this.cdr.markForCheck();
       },
       error: (err) => {

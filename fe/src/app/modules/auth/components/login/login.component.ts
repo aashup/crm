@@ -5,6 +5,7 @@ import { first } from 'rxjs/operators';
 import { UserModel } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-login',
@@ -29,7 +30,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: Title
   ) {
     this.isLoading$ = this.authService.isLoading$;
     // redirect to home if already logged in
@@ -43,13 +45,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
   ngOnInit(): void {
+    this.titleService.setTitle('Login');
     this.initForm();
-    // get return url from route parameters or default to '/'
+   
     this.returnUrl =
       this.route.snapshot.queryParams['returnUrl'.toString()] || '/';
   }
 
-  // convenience getter for easy access to form fields
+ 
   get f() {
     return this.loginForm.controls;
   }
@@ -74,6 +77,10 @@ export class LoginComponent implements OnInit, OnDestroy {
         ]),
       ],
     });
+  }
+  signUp() {
+    this.titleService.setTitle("Registration")
+    this.router.navigate(['/auth/registration']);
   }
 
   submit() {
