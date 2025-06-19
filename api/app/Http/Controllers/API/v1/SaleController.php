@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
 use App\Models\Sale;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,12 @@ class SaleController extends Controller
     /**
      * Display a listing of the resource.
      */
+    private $inventoryService;
+    public function __construct()
+    {
+        $this->inventoryService = new InventoryService();
+    }
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', Sale::class);
@@ -45,7 +52,11 @@ class SaleController extends Controller
             ]);
             $purchase->fill($request->all());
             $purchase->save();
-            $purchase->saleDetails()->createMany($request->saleDetails);
+
+            $saleDetails = $request->saleDetails;
+            $purchase->saleDetails()->createMany($saleDetails);
+            $this->inventoryService->processSalesInventory($saleDetails);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

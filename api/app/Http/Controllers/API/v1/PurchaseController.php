@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePurchaseRequest;
 use App\Http\Requests\UpdatePurchaseRequest;
 use App\Models\Purchase;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,12 @@ class PurchaseController extends Controller
     /**
      * Display a listing of the resource.
      */
+    private $inventoryService;
+
+    public function __construct()
+    {
+        $this->inventoryService = new InventoryService();
+    }
     public function index(Request $request)
     {
         $this->authorize('viewAny', Purchase::class);
@@ -45,7 +52,11 @@ class PurchaseController extends Controller
             ]);
             $purchase->fill($request->all());
             $purchase->save();
-            $purchase->purchaseDetails()->createMany($request->purchaseDetails);
+
+            $purchaseDetails = $request->purchaseDetails;
+            $purchase->purchaseDetails()->createMany($purchaseDetails);
+            $this->inventoryService->processPurchaseInventory($purchaseDetails);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
