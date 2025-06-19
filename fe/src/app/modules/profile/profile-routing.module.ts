@@ -17,7 +17,7 @@ const routes: Routes = [
         component: OverviewComponent,
       },
       {
-        path: 'projects',
+        path: 'permissions',
         component: ProjectsComponent,
       },
       {

@@ -163,8 +163,6 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
   checkPermissions() {
     const userData = this.authService.getCurrentUser(); 
-   console.log(userData.permissions);
-   
   }
   isAllSelected(): boolean {
     return (

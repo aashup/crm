@@ -1,4 +1,4 @@
-<div class="d-flex flex-wrap flex-stack mb-6">
+<!-- <div class="d-flex flex-wrap flex-stack mb-6">
   <h3 class="fw-bolder my-2">
     My Projects
     <span class="fs-6 text-gray-500 fw-bold ms-1">Active</span>
@@ -206,4 +206,12 @@
       </a>
     </li>
   </ul>
+</div> -->
+<div>
+  <strong>Permissions:</strong>
+  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+    <div *ngFor="let permission of permsissions">
+      {{ permission }}
+    </div>
+  </div>
 </div>

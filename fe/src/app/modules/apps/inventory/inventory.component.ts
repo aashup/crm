@@ -143,11 +143,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   prefetchUserNames() {
     this.userService.find({}).subscribe((users: any) => {
-      console.log("-----------");
-      console.log(users);
-      console.log("-----------");
-      
-      
       users.data.forEach((user:any) => {
         this.userCache[user.id] = user.name;
       });
