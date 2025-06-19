@@ -9,6 +9,7 @@ class PurchaseDetail extends Model
         "product_id",
         "unit_id",
         "amount",
+        "quantity"
     ];
 
 
