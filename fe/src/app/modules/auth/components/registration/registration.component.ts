@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { ConfirmPasswordValidator } from './confirm-password.validator';
 import { UserModel } from '../../models/user.model';
 import { first } from 'rxjs/operators';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-registration',
@@ -33,7 +34,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private titleService: Title
   ) {
     this.isLoading$ = this.authService.isLoading$;
     // redirect to home if already logged in
@@ -43,6 +45,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Registration');
     this.initForm();
   }
 
@@ -68,7 +71,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             Validators.required,
             Validators.email,
             Validators.minLength(3),
-            Validators.maxLength(320), // https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+            Validators.maxLength(320), 
           ]),
         ],
         password: [
@@ -87,6 +90,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             Validators.maxLength(100),
           ]),
         ],
+        roles:[[], Validators.compose([Validators.required])],
         agree: [false, Validators.compose([Validators.required])],
       },
       {
@@ -111,7 +115,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       .pipe(first())
       .subscribe((user: UserModel) => {
         if (user) {
-          this.router.navigate(['/auth/login']);
+          this.router.navigate(['/auth/vrfcn-message']);
         } else {
           this.hasError = true;
         }
