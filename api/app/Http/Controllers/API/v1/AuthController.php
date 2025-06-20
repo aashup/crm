@@ -47,9 +47,7 @@ class AuthController extends Controller
             'access_token' => $user->createToken('access_token', ['*'])->accessToken,
             'user' => $user,
             'permissions' => $user->getAllPermissions()->pluck('name'),
-            'menus' => Cache::remember('cache_menus', 60 * 60, function () use ($user) {
-                return (new MenuRepository())->getMenu($user);
-            }),
+            'menus' => (new MenuRepository())->getMenu($user) ?? [],
         ];
         return $data;
     }
