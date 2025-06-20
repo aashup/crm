@@ -11,6 +11,7 @@ use App\Models\Menu;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\State;
+use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Vendor;
 use Illuminate\Support\Str;
@@ -74,9 +75,9 @@ class FindController extends Controller
         return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
     }
 
-    public function vendor()
+    public function supplier()
     {
-        $model = new Vendor();
+        $model = new Supplier();
         $model = $model->select('id', 'name');
 
         return BaseResponse::success($model->orderBy('name', 'desc')->limit(250)->get());
