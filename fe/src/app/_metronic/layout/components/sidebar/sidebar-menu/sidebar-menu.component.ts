@@ -13,7 +13,6 @@ export class SidebarMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.sidebarMenuService.menuList$.subscribe(menu => {
-      console.log('Menu List:', menu);
     });
   }
 

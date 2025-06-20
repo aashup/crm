@@ -37,7 +37,6 @@ export class NavbarComponent implements OnInit, AfterViewInit {
       this.user$ = of(user);
     });
     this.user$.subscribe((user) => {
-      console.log(user);
       this.loggedInUser = user;
     });
   }

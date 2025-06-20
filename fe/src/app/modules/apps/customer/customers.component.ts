@@ -100,7 +100,6 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   getAllCities() {
     this.cityService.find({}).subscribe((res:any) => {
-      console.log(res.data);
       if(res.data.length){
         this.cities=res.data
       }
@@ -156,9 +155,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   checkPermissions() {
-    const userData = this.authService.getCurrentUser(); 
-   console.log(userData.permissions);
-   
+    const userData = this.authService.getCurrentUser();    
   }
   isAllSelected(): boolean {
     return (

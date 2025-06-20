@@ -136,7 +136,6 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getAllAddresses() {
     this.addressService.find({}).subscribe((res: any) => {
-      console.log(res.data);
       if (res.data.length) {
         this.address = res.data;
       }
@@ -145,7 +144,6 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getAllCities() {
     this.cityService.find({}).subscribe((res: any) => {
-      console.log(res.data);
       if (res.data.length) {
         this.cities = res.data;
       }

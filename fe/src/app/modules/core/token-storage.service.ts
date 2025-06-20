@@ -48,12 +48,16 @@ export class TokenStorageService {
     }
     this._user = this._decodedData.user || {};
     this.userUpdated$.next(this._user);
-
+  
     this._menu = this._decodedData.menus || [];
     this.sidebarMenuService.setMenu(this._menu);
-
-    this.permissionsService.loadPermissions(this._decodedData['permissions'] || []);
-
+    const permissions = this._decodedData['permissions'] || [];
+    if (permissions.length > 0) {
+      this.permissionsService.loadPermissions(permissions);
+    } else {
+      console.warn('Permissions are empty.');
+    }
+  
     return this._accessToken ? true : false;
   }
 
