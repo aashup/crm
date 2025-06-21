@@ -25,6 +25,7 @@ import { PurchaseModel } from './purchase.model';
 import { PurchaseService } from './purchase.service';
 import { AddPurchaseComponent } from './add-purchase/add-purchase.component';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-purchase',
@@ -76,7 +77,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'created_at',
       name: 'Created At',
       mutator: (item: any) =>
-        new Date(item.created_at).toLocaleString(),
+        this.datePipe.transform(item.created_at, 'mediumDate'),
     },
     { ref: 'action', name: 'Actions' },
   ];
@@ -86,7 +87,8 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: PurchaseService,
     private commonService: CommonService,
     private authService: AuthService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private datePipe: DatePipe
   ) {
     this.dataSource = new PurchaseDatasource(this.service);
   }

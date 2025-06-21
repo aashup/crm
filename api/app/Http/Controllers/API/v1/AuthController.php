@@ -32,7 +32,8 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
         $user = User::whereEmail($request->email)->first();
-        if ($user && !$user->email_verified_at || !$user->status) {
+
+        if ($user && (!$user->email_verified_at || !$user->status)) {
             return $this->error('Unauthorised User or Email not verified!!');
         }
         if ($user && Hash::check($request->password, $user->password)) {
@@ -96,7 +97,7 @@ class AuthController extends Controller
                     $user->email_verified_at = now();
                     $user->save();
                 }
-                return redirect(Config::get('services.urls.ui_url') . '/auth/login');
+                return redirect(Config::get('services.urls.ui_url') . '/auth/email-verified');
             } else {
                 return view('errors.link_expire');
             }
