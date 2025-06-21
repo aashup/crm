@@ -13,11 +13,10 @@ import { Title } from '@angular/platform-browser';
 export class AuthComponent implements OnInit, OnDestroy {
   today: Date = new Date();
 
-  constructor(private titleService: Title) {}
+  constructor() {}
 
   ngOnInit(): void {
     // BODY_CLASSES.forEach((c) => document.body.classList.add(c));
-    this.titleService.setTitle('Login');
   }
 
   ngOnDestroy() {

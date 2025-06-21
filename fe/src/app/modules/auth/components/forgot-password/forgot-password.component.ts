@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { first } from 'rxjs/operators';
+import { Title } from '@angular/platform-browser';
 
 enum ErrorStates {
   NotSubmitted,
@@ -24,11 +25,12 @@ export class ForgotPasswordComponent implements OnInit {
 
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(private fb: FormBuilder, private authService: AuthService,private titleService: Title) {
     this.isLoading$ = this.authService.isLoading$;
   }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Forgot Password');
     this.initForm();
   }
 
@@ -36,6 +38,7 @@ export class ForgotPasswordComponent implements OnInit {
 
 
   initForm() {
+    
     this.forgotPasswordForm = this.fb.group({
       email: ["",
         Validators.compose([

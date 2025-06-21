@@ -1,0 +1,54 @@
+.verification-message-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  
+  
+}
+
+.verification-card {
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.verification-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  color: #4caf50;
+  font-size: 64px;
+  margin-bottom: 10px;
+}
+
+.verification-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.message-text {
+  font-size: 16px;
+  color: #555555;
+  margin: 20px 0;
+}
+
+.verification-actions {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.action-button {
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
