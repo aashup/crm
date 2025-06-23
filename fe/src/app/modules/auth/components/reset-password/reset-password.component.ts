@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonService } from 'src/app/modules/core/common.service';
 
 enum ErrorStates {
   NotSubmitted,
@@ -31,7 +32,9 @@ export class ResetPasswordComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toastService:CommonService
+
   ) {
     this.isLoading$ = this.authService.isLoading$;
   }
@@ -70,9 +73,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   submit(event: Event): void {
-    debugger
-    console.log('Form Submitted:', this.resetPasswordForm.value);
-    
+   
     event.preventDefault();
 
     if (this.resetPasswordForm?.value.cpassword=== this.resetPasswordForm?.value.password) {
@@ -88,17 +89,17 @@ export class ResetPasswordComponent implements OnInit {
         token: this.token
       }).subscribe({
         next: (res) => {
-          debugger;
           this.errorState = ErrorStates.NoError;
           this.resetPasswordForm.reset();
+          this.toastService.toastr.success("Password Reset Successfully")
           this.router.navigate(['/auth/login']);
         },
         error: (err) => {
           this.errorState = ErrorStates.HasError;
+          this.toastService.toastr.error(err.error.message)
           this.authService.isLoadingSubject.next(false);
         },
         complete: () => {
-          debugger;
           this.authService.isLoadingSubject.next(false);
         },
       });

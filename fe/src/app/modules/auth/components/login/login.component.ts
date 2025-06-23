@@ -15,14 +15,12 @@ import { Title } from '@angular/platform-browser';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  defaultAuth: any = {
-    email: 'vijay@xtrox.com',
-    password: 'Vijay@123',
-  };
+ 
   loginForm: FormGroup;
   hasError: boolean;
   returnUrl: string;
   isLoading$: Observable<boolean>;
+  error:string
 
   private unsubscribe: Subscription[] = []; 
 
@@ -61,7 +59,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   initForm() {
     this.loginForm = this.fb.group({
       email: [
-        this.defaultAuth.email,
+        "",
         Validators.compose([
           Validators.required,
           Validators.email,
@@ -70,7 +68,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         ]),
       ],
       password: [
-        this.defaultAuth.password,
+        "",
         Validators.compose([
           Validators.required,
           Validators.minLength(3),
@@ -95,6 +93,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         },
         error : (e) => {
+          console.log("error ",e);
+          this.error=e.error.message
           this.authService.isLoadingSubject.next(false);
         },
         complete : () => {

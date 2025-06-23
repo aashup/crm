@@ -22,9 +22,9 @@ export class ForgotPasswordComponent implements OnInit {
   errorState: ErrorStates = ErrorStates.NotSubmitted;
   errorStates = ErrorStates;
   isLoading$: Observable<boolean>;
-
-  // private fields
-  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
+  emailSent = false;
+  error:string
+  private unsubscribe: Subscription[] = []; 
   constructor(private fb: FormBuilder, private authService: AuthService,private titleService: Title) {
     this.isLoading$ = this.authService.isLoading$;
   }
@@ -34,9 +34,6 @@ export class ForgotPasswordComponent implements OnInit {
     this.initForm();
   }
 
-  // convenience getter for easy access to form fields
-
-
   initForm() {
     
     this.forgotPasswordForm = this.fb.group({
@@ -45,7 +42,7 @@ export class ForgotPasswordComponent implements OnInit {
           Validators.required,
           Validators.email,
           Validators.minLength(3),
-          Validators.maxLength(320), // https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+          Validators.maxLength(320), 
         ]),
       ],
     });
@@ -58,16 +55,16 @@ export class ForgotPasswordComponent implements OnInit {
       .forgotPassword(this.forgotPasswordForm.value.email)
       .subscribe({
         next: (res) => {
-          debugger;
           this.errorState = ErrorStates.NoError;
           this.forgotPasswordForm.reset();
+          this.emailSent = true;
         },
         error: (err) => {
           this.errorState = ErrorStates.HasError;
+          this.error=err.error.message
           this.authService.isLoadingSubject.next(false);
         },
         complete: () => {
-          debugger;
           this.authService.isLoadingSubject.next(false);
         },
       });

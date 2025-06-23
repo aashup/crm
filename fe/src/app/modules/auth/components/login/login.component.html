@@ -68,10 +68,10 @@
 
 
   <!-- begin::Alert error-->
-  <ng-container *ngIf="hasError">
+  <ng-container *ngIf="error">
     <div class="mb-lg-15 alert alert-danger">
       <div class="alert-text font-weight-bold">
-        The login details are incorrect
+       {{error}}
       </div>
     </div>
   </ng-container>
