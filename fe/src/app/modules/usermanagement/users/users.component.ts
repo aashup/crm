@@ -102,8 +102,6 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.loadData();
-    this.commonService.page.updateTitle('Users List');
-
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
     this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
       .pipe(

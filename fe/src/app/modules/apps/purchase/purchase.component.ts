@@ -95,7 +95,6 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.loadData();
     this.checkPermissions()
-    this.commonService.page.updateTitle('Purchase List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
