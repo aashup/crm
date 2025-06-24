@@ -132,6 +132,14 @@
               >
                 <mat-icon>delete</mat-icon>
               </button>
+              <button
+              mat-icon-button
+              class="text-info blod"
+              *ngxPermissionsOnly="['purchase.show']"
+              [routerLink]="['/app/purchase', item.id]"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
             </td>
           </ng-container>
         </ng-container>
