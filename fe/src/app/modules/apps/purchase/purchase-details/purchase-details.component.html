@@ -3,6 +3,9 @@
   <mat-card class="purchase-card">
     <mat-card-header>
       <mat-card-title>Purchase Summary</mat-card-title>
+      <mat-card-actions style="margin-left: auto;">
+        <button mat-raised-button color="primary" (click)="printInvoice()">Print Invoice</button>
+      </mat-card-actions>
     </mat-card-header>
     <mat-card-content>
       <mat-list dense>
@@ -106,4 +109,89 @@
       </table>
     </mat-card-content>
   </mat-card>
+
+
+   <div id="invoice-section" style="padding: 16px; font-family: Arial, sans-serif; border: 1px solid #ccc; max-width: 800px; margin: auto; display:none">
+    <h1 style="text-align: center; font-size: 24px; margin-bottom: 16px;">XYZ ENTERPRISES</h1>
+    <p style="text-align: center; margin: 0;">123 MARKET ROAD, MUMBAI, INDIA</p>
+    <p style="text-align: center; margin: 0;">+91-9876543210 | xyz&#64;company.com</p>
+    <h2 style="text-align: center; margin-top: 16px;">PURCHASE INVOICE</h2>
+
+    <!-- Invoice Details -->
+    <div style="margin-top: 16px;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td><strong>Invoice No:</strong> PUR-2025-001</td>
+          <td><strong>Invoice Date:</strong> {{ purchaseDetails?.created_at | date: 'dd-MMMM-yyyy' }}</td>
+        </tr>
+        <tr>
+          <td><strong>Supplier Name:</strong> {{ purchaseDetails?.supplier?.name }}</td>
+          <td><strong>Supplier GSTIN:</strong> 27FGHIJ5678K2</td>
+        </tr>
+        <tr>
+          <td><strong>Purchase Type:</strong> Taxable</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Items Purchased -->
+    <h3 style="margin-top: 16px;">Items Purchased</h3>
+    <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr>
+          <th style="padding: 8px;">S No</th>
+          <th style="padding: 8px;">Item Name</th>
+          <th style="padding: 8px;">HSN Code</th>
+          <th style="padding: 8px;">Quantity</th>
+          <th style="padding: 8px;">Rate ₹</th>
+          <th style="padding: 8px;">Tax %</th>
+          <th style="padding: 8px;">Total ₹</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of purchaseDetails?.purchase_details; let i = index">
+          <td style="padding: 8px;">{{ i + 1 }}</td>
+          <td style="padding: 8px;">Item {{ item.product_id }}</td>
+          <td style="padding: 8px;">8471</td>
+          <td style="padding: 8px;">{{ item.quantity }}</td>
+          <td style="padding: 8px;">{{ item.amount }}</td>
+          <td style="padding: 8px;">18%</td>
+          <td style="padding: 8px;">{{ (item.amount | number: '1.2-2') }}</td>
+        </tr>
+        <tr>
+          <td colspan="6" style="padding: 8px; text-align: right;"><strong>Total</strong></td>
+          <td style="padding: 8px;">{{ purchaseDetails?.amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Payment Summary -->
+    <h3 style="margin-top: 16px;">Payment Summary</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr>
+        <td style="padding: 8px;"><strong>Subtotal:</strong></td>
+        <td style="padding: 8px;">44,000</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px;"><strong>Total Tax (GST 18%):</strong></td>
+        <td style="padding: 8px;">7,920</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px;"><strong>Grand Total:</strong></td>
+        <td style="padding: 8px;">51,920</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px;"><strong>Payment Mode:</strong></td>
+        <td style="padding: 8px;">Bank Transfer (NEFT)</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px;"><strong>Paid Amount:</strong></td>
+        <td style="padding: 8px;">51,920</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px;"><strong>Balance Due:</strong></td>
+        <td style="padding: 8px;">0</td>
+      </tr>
+    </table>
+  </div>
 </div>

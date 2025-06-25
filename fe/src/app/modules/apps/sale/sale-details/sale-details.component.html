@@ -1,7 +1,11 @@
 <div class="sale-details-container mat-elevation-z4">
   <mat-card class="sale-card">
     <mat-card-header>
-      <mat-card-title>Sale Details</mat-card-title>
+      <mat-card-title>
+        <span>Sale Details</span>
+      </mat-card-title>
+      <!-- Button placed next to the Sale title -->
+      <button mat-raised-button color="primary" style="margin-left: auto;" (click)="printInvoice()">Print Invoice</button>
     </mat-card-header>
     <mat-card-content>
       <mat-list dense>
@@ -95,4 +99,63 @@
       </table>
     </mat-card-content>
   </mat-card>
+  <!--enovice-->
+  <div id="print-section" style="display: none;">
+    <h1 style="text-align: center;">SALES INVOICE</h1>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <td style="width: 50%; padding: 10px; border: 1px solid #000;">
+          <strong>Company Name</strong><br>
+          Address Line 1<br>
+          Address Line 2<br>
+          Phone: +91-99643210<br>
+          info&#64;company.com
+        </td>
+        <td style="width: 50%; padding: 10px; border: 1px solid #000;">
+          <strong>Invoice #:</strong> {{ saleDetails?.id }}<br>
+          <strong>Date:</strong> {{ saleDetails?.created_at | date:'dd MMMM yyyy' }}<br>
+          <strong>Due Date:</strong> {{ saleDetails?.created_at | date:'dd MMMM yyyy' }}
+        </td>
+      </tr>
+    </table>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <td style="width: 50%; padding: 10px; border: 1px solid #000;">
+          <strong>Bill To:</strong><br>
+          {{ saleDetails?.created_by?.name }}<br>
+          {{ saleDetails?.created_by?.email }}
+        </td>
+        <td style="width: 50%; padding: 10px; border: 1px solid #000;">
+          <strong>Shipping To:</strong><br>
+          Same as billing address
+        </td>
+      </tr>
+    </table>
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr>
+          <th style="border: 1px solid #000; padding: 5px;">#</th>
+          <th style="border: 1px solid #000; padding: 5px;">Product ID</th>
+          <th style="border: 1px solid #000; padding: 5px;">Qty</th>
+          <th style="border: 1px solid #000; padding: 5px;">Amount</th>
+          <th style="border: 1px solid #000; padding: 5px;">Discount</th>
+          <th style="border: 1px solid #000; padding: 5px;">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of saleDetails?.sale_details; let i = index">
+          <td style="border: 1px solid #000; padding: 5px;">{{ i + 1 }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item.product_id }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item.quantity }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{ item.amount }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{ item.discount_amount }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{ item.net }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="text-align: right;"><strong>Subtotal:</strong> ₹{{ saleDetails?.amount }}</p>
+    <p style="text-align: right;"><strong>Discount:</strong> ₹{{ saleDetails?.discount_amount }}</p>
+    <p style="text-align: right;"><strong>Grand Total:</strong> ₹{{ saleDetails?.net_total }}</p>
+    <p style="text-align: center;">Thank you for your business!</p>
+  </div>
 </div>
