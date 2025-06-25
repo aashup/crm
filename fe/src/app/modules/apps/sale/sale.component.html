@@ -21,9 +21,9 @@
     </div>
   </div>
   <div class="card-body">
-    <div class="table-responsive">
+    <div class="table-responsive scrollable-table">
       <mat-progress-bar mode="indeterminate" *ngIf="dataSource.loading$ | async"></mat-progress-bar>
-
+    
       <table
         #table
         cdk-table
@@ -56,7 +56,7 @@
               </mat-checkbox>
             </td>
           </ng-container>
-
+    
           <ng-container [matColumnDef]="cols.ref" *ngIf="['action', 'select'].indexOf(cols.ref) == -1">
             <th
               cdk-header-cell
@@ -85,7 +85,7 @@
               </div>
             </td>
           </ng-container>
-
+    
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
             <th cdk-header-cell [attr.aria-label]="cols.name" *matHeaderCellDef [ngStyle]="cols.style || {}">
               {{ cols.name }}
@@ -118,7 +118,7 @@
             </td>
           </ng-container>
         </ng-container>
-
+    
         <tr cdk-header-row *cdkHeaderRowDef="displayableCol"></tr>
         <tr cdk-row *cdkRowDef="let row; columns: displayableCol"></tr>
       </table>

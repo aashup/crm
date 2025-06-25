@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { SaleDetailsComponent } from './sale-details/sale-details.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { PurchaseComponent } from './purchase/purchase.component';
-import { PurchaseDetailsComponent } from './purchase-details/purchase-details.component';
+import { SaleDetailsComponent } from './sale/sale-details/sale-details.component';
+import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-details.component';
 @NgModule({
-  declarations: [SaleDetailsComponent,PurchaseDetailsComponent],
+  declarations: [],
   imports: [
     CommonModule,
     MatCardModule,
@@ -53,7 +53,7 @@ import { PurchaseDetailsComponent } from './purchase-details/purchase-details.co
       },
       {
         path: 'sale/:id',
-       component:SaleDetailsComponent,
+        loadChildren: () => import('./sale/sale.module').then((m) =>m.SaleModule),
       },
     ])
   ]

@@ -6,11 +6,11 @@ import {
   OnInit
 } from '@angular/core';
 import _ from 'lodash';
-import { CommonService } from '../../core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { ActivatedRoute } from '@angular/router';
 import { SaleDetailsService } from './sale-details-service';
-import { ProductService } from '../product/product.service';
+import { CommonService } from 'src/app/modules/core/common.service';
+import { ProductService } from '../../product/product.service';
 
 @Component({
   selector: 'app-sale-details',
