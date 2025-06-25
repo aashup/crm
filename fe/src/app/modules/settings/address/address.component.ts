@@ -71,7 +71,6 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Address List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

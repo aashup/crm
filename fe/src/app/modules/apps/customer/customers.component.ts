@@ -83,7 +83,6 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getAllCities()
     this.loadData();
     this.checkPermissions()
-    this.commonService.page.updateTitle('Customer List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

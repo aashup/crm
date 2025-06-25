@@ -97,7 +97,6 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getAllCities()
     this.loadData();
     this.checkPermissions()
-    this.commonService.page.updateTitle('Sale List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

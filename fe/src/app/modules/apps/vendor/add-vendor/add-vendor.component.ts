@@ -60,9 +60,9 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     this.addressService.find().subscribe((res: any) => {
       this.addresses = res.data;
       this.addresses.filter((address: any) => {
-        if (address.type =='2') {
+        if (address.type =='1') {
           this.billingAddress.push(address);
-        } else if (address.type == '1') {
+        } else if (address.type == '2') {
           this.shippingAddress.push(address);
         }
       }

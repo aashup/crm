@@ -103,7 +103,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     this.prefetchProductNames()
     this.prefetchUnitNames()
     this.prefetchUserNames();
-    this.commonService.page.updateTitle('Inventory List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

@@ -120,7 +120,6 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getAllAddresses();
     this.getAllCities();
     this.loadData();
-    this.commonService.page.updateTitle('Suppliers List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
     });

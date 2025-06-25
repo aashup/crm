@@ -1,0 +1,89 @@
+.sale-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.sale-card {
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+mat-card-header {
+  background-color: #3f51b5;
+  color: white;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+}
+
+mat-card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+mat-list-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+mat-list-item strong {
+  font-weight: bold;
+}
+
+mat-list-item span {
+  color: #555;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-table th {
+  background-color: #3f51b5;
+  color: white;
+  padding: 10px;
+}
+
+.modern-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.mat-elevation-z8 {
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table-header {
+  background-color: #673ab7; /* Material Design purple */
+  color: white;
+  font-weight: bold;
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid #ddd;
+}
+
+.table-cell {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.mat-header-row {
+  border-radius: 8px 8px 0 0;
+}
+
+.mat-row:hover {
+  background-color: #f1f1f1; /* Light hover effect */
+}
+
+.mat-elevation-z8 {
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}

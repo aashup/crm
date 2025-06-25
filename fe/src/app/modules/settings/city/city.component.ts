@@ -73,7 +73,6 @@ export class CityComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('City List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

@@ -57,7 +57,6 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Unit List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

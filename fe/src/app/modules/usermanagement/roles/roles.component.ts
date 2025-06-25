@@ -82,7 +82,6 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Roles List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

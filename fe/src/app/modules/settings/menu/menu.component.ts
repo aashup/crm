@@ -64,7 +64,6 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Menu List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );

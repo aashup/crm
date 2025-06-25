@@ -42,3 +42,29 @@ section {
   align-items: center;
   z-index: 1000;
 }
+.scrollable-table {
+  max-height: 400px; /* Adjust height as needed */
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  white-space: nowrap; /* Prevent wrapping */
+  text-align: left;
+  padding: 10px;
+}
+
+th {
+
+  color: white;
+  font-weight: bold;
+}
+
+td {
+  border-bottom: 1px solid #ddd;
+}
