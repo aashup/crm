@@ -73,7 +73,10 @@
           <th mat-header-cell *matHeaderCellDef> Product ID </th>
           <td mat-cell *matCellDef="let element"> {{ element.product_id }} </td>
         </ng-container>
-
+        <ng-container matColumnDef="product_name">
+          <th mat-header-cell *matHeaderCellDef> Product Name </th>
+          <td mat-cell *matCellDef="let element"> {{ getProductByid(element.product_id).name }} </td>
+        </ng-container>
         <ng-container matColumnDef="quantity">
           <th mat-header-cell *matHeaderCellDef> Quantity </th>
           <td mat-cell *matCellDef="let element"> {{ element.quantity }} </td>
@@ -94,8 +97,8 @@
           <td mat-cell *matCellDef="let element"> {{ element.net }} </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="['product_id', 'quantity', 'amount', 'discount_amount', 'net']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['product_id', 'quantity', 'amount', 'discount_amount', 'net'];"></tr>
+        <tr mat-header-row *matHeaderRowDef="['product_id','product_name' ,'quantity', 'amount', 'discount_amount', 'net']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['product_id','product_name', 'quantity', 'amount', 'discount_amount', 'net'];"></tr>
       </table>
     </mat-card-content>
   </mat-card>
@@ -121,14 +124,12 @@
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
       <tr>
         <td style="width: 50%; padding: 10px; border: 1px solid #000;">
-          <strong>Bill To:</strong><br>
-          {{ saleDetails?.created_by?.name }}<br>
-          {{ saleDetails?.created_by?.email }}
+          <strong>Contact Details</strong><br>
+         <strong>Contact Name : </strong>{{saleDetails?.contact?.name}} <br>
+         <strong>Contact Number's : </strong>{{saleDetails?.contact?.mob1}},{{saleDetails?.contact?.mob1}} <br>
+         <strong>Contact Name : </strong>{{saleDetails?.contact?.name}} <br>
         </td>
-        <td style="width: 50%; padding: 10px; border: 1px solid #000;">
-          <strong>Shipping To:</strong><br>
-          Same as billing address
-        </td>
+       
       </tr>
     </table>
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
@@ -136,6 +137,7 @@
         <tr>
           <th style="border: 1px solid #000; padding: 5px;">#</th>
           <th style="border: 1px solid #000; padding: 5px;">Product ID</th>
+          <th style="border: 1px solid #000; padding: 5px;">Product Name</th>
           <th style="border: 1px solid #000; padding: 5px;">Qty</th>
           <th style="border: 1px solid #000; padding: 5px;">Amount</th>
           <th style="border: 1px solid #000; padding: 5px;">Discount</th>
@@ -146,6 +148,7 @@
         <tr *ngFor="let item of saleDetails?.sale_details; let i = index">
           <td style="border: 1px solid #000; padding: 5px;">{{ i + 1 }}</td>
           <td style="border: 1px solid #000; padding: 5px;">{{ item.product_id }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ getProductByid(item.product_id).name }}</td>
           <td style="border: 1px solid #000; padding: 5px;">{{ item.quantity }}</td>
           <td style="border: 1px solid #000; padding: 5px;">₹{{ item.amount }}</td>
           <td style="border: 1px solid #000; padding: 5px;">₹{{ item.discount_amount }}</td>

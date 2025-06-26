@@ -24,8 +24,9 @@ import { StateService } from 'src/app/modules/settings/state/state.service';
 export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   purchaseId: string | null = null;
-  address:any[]
-  states:any[]
+  address:any[]=[]
+  states:any[]=[]
+  products:any[]=[]
   purchaseDetails: any;
   constructor(
     private cdr: ChangeDetectorRef,
@@ -40,6 +41,7 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewIni
   ngOnInit(): void {
   this.getAllAddress()
     this.getAllState()
+    this.getAllProducts()
     this.purchaseId = this.route.snapshot.paramMap.get('id');
     if (this.purchaseId) {
       this.spinnerService.show()
@@ -63,13 +65,16 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     }
   }
   
-  
+  getAllProducts(){
+    this.productService.find().subscribe((res:any)=>{
+      console.log("products",res.data);
+      
+      this.products=res.data
+    })
+  }
   getProductByid(id:string){
-    let name=""
-    console.log(id);
-    this.productService.get({id:id,with:[]}).subscribe(res=>{
-      return res.data.name
-    })  
+    if(id&&this.products.length)
+      return this.products.find(product => product.id === id) ;
   }
   getAllAddress(){
     this.addressService.find({
@@ -93,10 +98,11 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     })
   }
   getStateById(id: string): any {
-    return this.states.find(state => state.id === id).name ;
+    if(id&&this.states.length)
+    return this.states.find(state => state.id === id) ;
   }
   getAddressById(id:string){
-    debugger
+    if(id&&this.address.length)
     return this.address.find((addr)=>addr.id===id)
   }
   printInvoice(): void {

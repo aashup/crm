@@ -13,7 +13,6 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { ProductService } from '../../product/product.service';
 import { AddressService } from 'src/app/modules/settings/address/address.service';
 import { StateService } from 'src/app/modules/settings/state/state.service';
-import { CountryService } from 'src/app/modules/settings/country/country.service';
 
 @Component({
   selector: 'app-sale-details',
@@ -26,8 +25,9 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   saleId: string | null = null;
   saleDetails: any;
-  address:any[]
-  states:any[]
+  address:any[]=[]
+  states:any[]=[]
+  products:any[]=[]
   constructor(
     private cdr: ChangeDetectorRef,
     private commonService: CommonService,
@@ -39,6 +39,7 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     private stateService:StateService,
   ) {}
   ngOnInit(): void {
+    this.getAllProducts()
     this.saleId = this.route.snapshot.paramMap.get('id');
     if (this.saleId) {
       this.saleDetailsService.findById(this.saleId,{
@@ -59,6 +60,17 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       );
     }
+  }
+  getAllProducts(){
+    this.productService.find().subscribe((res:any)=>{
+      console.log("products",res.data);
+      
+      this.products=res.data
+    })
+  }
+  getProductByid(id:string){
+    if(id&&this.products.length)
+      return this.products.find(product => product.id === id) ;
   }
   printInvoice(): void {
     const printContent = document.getElementById('print-section')?.innerHTML;
