@@ -74,27 +74,8 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   printInvoice(): void {
     const printContent = document.getElementById('print-section')?.innerHTML;
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
-    if (printWindow && printContent) {
-      printWindow.document.open();
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Invoice</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              h1 { text-align: center; }
-              p { margin: 5px 0; }
-            </style>
-          </head>
-          <body>
-            ${printContent}
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
+    if(printContent)
+    this.commonService.printHtmlContent(printContent)
   }
   
   ngOnDestroy(): void {}

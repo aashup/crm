@@ -110,10 +110,7 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     const originalContents = document.body.innerHTML;
   
     if (printContents) {
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload(); 
+     this.commonService.printHtmlContent(printContents)
     }
   }
   ngOnDestroy(): void {}
