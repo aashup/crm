@@ -1,125 +1,114 @@
-<div class="purchase-details-container mat-elevation-z4">
-  <!-- Purchase Summary -->
-  <mat-card class="purchase-card">
-    <mat-card-header>
-      <mat-card-title>Purchase Summary</mat-card-title>
-      <mat-card-actions style="margin-left: auto">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="printInvoice()"
-          [disabled]="states.length === 0 || address.length === 0 || products.length === 0"
-        >
-          Print Invoice
-        </button>
-      </mat-card-actions>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list dense>
-        <mat-list-item>
-          <strong>Amount:</strong> <span>{{ purchaseDetails?.amount }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Notes:</strong> <span>{{ purchaseDetails?.notes || 'No Notes' }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Created At:</strong> <span>{{ purchaseDetails?.created_at | date: 'medium' }}</span>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+<div class="purchase-order-container ">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="title">PURCHASE ORDER</h1>
+    <h2 class="order-number">Purchase Order# PO-0000{{ purchaseDetails?.id }}</h2>
+  </div>
 
-  <!-- Contact Details -->
-  <mat-card class="purchase-card">
-    <mat-card-header>
-      <mat-card-title>Contact Details</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list dense>
-        <mat-list-item>
-          <strong>Name:</strong> <span>{{ purchaseDetails?.contact?.name }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Mobile 1:</strong> <span>{{ purchaseDetails?.contact?.mob1 }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Mobile 2:</strong> <span>{{ purchaseDetails?.contact?.mob2 }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Status:</strong> <span>{{ purchaseDetails?.contact?.status === 1 ? 'Active' : 'Inactive' }}</span>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+  <!-- Print Button -->
+  <div class="print-button-container">
+    <button class="print-button" (click)="printInvoice()">Print Invoice</button>
+  </div>
 
-  <!-- Unit Details -->
-  <mat-card class="purchase-card">
-    <mat-card-header>
-      <mat-card-title>Unit Details</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list dense>
-        <mat-list-item>
-          <strong>Name:</strong> <span>{{ purchaseDetails?.unit?.name }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Status:</strong> <span>{{ purchaseDetails?.unit?.status === 1 ? 'Active' : 'Inactive' }}</span>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+  <!-- Status Section -->
+  <div class="status-section">
+    <div class="status-item">
+      <strong>Status:</strong>
+      <span class="status-label order-status">{{ purchaseDetails?.status || 'Issued' }}</span>
+    </div>
+    <div class="status-item">
+      <strong>Receive:</strong>
+      <span class="status-label receive-status">{{ purchaseDetails?.receive_status || 'Received' }}</span>
+    </div>
+  </div>
 
-  <!-- Supplier Details -->
-  <mat-card class="purchase-card">
-    <mat-card-header>
-      <mat-card-title>Supplier Details</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list dense>
-        <mat-list-item>
-          <strong>Name:</strong> <span>{{ purchaseDetails?.supplier?.name }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Type:</strong> <span>{{ purchaseDetails?.supplier?.type === 1 ? 'Regular' : 'Other' }}</span>
-        </mat-list-item>
-        <mat-list-item>
-          <strong>Status:</strong> <span>{{ purchaseDetails?.supplier?.status === 1 ? 'Active' : 'Inactive' }}</span>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+  <!-- Details Section -->
+  <div class="details-section">
+    <div class="details-column">
+      <p><strong>Reference#:</strong> {{ purchaseDetails?.notes || 'Test' }}</p>
+      <p><strong>Order Date:</strong> {{ purchaseDetails?.created_at | date: 'dd/MM/yyyy' }}</p>
+      <p><strong>Delivery Date:</strong> {{ purchaseDetails?.created_at | date: 'dd/MM/yyyy' }}</p>
+      <p><strong>Payment Terms:</strong> {{ purchaseDetails?.payment_terms || 'Due on Receipt' }}</p>
+    </div>
+    <div class="details-column">
+      <p>
+        <strong>Supplier Address:</strong><br />
+        {{ purchaseDetails?.supplier?.name }}<br />
+        <span *ngIf="purchaseDetails?.supplier?.billing_address_id && address.length > 0 && states.length > 0">
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).address }},
+          <br />
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).mob1 }},{{
+            getAddressById(purchaseDetails?.supplier?.billing_address_id).mob2
+          }},
 
-  <!-- Purchase Items -->
-  <mat-card class="purchase-card">
-    <mat-card-header>
-      <mat-card-title>Purchase Items</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <table mat-table [dataSource]="purchaseDetails?.purchase_details" class="mat-elevation-z8 modern-table" *ngIf="products.length > 0">
-        <ng-container matColumnDef="product_id">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Product ID</th>
-          <td mat-cell *matCellDef="let element" class="table-cell">{{ element.product_id }}</td>
-        </ng-container>
-        <ng-container matColumnDef="product_name" >
-          <th mat-header-cell *matHeaderCellDef class="table-header">Product Name</th>
-          <td mat-cell *matCellDef="let element" class="table-cell">{{ getProductByid(element.product_id).name }}</td>
-        </ng-container>
-        <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Quantity</th>
-          <td mat-cell *matCellDef="let element" class="table-cell">{{ element.quantity }}</td>
-        </ng-container>
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).city.name }},
 
-        <ng-container matColumnDef="amount">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Amount</th>
-          <td mat-cell *matCellDef="let element" class="table-cell">{{ element.amount }}</td>
-        </ng-container>
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).name }},
 
-        <tr mat-header-row *matHeaderRowDef="['product_id', 'product_name' ,'quantity', 'amount']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['product_id','product_name', 'quantity', 'amount']"></tr>
-      </table>
-    </mat-card-content>
-  </mat-card>
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).country.name }}
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).pin }}
+        </span>
+      </p>
+      <p>
+        <strong>Delivery Address:</strong>
+        <span *ngIf="purchaseDetails?.supplier?.shipping_address_id && address.length > 0 && states.length > 0">
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).address }},
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob1 }},{{
+            getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob2
+          }}
 
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.name }},
+
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).name }},
+
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).country.name }},
+
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).pin }}
+        </span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Items Section -->
+  <div class="items-section">
+    <h3>Items & Description</h3>
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Item Name</th>
+          <th>Ordered</th>
+          <th>Status</th>
+          <th>Rate ₹</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="products.length > 0">
+        <tr *ngFor="let item of purchaseDetails?.purchase_details">
+          <td>{{ getProductByid(item.product_id).name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.status || 'Billed' }}</td>
+          <td>{{ item.amount | number: '1.2-2' }}</td>
+          <td>{{ item.amount*item.quantity | number: '1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="summary-section">
+    <div class="summary-item">
+      <strong>Sub Total:</strong>
+      <span>₹{{ purchaseDetails?.sub_total || '1,200.00' }}</span>
+    </div>
+    <div class="summary-item">
+      <strong>Discount:</strong>
+      <span>₹{{ purchaseDetails?.discount || '0.00' }}</span>
+    </div>
+    <div class="summary-item">
+      <strong>Total:</strong>
+      <span>₹{{ purchaseDetails?.total || '1,200.00' }}</span>
+    </div>
+  </div>
   <div
     id="invoice-section"
     style="
@@ -140,7 +129,7 @@
     <div style="margin-top: 16px">
       <table style="width: 100%; border-collapse: collapse">
         <tr>
-          <td><strong>Invoice No:</strong> PUR-2025-001</td>
+          <td><strong>Invoice No:</strong> PO-0000{{ purchaseDetails?.id }}</td>
           <td><strong>Invoice Date:</strong> {{ purchaseDetails?.created_at | date: 'dd-MMMM-yyyy' }}</td>
         </tr>
         <tr>
@@ -230,7 +219,5 @@
         </tr>
       </tbody>
     </table>
-
-    <!-- Payment Summary -->
   </div>
 </div>
