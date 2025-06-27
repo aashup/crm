@@ -3,6 +3,16 @@
   <mat-card class="purchase-card">
     <mat-card-header>
       <mat-card-title>Purchase Summary</mat-card-title>
+      <mat-card-actions style="margin-left: auto">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="printInvoice()"
+          [disabled]="states.length === 0 || address.length === 0 || products.length === 0"
+        >
+          Print Invoice
+        </button>
+      </mat-card-actions>
     </mat-card-header>
     <mat-card-content>
       <mat-list dense>
@@ -85,25 +95,142 @@
       <mat-card-title>Purchase Items</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <table mat-table [dataSource]="purchaseDetails?.purchase_details" class="mat-elevation-z8 modern-table">
+      <table mat-table [dataSource]="purchaseDetails?.purchase_details" class="mat-elevation-z8 modern-table" *ngIf="products.length > 0">
         <ng-container matColumnDef="product_id">
-          <th mat-header-cell *matHeaderCellDef class="table-header"> Product ID </th>
-          <td mat-cell *matCellDef="let element" class="table-cell"> {{ element.product_id }} </td>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Product ID</th>
+          <td mat-cell *matCellDef="let element" class="table-cell">{{ element.product_id }}</td>
         </ng-container>
-      
+        <ng-container matColumnDef="product_name" >
+          <th mat-header-cell *matHeaderCellDef class="table-header">Product Name</th>
+          <td mat-cell *matCellDef="let element" class="table-cell">{{ getProductByid(element.product_id).name }}</td>
+        </ng-container>
         <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef class="table-header"> Quantity </th>
-          <td mat-cell *matCellDef="let element" class="table-cell"> {{ element.quantity }} </td>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Quantity</th>
+          <td mat-cell *matCellDef="let element" class="table-cell">{{ element.quantity }}</td>
         </ng-container>
-      
+
         <ng-container matColumnDef="amount">
-          <th mat-header-cell *matHeaderCellDef class="table-header"> Amount </th>
-          <td mat-cell *matCellDef="let element" class="table-cell"> {{ element.amount }} </td>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Amount</th>
+          <td mat-cell *matCellDef="let element" class="table-cell">{{ element.amount }}</td>
         </ng-container>
-      
-        <tr mat-header-row *matHeaderRowDef="['product_id', 'quantity', 'amount']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['product_id', 'quantity', 'amount'];"></tr>
+
+        <tr mat-header-row *matHeaderRowDef="['product_id', 'product_name' ,'quantity', 'amount']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['product_id','product_name', 'quantity', 'amount']"></tr>
       </table>
     </mat-card-content>
   </mat-card>
+
+  <div
+    id="invoice-section"
+    style="
+      padding: 16px;
+      font-family: Arial, sans-serif;
+      border: 1px solid #ccc;
+      max-width: 800px;
+      margin: auto;
+      display: none;
+    "
+  >
+    <h1 style="text-align: center; font-size: 24px; margin-bottom: 16px">XYZ ENTERPRISES</h1>
+    <p style="text-align: center; margin: 0">123 MARKET ROAD, MUMBAI, INDIA</p>
+    <p style="text-align: center; margin: 0">+91-9876543210 | xyz&#64;company.com</p>
+    <h2 style="text-align: center; margin-top: 16px">PURCHASE INVOICE</h2>
+
+    <!-- Invoice Details -->
+    <div style="margin-top: 16px">
+      <table style="width: 100%; border-collapse: collapse">
+        <tr>
+          <td><strong>Invoice No:</strong> PUR-2025-001</td>
+          <td><strong>Invoice Date:</strong> {{ purchaseDetails?.created_at | date: 'dd-MMMM-yyyy' }}</td>
+        </tr>
+        <tr>
+          <td><strong>Supplier Name:</strong> {{ purchaseDetails?.supplier?.name }}</td>
+          <td><strong>Supplier GSTIN:</strong> {{ purchaseDetails?.supplier?.gst || '27AAAAA0000A1Z5' }}</td>
+        </tr>
+        <tr>
+          <td><strong>Purchase Type:</strong> Taxable</td>
+        </tr>
+      </table>
+    </div>
+    <!--address-->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px">
+      <tr>
+        <td style="width: 50%; padding: 10px; border: 1px solid #000">
+          <strong>Bill To:</strong><br />
+          {{ purchaseDetails?.supplier?.name }}<br />
+          <span *ngIf="purchaseDetails?.supplier?.billing_address_id && address.length > 0 && states.length > 0">
+            <strong>Address Name : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).address }}
+            <br />
+            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).mob1 }},{{
+              getAddressById(purchaseDetails?.supplier?.billing_address_id).mob2
+            }}
+            <br />
+            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).city.name }} <br />
+            <strong>State : </strong
+            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).name }} <br />
+            <strong>Country : </strong
+            >{{
+              getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).country.name
+            }}
+            <br />
+            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).pin }} <br />
+          </span>
+        </td>
+        <td style="width: 50%; padding: 10px; border: 1px solid #000">
+          <strong>Shipping To:</strong><br />
+          <span *ngIf="purchaseDetails?.supplier?.shipping_address_id && address.length > 0 && states.length > 0">
+            <strong>Address Name : </strong
+            >{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).address }} <br />
+            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob1 }},{{
+              getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob2
+            }}
+            <br />
+            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.name }}
+            <br />
+            <strong>State : </strong
+            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).name }}
+            <br />
+            <strong>Country : </strong
+            >{{
+              getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).country.name
+            }}
+            <br />
+            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).pin }} <br />
+          </span>
+        </td>
+      </tr>
+    </table>
+    <!-- Items Purchased -->
+    <h3 style="margin-top: 16px">Items Purchased</h3>
+    <table border="1" style="width: 100%; border-collapse: collapse; text-align: left">
+      <thead>
+        <tr>
+          <th style="padding: 8px">S No</th>
+          <th style="padding: 8px">Item Name</th>
+          <th style="padding: 8px">HSN Code</th>
+          <th style="padding: 8px">Quantity</th>
+          <th style="padding: 8px">Rate ₹</th>
+          <th style="padding: 8px">Tax %</th>
+          <th style="padding: 8px">Total ₹</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="products.length > 0">
+        <tr *ngFor="let item of purchaseDetails?.purchase_details; let i = index">
+          <td style="padding: 8px">{{ i + 1 }}</td>
+          <td style="padding: 8px">{{ getProductByid(item.product_id).name }}</td>
+          <td style="padding: 8px">8471</td>
+          <td style="padding: 8px">{{ item.quantity }}</td>
+          <td style="padding: 8px">{{ item.amount }}</td>
+          <td style="padding: 8px">18%</td>
+          <td style="padding: 8px">{{ item.amount | number: '1.2-2' }}</td>
+        </tr>
+        <tr>
+          <td colspan="6" style="padding: 8px; text-align: right"><strong>Total</strong></td>
+          <td style="padding: 8px">{{ purchaseDetails?.amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Payment Summary -->
+  </div>
 </div>

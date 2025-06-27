@@ -88,4 +88,16 @@ export class CommonService {
       }
     });
   }
+  printHtmlContent(htmlContent: string): void {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write('<html><head><title>Print</title></head><body>');
+      printWindow.document.write(htmlContent);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+    }
+  }
 }
+
+
