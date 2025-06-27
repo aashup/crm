@@ -92,7 +92,7 @@ class SupplierController extends Controller
         $this->authorize('delete', $supplier);
 
         try {
-            return $this->success("Permission deleted successfully!", $supplier->delete());
+            return $this->success("Supplier deleted successfully!", $supplier->delete());
         } catch (QueryException $e) {
             if ($e->getCode() == '23000') {
                 return $this->error("Supplier is linked to other records and cannot be deleted.", 400);
