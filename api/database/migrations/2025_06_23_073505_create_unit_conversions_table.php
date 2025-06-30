@@ -17,7 +17,7 @@ return new class extends Migration
     {
         $menuId = DB::table('menus')->insertGetId([
             'name' => 'Unit Conversions',
-            'page' => '/app/unit-conversion',
+            'page' => '/app/settings/unit-conversion',
             'icon' => 'element-11',
             'root' => 0,
             'status' => 1,
@@ -48,7 +48,7 @@ return new class extends Migration
 
         $role = Role::where('name', 'Super Admin')->first();
         if ($role) {
-            $role->syncPermissions(Permission::whereIn('id', $tempPermissionsId)->get());
+            $role->givePermissionTo(Permission::whereIn('id', $tempPermissionsId)->get());
         }
 
         Schema::create('unit_conversions', function (Blueprint $table) {
