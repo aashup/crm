@@ -10,7 +10,7 @@ class UnitConversion extends Model
     use BaseModelTrait;
 
 
-    protected $relations = [];
+    protected $relations = ["product", "fromUnit", "toUnit"];
 
     protected $fillable = [
         'product_id',
@@ -61,5 +61,20 @@ class UnitConversion extends Model
             'description',
             'status',
         ];
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function fromUnit()
+    {
+        return $this->belongsTo(Unit::class, 'from_unit_id');
+    }
+
+    public function toUnit()
+    {
+        return $this->belongsTo(Unit::class, 'to_unit_id');
     }
 }
