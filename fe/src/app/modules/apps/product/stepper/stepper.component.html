@@ -153,28 +153,28 @@
       <div class="current">
         <ng-container *ngIf="currentStep$.value === 1" >
           <ng-container *ngIf="this.loadCompleted">
-            <app-add-product [form]="productInfo" [next]="nextStep.bind(this)"></app-add-product>
+            <app-add-product [form]="form" [next]="nextStep.bind(this)"></app-add-product>
           </ng-container>
         </ng-container>
         <ng-container *ngIf="currentStep$.value === 2">
           <ng-container *ngIf="this.loadCompleted">
-            <app-product-unit [form]="unitInfo" [next]="nextStep.bind(this)"[prev]="prevStep.bind(this)" ></app-product-unit>
+            <app-product-unit [form]="form" [next]="nextStep.bind(this)"[prev]="prevStep.bind(this)" ></app-product-unit>
         </ng-container>
         </ng-container>
         <ng-container *ngIf="currentStep$.value === 3">
           <ng-container *ngIf="this.loadCompleted">
-            <app-product-inventry [form]="inventoryInfo" [next]="nextStep.bind(this)"[prev]="prevStep.bind(this)" ></app-product-inventry>
+            <app-unit-conversion [form]="form" [next]="nextStep.bind(this)"[prev]="prevStep.bind(this)" ></app-unit-conversion>
           </ng-container>
         </ng-container>
         <ng-container *ngIf="currentStep$.value === 4"> 
          
-            <app-product-seller [form]="sellerInfo" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-seller>
+            <!-- <app-product-seller [form]="sellerInfo" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-seller> -->
     
         </ng-container>
         <ng-container *ngIf="currentStep$.value === 5">
-          <app-complete [form]="form">
+          <!-- <app-complete [form]="form">
            
-          </app-complete>  
+          </app-complete>   -->
         </ng-container>
       </div>
     </form>

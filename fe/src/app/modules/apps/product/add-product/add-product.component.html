@@ -1,6 +1,6 @@
 <div class="card">
   <div class="card-body">
-    <form class="form" [formGroup]="form" *ngIf="form">
+    <form class="form" [formGroup]="productInfoForm" *ngIf="productInfoForm">
       <div class="row">
         <div class="col-12 kt-margin-bottom-20-mobile">
           <mat-form-field class="w-100">
@@ -29,11 +29,11 @@
         </div>
       </div>
       <div class="d-flex justify-content-center">
-        <button type="button" class="btn btn-outline-primary" [disabled]="!form.valid" (click)="submit()">
+        <button type="button" class="btn btn-outline-primary" [disabled]="!productInfoForm.valid" (click)="submit()">
           Save
         </button>
        
-        <button type="button" class="btn btn-outline-primary"  (click)="next()">Next</button>
+        <button type="button" class="btn btn-outline-primary"  (click)="next()" [disabled]="!isProductCreated">Next</button>
       </div>
     </form>
   </div>

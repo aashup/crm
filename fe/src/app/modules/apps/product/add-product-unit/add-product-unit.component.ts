@@ -92,8 +92,8 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
       error: err => {
         console.log("faild");
         
-        this.commonService.toastr.error(err);
-                this.commonService.handleError(err)
+        this.commonService.toastr.error(err.error.message);
+                // this.commonService.handleError(err.error)
       }
     })
   }

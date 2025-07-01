@@ -60,19 +60,13 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.form = this.fb.group({
       productInfo: this.fb.group({
+        id:[""],
         name: ['', [Validators.required]],
         status: ['',  [Validators.required]],
         slug: ['']
       }),
-      unitInfo: this.form = this.fb.group({
-        id: ["", [Validators.required]],
-        product_id: ["",[Validators.required]],
-        unit_id: ["",[Validators.required]],
-        sale_price: ["", [Validators.required]],
-        purchase_price: [""],
-        notes: [""],
-        status: [""],
-      }),
+      unitInfo: this.fb.array([]),
+      unitConversionInfo: this.fb.array([]),
       inventoryInfo:this.form = this.fb.group({
         id: ["", []],
         product_id: ["", [Validators.required]],

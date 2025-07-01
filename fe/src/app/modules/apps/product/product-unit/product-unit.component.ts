@@ -1,25 +1,20 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   Input,
   OnDestroy,
-  OnInit,
+  OnInit
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import _ from 'lodash';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
-import { ProductModel } from '../product.model';
-import { ProductService } from '../product.service';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { MatDialog } from '@angular/material/dialog';
 import { AddProductUnitComponent } from '../add-product-unit/add-product-unit.component';
 import { ProductUnitModel } from './product-unit.model';
 import { ProductUnitService } from './product-unit.service';
-import { AppStateManager } from '../stepper/state.manager';
 
 @Component({
   selector: 'app-product-unit',
@@ -48,8 +43,9 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.productId = Number(this.ar.snapshot.paramMap.get('id'));
+    this.productId = this.form.value.productInfo.id
 
+    console.log(this.form);
     console.log(this.productId);
     
    if(this.productId)
@@ -78,7 +74,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
       .afterClosed()
       .subscribe((result) => {
         console.log("result is ",result);
-        this.form.patchValue(result);
+        this.form.value.unitInfo=[...this.form.value.unitInfo,result];
         console.log("form",this.form);
         this.loadUnit();
       });
