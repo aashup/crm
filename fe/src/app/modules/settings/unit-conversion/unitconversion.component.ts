@@ -75,28 +75,32 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   }
   ngAfterViewInit(): void {
     this.isLoading = false; 
-    this.spinnerService.hide()
-     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-       .pipe(
-         debounceTime(500),
-         distinctUntilChanged(),
-         tap(() => {
-           this.paginator.pageIndex = 0;
-           this.search.all = this.searchElementRef.nativeElement.value;
-           this.loadData();
-         })
-       )
-       .subscribe();
-   }
+    this.spinnerService.hide();
+  
+    
+    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(500), 
+        distinctUntilChanged(), 
+        tap(() => {
+          this.paginator.pageIndex = 0; 
+          this.search.all = this.searchElementRef.nativeElement.value.trim(); 
+          this.loadData();
+        })
+      )
+      .subscribe();
+  }
  
    loadData() {
-    this.filter.orderField = this.sort.active;
-    this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize || 20;
-    this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['product', 'fromUnit', 'toUnit'];
-    this.dataSource.find(_.pickBy(this.filter))
+    this.filter.orderField = this.sort.active; 
+    this.filter.orderBy = this.sort.direction; 
+    this.filter.page = this.paginator.pageIndex + 1; 
+    this.filter.pageSize = this.paginator.pageSize || 20; 
+    this.filter.filter = JSON.stringify(_.pickBy(this.search)); 
+    this.filter.with = ['product', 'fromUnit', 'toUnit']; 
+      console.log('Filter:', this.filter);
+  
+    this.dataSource.find(_.pickBy(this.filter)); 
   }
 
   masterToggle() {
