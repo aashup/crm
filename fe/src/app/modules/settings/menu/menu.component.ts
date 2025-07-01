@@ -12,6 +12,7 @@ import { merge, tap, take, debounceTime, distinctUntilChanged, fromEvent } from 
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-menu',
@@ -24,6 +25,7 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   dataSource: MenuDatasource;
   selection = new SelectionModel<MenuModel>(true, []);
+  isLoading = false;
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
@@ -55,13 +57,13 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: MenuService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new MenuDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Menu List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -80,6 +82,8 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
  ngAfterViewInit(): void {
+  this.isLoading = false; 
+  this.spinnerService.hide()
     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
       .pipe(
         debounceTime(500),
@@ -134,12 +138,20 @@ export class MenuComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .subscribe((res) => {
         if (res) {
+          this.isLoading = true; 
+          this.spinnerService.show()
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.toastr.success('Menu has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.spinnerService.hide()
+              this.commonService.handleError(err);
+            },
           });
         }
       });

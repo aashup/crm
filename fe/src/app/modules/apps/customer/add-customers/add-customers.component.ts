@@ -9,6 +9,7 @@ import { CustomersModel } from '../customers.model';
 import { CustomersService } from '../customers.service';
 import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { AddressService } from 'src/app/modules/settings/address/address.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 @Component({
     selector: 'app-add-customers',
     templateUrl: '././add-customers.component.html',
@@ -22,6 +23,7 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
   isEdit: boolean = false;
   contacts: any = [];
   addresses: any = [];
+  isLoading = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddCustomersComponent>);
   readonly data = inject<{
@@ -38,6 +40,7 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
     private commonService: CommonService,
     private contactService: ContactService,
     private addressService: AddressService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +63,8 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
   ngAfterViewInit(): void {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
+    this.isLoading = false; 
+    this.spinnerService.hide();
     this.initForm(this.model);
   }
 
@@ -91,14 +96,25 @@ export class AddCustomersComponent implements AfterViewInit, OnInit {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+    this.spinnerService.show();
+
+
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'Customer has been updated.' : 'Customer has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(); 
+        this.isLoading = false; 
+        this.spinnerService.hide();
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+        this.spinnerService.hide();
+      },
     });
   }
 }

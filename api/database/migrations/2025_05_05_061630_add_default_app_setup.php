@@ -16,6 +16,8 @@ return new class extends Migration
                 'name' => 'Super Admin',
                 'email' => 'vijay@xtrox.com',
                 'password' => bcrypt('Vijay@123'),
+                'email_verified_at' => now(),
+                'status' => 1,
             ]);
             $user->save();
 
@@ -215,7 +217,7 @@ return new class extends Migration
             'Menu',
             'Contact',
             'Units',
-            'Vendors',
+            'Suppliers',
             'Customers',
             'Address'
         ])->delete();

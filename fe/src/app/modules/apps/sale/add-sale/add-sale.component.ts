@@ -8,6 +8,7 @@ import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
 import { SaleService } from '../sale.service';
 import { CommonService } from 'src/app/modules/core/common.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-add-sale',
@@ -20,6 +21,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   contacts: any[] = [];
   units: any[] = [];
   products: any[] = [];
+  isLoading = false;
   isEdit = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddSaleComponent>);
@@ -34,7 +36,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     private unitService: UnitService,
     private productService: ProductService,
     private saleService: SaleService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +54,12 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.isEdit = this.data.isEdit;
+    this.isLoading = false; 
+    this.spinnerService.hide(); 
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+      this.spinnerService.hide();
+    });
   }
 
   getAllContact() {
@@ -112,16 +121,18 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     const group = this.fb.group({
       product_id: [null, Validators.required],
       unit_id: [null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]], // Added quantity field
       amount: [0, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
       net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]]
     });
-
+  
+    group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index)); // Added quantity change listener
     group.get('amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
-
+  
     return group;
   }
 
@@ -139,24 +150,24 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   calculateNet(index: number): void {
     const item = this.saleDetails.at(index);
+    const quantity = item.get('quantity')?.value || 1; // Use quantity in calculation
     const amount = item.get('amount')?.value || 0;
     const discountAmount = item.get('discount_amount')?.value || 0;
     const discountType = item.get('discount_type')?.value;
-
-    let net = amount;
-
+  
+    let net = amount * quantity; // Multiply amount by quantity
+  
     if (discountType === 1) {
-      net = amount - discountAmount;
+      net -= discountAmount;
     } else if (discountType === 2) {
-      net = amount - (amount * discountAmount / 100);
+      net -= (amount * discountAmount / 100) * quantity;
     }
-
+  
     net = Math.max(0, parseFloat(net.toFixed(2)));
     item.get('net')?.setValue(net, { emitEvent: false });
-
+  
     this.calculateNetTotal();
   }
-
   calculateNetTotal(): void {
     let total = 0;
     this.saleDetails.controls.forEach(ctrl => {
@@ -175,15 +186,16 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
       notes: sale.notes || '',
       status: sale.status || 1,
     });
-
+  
     this.saleDetails.clear();
-
+  
     if (sale.sale_details && Array.isArray(sale.sale_details)) {
       sale.sale_details.forEach((detail: any, index: number) => {
         const group = this.createSaleDetailWithCalculation(index);
         group.patchValue({
           product_id: detail.product_id || null,
           unit_id: detail.unit_id || null,
+          quantity: detail.quantity || 1, // Patch quantity value
           amount: detail.amount || 0,
           discount_amount: detail.discount_amount || 0,
           discount_type: detail.discount_type || 1
@@ -192,42 +204,55 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
         this.calculateNet(index);
       });
     }
-
+  
     this.calculateNetTotal();
   }
-
   onSubmit(): void {
-    if (this.form.valid) {
-      const payload = {
-        ...this.form.getRawValue(),
-        id: this.data.model.id
-      };
-
-      if (this.isEdit) {
-        this.saleService.update(payload).subscribe({
-          next: (res) => {
-            this.commonService.toastr.success("Updated Successfully");
-            this.dialogRef.close(true);
-          },
-          error: (err) => {
-            console.error('Error updating sale:', err);
-          }
-        });
-      } else {
-        this.saleService.create(payload).subscribe({
-          next: (res) => {
-            this.commonService.toastr.success("Sale Created Successfully");
-            this.dialogRef.close(true);
-            window.location.reload();
-          },
-          error: (err) => {
-            console.error('Error creating sale:', err);
-          }
-        });
-      }
+    this.commonService.markFormGroupTouched(this.form);
+  
+    if (!this.form.valid) {
+      this.commonService.toastr.error('Please fix all errors.');
+      return;
+    }
+  
+    this.isLoading = true; 
+    this.spinnerService.show();
+  
+    const payload = {
+      ...this.form.getRawValue(),
+      id: this.data.model?.id || null,
+    };
+  
+    if (this.isEdit) {
+      this.saleService.update(payload).subscribe({
+        next: () => {
+          this.commonService.toastr.success('Updated Successfully');
+          this.dialogRef.close(true); 
+          this.isLoading = false; 
+          this.spinnerService.hide();
+        },
+        error: (err) => {
+          console.error('Error updating sale:', err);
+          this.commonService.handleError(err);
+          this.isLoading = false;
+          this.spinnerService.hide();
+        },
+      });
     } else {
-      console.warn('Form is invalid:', this.form.value);
-      console.error('Validation errors:', this.form.errors);
+      this.saleService.create(payload).subscribe({
+        next: () => {
+          this.commonService.toastr.success('Sale Created Successfully');
+          this.dialogRef.close(true);
+          this.isLoading = false; 
+          this.spinnerService.hide();
+        },
+        error: (err) => {
+          console.error('Error creating sale:', err);
+          this.commonService.handleError(err);
+          this.isLoading = false; 
+          this.spinnerService.hide();
+        },
+      });
     }
   }
 }

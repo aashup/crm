@@ -9,6 +9,8 @@ import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
 import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { PurchaseService } from '../purchase.service';
+import { VendorService } from '../../vendor/vendor.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 @Component({
     selector: 'app-add-purchase',
     templateUrl: '././add-purchase.component.html',
@@ -22,6 +24,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
   suppliers:any = []; 
   products:any = [];
   isEdit = false; 
+  isLoading = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddPurchaseComponent>);
   readonly data = inject<{
@@ -37,7 +40,9 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     private unitService:UnitService,
     private productService:ProductService,
     private contactService:ContactService,
-    private purchaseService:PurchaseService
+    private purchaseService:PurchaseService,
+    private supplierService:VendorService,
+    private spinnerService: SpinnerService
 
 
   ) {}
@@ -47,6 +52,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     
     this.isEdit=this.data.isEdit
     this.getAllUnits()
+    this.getAllSuppliers()
     this.getAllConntact()
     this.getAllProduct()
     this.form = this.fb.group({
@@ -68,6 +74,14 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
         this.units=res.data
       }
     })
+  }
+  getAllSuppliers(){
+    this.supplierService.find({}).subscribe((res:any)=>{  
+      if(res.data){
+        this.suppliers=res.data
+      }
+    }
+    )
   }
 
 getAllConntact(){
@@ -105,6 +119,7 @@ getAllProduct(){
     return this.fb.group({
       product_id: [null, Validators.required],
       unit_id: [null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]], // Added quantity field
       amount: [null, Validators.required]
     });
   }
@@ -126,45 +141,69 @@ getAllProduct(){
       this.purchaseDetails.push(this.fb.group({
         product_id: [detail.product_id, Validators.required],
         unit_id: [detail.unit_id, Validators.required],
+        quantity: [detail.quantity || 1, [Validators.required, Validators.min(1)]], // Patch quantity value
         amount: [detail.amount, Validators.required]
       }));
     });
   }
 
-  loadDropdownData(): void {
-    // Load contacts, units, suppliers, and products data here
-    // Example:
-    
-  }
+
   ngAfterViewInit(): void {
-  
+    this.isLoading = false; 
+    this.spinnerService.hide();
+
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+      this.spinnerService.hide();
+    });
   }
  
   
   onSubmit(): void {
-    if(this.isEdit&& this.data.model){
-      const payload=this.form.value
-      payload.id=this.data.model.id
-      this.purchaseService.update(this.form.value).subscribe((res)=>{
-        if(res){
-          this.commonService.toastr.success("Purchase Updated")
-          this.dialogRef.close(this.data.model)
-        }
-      })
-      return
+    this.commonService.markFormGroupTouched(this.form);
+  
+    if (!this.form.valid) {
+      this.commonService.toastr.error('Please fix all errors.');
+      return;
     }
-    if (this.form.valid) {
-      const purchaseData = this.form.value;
-      this.purchaseService.create(this.form.value).subscribe((res)=>{
-        if(res){
-          this.commonService.toastr.success("Purchase Item Created")
-
-          this.dialogRef.close(purchaseData);
-          window.location.reload()
-        }
-      })
-     
+  
+    this.isLoading = true;
+    this.spinnerService.show();
+  
+    if (this.isEdit && this.data.model) {
+      const payload = this.form.value;
+      payload.id = this.data.model.id;
+  
+      this.purchaseService.update(payload).subscribe({
+        complete: () => {
+          this.commonService.toastr.success('Purchase Updated');
+          this.dialogRef.close(this.data.model);
+          this.isLoading = false;
+          this.spinnerService.hide();
+        },
+        error: (err) => {
+          this.commonService.handleError(err);
+          this.isLoading = false;
+          this.spinnerService.hide();
+        },
+      });
+      return;
     }
+  
+    const purchaseData = this.form.value;
+    this.purchaseService.create(purchaseData).subscribe({
+      complete: () => {
+        this.commonService.toastr.success('Purchase Item Created');
+        this.dialogRef.close(purchaseData);
+        this.isLoading = false;
+        this.spinnerService.hide();
+      },
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false;
+        this.spinnerService.hide();
+      },
+    });
   }
 
   

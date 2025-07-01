@@ -1,74 +1,20 @@
-<form class="form" novalidate="novalidate" id="kt_login_signup_form" [formGroup]="registrationForm"
-  (ngSubmit)="submit()"
-  style="width: 600px;">
+<form class="form" novalidate="novalidate" id="kt_login_signup_form" [formGroup]="registrationForm" (ngSubmit)="submit()" style="width: 600px;">
   <!--begin::Heading-->
   <div class="text-center mb-11">
-    <h1 class="text-gray-900 fw-bolder mb-3">
-      Sign Up
-    </h1>
-
-    <!--end::Title-->
-
-    <!--begin::Subtitle-->
-    <!-- <div class="text-gray-500 fw-semibold fs-6">
-      Your Social Campaigns
-    </div> -->
-    <!--end::Subtitle--->
+    <h1 class="text-gray-900 fw-bolder mb-3">Sign Up</h1>
   </div>
-  <!--begin::Heading-->
+  <!--end::Heading-->
 
-  <!--begin::Login options-->
-  <!-- <div class="row g-3 mb-9">
-   
-    <div class="col-md-6">
-      
-      <a href="#"
-        class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-        <img alt="Logo" src="./assets/media/svg/brand-logos/google-icon.svg" class="h-15px me-3" />
-        Sign in with Google
-      </a>
-     
-    </div>
-   
-    <div class="col-md-6">
-    
-      <a href="#"
-        class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-        <img alt="Logo" src="./assets/media/svg/brand-logos/apple-black.svg" class="theme-light-show h-15px me-3" />
-        <img alt="Logo" src="./assets/media/svg/brand-logos/apple-black-dark.svg" class="theme-dark-show h-15px me-3" />
-        Sign in with Apple
-      </a>
-      
-    </div>
-    
-  </div> -->
-
-  <!-- <div class="separator separator-content my-14"><span class="w-125px text-gray-500 fw-semibold fs-7">Or with
-      email</span></div> -->
-
-      <ng-container *ngIf="hasError">
-        <div class="mb-lg-15 alert alert-danger">
-          <div class="alert-text font-weight-bold">
-            The registration details are incorrect
-          </div>
-        </div>
-      </ng-container>
-  
-      <div class="fv-row mb-8">
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Fullname</mat-label>
-          <input matInput type="text" name="name" formControlName="name" placeholder="Fullname" autocomplete="off" />
-          <mat-error *ngIf="registrationForm.controls['name'].hasError('required')">
-            Fullname is required
-          </mat-error>
-          <mat-error *ngIf="registrationForm.controls['name'].hasError('minlength')">
-            Fullname should have at least 3 symbols
-          </mat-error>
-          <mat-error *ngIf="registrationForm.controls['name'].hasError('maxLength')">
-            Fullname should have maximum 100 symbols
-          </mat-error>
-        </mat-form-field>
-      </div>
+  <!--begin::Form group-->
+  <div class="fv-row mb-8">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Fullname</mat-label>
+      <input matInput type="text" name="name" formControlName="name" placeholder="Fullname" autocomplete="off" />
+      <mat-error *ngIf="registrationForm.controls['name'].hasError('required')">Fullname is required</mat-error>
+      <mat-error *ngIf="registrationForm.controls['name'].hasError('minlength')">Fullname should have at least 3 symbols</mat-error>
+      <mat-error *ngIf="registrationForm.controls['name'].hasError('maxLength')">Fullname should have maximum 100 symbols</mat-error>
+    </mat-form-field>
+  </div>
   <!--end::Form group-->
 
   <!--begin::Form group-->
@@ -76,77 +22,62 @@
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Email</mat-label>
       <input matInput type="email" name="email" formControlName="email" placeholder="Email" autocomplete="off" />
-      <mat-error *ngIf="registrationForm.controls['email'].hasError('required')">
-        Email is required
-      </mat-error>
-      <mat-error *ngIf="registrationForm.controls['email'].hasError('email')">
-        Email is invalid
-      </mat-error>
-      <mat-error *ngIf="registrationForm.controls['email'].hasError('minlength')">
-        Email should have at least 3 symbols
-      </mat-error>
-      <mat-error *ngIf="registrationForm.controls['email'].hasError('maxLength')">
-        Email should have maximum 360 symbols
-      </mat-error>
+      <mat-error *ngIf="registrationForm.controls['email'].hasError('required')">Email is required</mat-error>
+      <mat-error *ngIf="registrationForm.controls['email'].hasError('email')">Email is invalid</mat-error>
+      <mat-error *ngIf="registrationForm.controls['email'].hasError('minlength')">Email should have at least 3 symbols</mat-error>
+      <mat-error *ngIf="registrationForm.controls['email'].hasError('maxLength')">Email should have maximum 360 symbols</mat-error>
     </mat-form-field>
   </div>
   <!--end::Form group-->
 
   <!--begin::Form group-->
-  <!-- Password Field -->
-
-<div class="fv-row mb-8">
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Password</mat-label>
-    <input matInput [type]="showPassword ? 'text' : 'password'" name="password" formControlName="password"
-      placeholder="Password" autocomplete="off" />
-    <button mat-icon-button matSuffix (click)="showPassword = !showPassword" type="button">
-      <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-    </button>
-    <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">
-      Password is required
-    </mat-error>
-    <mat-error *ngIf="registrationForm.controls['password'].hasError('minlength')">
-      Password should have at least 3 symbols
-    </mat-error>
-    <mat-error *ngIf="registrationForm.controls['password'].hasError('maxLength')">
-      Password should have maximum 100 symbols
-    </mat-error>
-  </mat-form-field>
-</div>
-
-<!-- Confirm Password Field -->
-<div class="fv-row mb-8">
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Confirm Password</mat-label>
-    <input matInput [type]="showConfirmPassword ? 'text' : 'password'" name="cpassword" formControlName="cpassword"
-      placeholder="Confirm password" autocomplete="off" />
-    <button mat-icon-button matSuffix (click)="showConfirmPassword = !showConfirmPassword" type="button">
-      <mat-icon>{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-    </button>
-    <mat-error *ngIf="registrationForm.controls['cpassword'].hasError('required')">
-      Confirm Password is required
-    </mat-error>
-    <mat-error *ngIf="registrationForm.controls['cpassword'].hasError('minlength')">
-      Confirm Password should have at least 3 symbols
-    </mat-error>
-    <mat-error *ngIf="registrationForm.controls['cpassword'].hasError('maxLength')">
-      Confirm Password should have maximum 100 symbols
-    </mat-error>
-    <mat-error *ngIf="registrationForm.controls['cpassword'].errors?.ConfirmPassword">
-      'Password' and 'Confirm Password' didn't match.
-    </mat-error>
-  </mat-form-field>
-</div>
+  <div class="fv-row mb-8">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Password</mat-label>
+      <input matInput [type]="showPassword ? 'text' : 'password'" name="password" formControlName="password" placeholder="Password" autocomplete="off" />
+      <button mat-icon-button matSuffix (click)="showPassword = !showPassword" type="button">
+        <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">Password is required</mat-error>
+      <mat-error *ngIf="registrationForm.controls['password'].hasError('minlength')">Password should have at least 3 symbols</mat-error>
+      <mat-error *ngIf="registrationForm.controls['password'].hasError('maxLength')">Password should have maximum 100 symbols</mat-error>
+    </mat-form-field>
+  </div>
   <!--end::Form group-->
+
+  <!--begin::Form group-->
+  <div class="fv-row mb-8">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Confirm Password</mat-label>
+      <input matInput [type]="showConfirmPassword ? 'text' : 'password'" name="cpassword" formControlName="cpassword" placeholder="Confirm password" autocomplete="off" />
+      <button mat-icon-button matSuffix (click)="showConfirmPassword = !showConfirmPassword" type="button">
+        <mat-icon>{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="registrationForm.controls['cpassword'].hasError('required')">Confirm Password is required</mat-error>
+      <mat-error *ngIf="registrationForm.controls['cpassword'].hasError('minlength')">Confirm Password should have at least 3 symbols</mat-error>
+      <mat-error *ngIf="registrationForm.controls['cpassword'].hasError('maxLength')">Confirm Password should have maximum 100 symbols</mat-error>
+      <mat-error *ngIf="registrationForm.controls['cpassword'].errors?.ConfirmPassword">'Password' and 'Confirm Password' didn't match.</mat-error>
+    </mat-form-field>
+  </div>
+  <!--end::Form group-->
+
+  <div class="fv-row mb-8">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Select Roles</mat-label>
+      <mat-select formControlName="roles" multiple>
+        <mat-option value="Customer">Customer</mat-option>
+        <mat-option value="Supplier">Supplier</mat-option>
+      </mat-select>
+      <mat-error *ngIf="registrationForm.controls['roles'].hasError('required')">At least one role is required</mat-error>
+    </mat-form-field>
+  </div>
 
   <!--begin::Form group-->
   <div class="fv-row mb-8">
     <label class="form-check form-check-inline">
       <input id="kt_login_toc_agree" type="checkbox" formControlName="agree" name="agree" class="form-check-input" />
       <span for="kt_login_toc_agree" class="form-check-label fw-semibold text-gray-700 fs-base ms-1">
-        I Accept the&nbsp;<a href="https://keenthemes.com/metronic/?page=faq" target="_blank"
-          class="ms-1 link-primary">Terms</a>.
+        I Accept the&nbsp;<a href="https://keenthemes.com/metronic/?page=faq" target="_blank" class="ms-1 link-primary">Terms</a>.
       </span>
     </label>
   </div>
@@ -154,9 +85,7 @@
 
   <!--begin::Form group-->
   <div class="d-grid mb-10">
-    <button type="submit" id="kt_sign_up_submit" [disabled]="
-        registrationForm.invalid || !registrationForm.controls['agree'].value
-      " class="btn btn-primary">
+    <button type="submit" id="kt_sign_up_submit" [disabled]="registrationForm.invalid || !registrationForm.controls['agree'].value" class="btn btn-primary">
       <ng-container *ngIf="(isLoading$ | async) === false">
         <span class="indicator-label">Submit</span>
       </ng-container>
@@ -173,23 +102,7 @@
   <!--begin::Sign up-->
   <div class="text-gray-500 text-center fw-semibold fs-6">
     Already have an Account?
-
-    <a routerLink="/auth/login" class="link-primary fw-semibold">
-      Sign in
-    </a>
+    <a routerLink="/auth/login" class="link-primary fw-semibold">Sign in</a>
   </div>
   <!--end::Sign up-->
-
 </form>
-
-<ng-template #formError let-control="control" let-message="message" let-validation="validation">
-  <ng-container *ngIf="control.hasError(validation) && (control.dirty || control.touched)">
-    <div class="fv-plugins-message-container">
-      <div class="fv-help-block">
-        <span role="alert">
-          {{ message }}
-        </span>
-      </div>
-    </div>
-  </ng-container>
-</ng-template>

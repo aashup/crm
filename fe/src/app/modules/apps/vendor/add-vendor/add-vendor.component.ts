@@ -9,6 +9,7 @@ import { ContactService } from 'src/app/modules/settings/contact/contact.service
 import { AddressService } from 'src/app/modules/settings/address/address.service';
 import { VendorModel } from '../vendor.model';
 import { VendorService } from '../vendor.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 @Component({
     selector: 'app-add-vendor',
     templateUrl: '././add-vendor.component.html',
@@ -22,6 +23,9 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
   isEdit: boolean = false;
   contacts: any = [];
   addresses: any = [];
+  billingAddress: any = [];
+  shippingAddress: any = [];
+  isLoading = false;
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddVendorComponent>);
   readonly data = inject<{
@@ -38,6 +42,7 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     private commonService: CommonService,
     private contactService: ContactService,
     private addressService: AddressService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +59,14 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
   getAddresses() {
     this.addressService.find().subscribe((res: any) => {
       this.addresses = res.data;
+      this.addresses.filter((address: any) => {
+        if (address.type =='1') {
+          this.billingAddress.push(address);
+        } else if (address.type == '2') {
+          this.shippingAddress.push(address);
+        }
+      }
+      );
     }
     );
   }
@@ -61,6 +74,8 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
+    this.isLoading = false; 
+    this.spinnerService.hide();
   }
 
   initForm(model: VendorModel) {
@@ -75,12 +90,14 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
         ],
       ],
       contact_id: [model.contact_id, [Validators.required]],
-      address_id: [model.address_id, [ Validators.required]],
-     
+      billing_address_id: [model.billing_address_id, [Validators.required]],
+      shipping_address_id: [model.shipping_address_id, [Validators.required]],
+      level: [model.level, [Validators.required]],
+      status: [model.status, [Validators.required]],
+      type: [model.type, [Validators.required]],
     });
     this.clone = this.form.value;
   }
-
   submit() {
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {
@@ -91,14 +108,26 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+    this.spinnerService.show();
+
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
+        this.isLoading = false; 
+        this.spinnerService.hide();
         this.commonService.toastr.success(
-          this.isEdit ? 'Vendor has been updated.' : 'Vendor has been created.'
+          this.isEdit ? 'Supplier has been updated.' : 'Supplier has been created.'
         );
+        this.isLoading = false; 
+        this.spinnerService.hide();
         this.dialogRef.close(true);
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.isLoading = false; 
+        this.spinnerService.hide();
+        this.commonService.handleError(err);
+      },
     });
   }
 }

@@ -19,6 +19,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('state', 'App\Http\Controllers\API\v1\StateController');
         Route::apiResource('city', controller: 'App\Http\Controllers\API\v1\CityController');
         Route::apiResource('unit', controller: 'App\Http\Controllers\API\v1\UnitController');
+        Route::apiResource('unit-conversion', controller: 'App\Http\Controllers\API\v1\UnitConversionController');
         Route::apiResource('role', controller: 'App\Http\Controllers\API\v1\RoleController');
         Route::any('role/{role}/sync-permission', ['App\Http\Controllers\API\v1\RoleController', 'syncPermission'])->name('role.permission');
         Route::apiResource('permission', controller: 'App\Http\Controllers\API\v1\PermissionController');

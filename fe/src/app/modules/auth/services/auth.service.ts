@@ -15,7 +15,7 @@ export type UserType = UserModel | undefined;
 })
 export class AuthService implements OnDestroy {
   // private fields
-  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
+  private unsubscribe: Subscription[] = []; 
   private authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
 
   // public fields
@@ -88,7 +88,7 @@ registration(user: UserModel): Observable<any> {
     tap((data: any) => {
       console.log('Registration successful:', data);
     }),
-    switchMap(() => this.login(user.email, user.password)), // Optional: If you still want to log in after registration
+    // switchMap(() => this.login(user.email, user.password)), 
     catchError((err) => {
       console.error('Registration error:', err);
       return of(undefined);

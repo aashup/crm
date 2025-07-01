@@ -13,6 +13,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { VrfcnMessageComponent } from './components/email-vrfcn-message/vrfcn-message.component';
+import { MatCardModule } from '@angular/material/card';
+import { EmailVerificationSuccessMessageComponent } from './components/email-verified-success/email-verification-success-message';
 
 @NgModule({
   declarations: [
@@ -21,6 +25,9 @@ import { MatIconModule } from '@angular/material/icon';
     ResetPasswordComponent,
     ForgotPasswordComponent,
     AuthComponent,
+    VrfcnMessageComponent,
+    EmailVerificationSuccessMessageComponent
+
   ],
   imports: [
     CommonModule,
@@ -32,7 +39,10 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
      MatInputModule, 
      MatButtonModule, 
-     MatIconModule
+     MatIconModule,
+     MatSelectModule,
+     MatCardModule, 
+    
   ],
 })
 export class AuthModule {}

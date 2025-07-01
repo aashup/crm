@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmailVerification;
 use App\Mail\ForgotPassword;
 use App\Models\PasswordResetToken;
+use App\Models\Role;
 use App\Models\User;
 use App\Repository\MenuRepository;
 use Exception;
@@ -31,6 +32,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
         $user = User::whereEmail($request->email)->first();
+
+        if ($user && (!$user->email_verified_at || !$user->status)) {
+            return $this->error('Unauthorised User or Email not verified!!');
+        }
         if ($user && Hash::check($request->password, $user->password)) {
             return $this->success('Login Successfully!', $this->generateToken($user));
         }
@@ -43,9 +48,7 @@ class AuthController extends Controller
             'access_token' => $user->createToken('access_token', ['*'])->accessToken,
             'user' => $user,
             'permissions' => $user->getAllPermissions()->pluck('name'),
-            'menus' => Cache::remember('cache_menus', 60 * 60, function () use ($user) {
-                return (new MenuRepository())->getMenu($user);
-            }),
+            'menus' => (new MenuRepository())->getMenu($user) ?? [],
         ];
         return $data;
     }
@@ -62,9 +65,9 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'cpassword' => 'required_with:password|same:password',
-            // 'roles' => 'required',
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,name',
         ]);
-
         try {
             DB::beginTransaction();
             $user = User::create([
@@ -72,8 +75,8 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
             ]);
-            // $roles = Role::whereIn('id', $request->roles)->get();
-            // $user->assignRole($roles);
+            $roles = Role::whereIn('name', $request->roles)->get();
+            $user->assignRole($roles);
 
             Mail::to($user->email)->send(new EmailVerification($user));
 
@@ -94,7 +97,7 @@ class AuthController extends Controller
                     $user->email_verified_at = now();
                     $user->save();
                 }
-                return redirect(Config::get('services.urls.ui_url') . '/auth/login');
+                return redirect(Config::get('services.urls.ui_url') . '/auth/email-verified');
             } else {
                 return view('errors.link_expire');
             }

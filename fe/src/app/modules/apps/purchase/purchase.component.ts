@@ -24,6 +24,8 @@ import { PurchaseDatasource } from './purchase.datasource';
 import { PurchaseModel } from './purchase.model';
 import { PurchaseService } from './purchase.service';
 import { AddPurchaseComponent } from './add-purchase/add-purchase.component';
+import { SpinnerService } from 'src/app/services/spinner.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-purchase',
@@ -39,6 +41,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = [
@@ -74,7 +77,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       ref: 'created_at',
       name: 'Created At',
       mutator: (item: any) =>
-        new Date(item.created_at).toLocaleString(),
+        this.datePipe.transform(item.created_at, 'mediumDate'),
     },
     { ref: 'action', name: 'Actions' },
   ];
@@ -83,15 +86,15 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private service: PurchaseService,
     private commonService: CommonService,
-    private cityService: CityService,
     private authService: AuthService,
+    private spinnerService: SpinnerService,
+    private datePipe: DatePipe
   ) {
     this.dataSource = new PurchaseDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
     this.checkPermissions()
-    this.commonService.page.updateTitle('Purchase List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -161,8 +164,6 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
   checkPermissions() {
     const userData = this.authService.getCurrentUser(); 
-   console.log(userData.permissions);
-   
   }
   isAllSelected(): boolean {
     return (
@@ -182,13 +183,23 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show();
+
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Purchase has been deleted.');
               this.loadData();
+              this.isLoading = false; 
+              this.spinnerService.hide();
+              this.cdr.detectChanges(); 
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+              this.spinnerService.hide();
+            },
           });
         }
       });
@@ -197,7 +208,9 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   add() {
     this.dialog
       .open(AddPurchaseComponent, {
-        width:"1000px",
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: new PurchaseModel().clear(),
           isEdit: false,
@@ -205,12 +218,20 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 
   edit(item: PurchaseModel) {
     this.dialog
       .open(AddPurchaseComponent, {
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: item,
           isEdit: true,
@@ -218,6 +239,11 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 }

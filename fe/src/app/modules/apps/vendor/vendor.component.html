@@ -11,7 +11,7 @@
     </div>
     <div class="card-toolbar">
       <div class="d-flex justify-content-end">
-        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['vendors.create']">
+        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['suppliers.create']">
           Add New
         </button>
         <button mat-icon-button (click)="loadData()">
@@ -23,6 +23,7 @@
   <div class="card-body">
     <div class="table-responsive">
       <mat-progress-bar mode="indeterminate" *ngIf="dataSource.loading$ | async"></mat-progress-bar>
+     
       <table
         #table
         cdk-table
@@ -73,29 +74,28 @@
                   {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
                 </div>
                 <button
-                  *ngIf="cols.ref === 'address'"
+                  *ngIf="cols.ref === 'shipping_address_id'"
                   mat-icon-button
-                  matTooltip="Addres Name: {{ row.address?.address || 'N/A' }},Phone 1: {{
-                    row.address?.mob1 || 'N/A'
-                  }}, Phone 2: {{ row.address?.mob2 || 'N/A' }},City:{{
-                    getCityName(row.address.city_id)
-                  }}, Zip Code: {{ row.address?.pin || 'N/A' }}, Type: {{
-                    row.address?.type === 1 ? 'Billing' : 'Shipping'
-                  }}"
-                  matTooltipPosition="above"
-                  class="text-info"
+                  class="text-info" 
+                  [attr.id]="'id'+row.shipping_address.id"   (mouseover)="showAddressTooltip(row.shipping_address)"
                 >
                   <mat-icon>info</mat-icon>
                 </button>
                 <button
-                  *ngIf="cols.ref === 'contact'"
+                  *ngIf="cols.ref === 'billing_address_id'"
                   mat-icon-button
-                  matTooltip="Name: {{ row.contact?.name || 'N/A' }}, Phone 1: {{
-                    row.contact?.mob1 || 'N/A'
-                  }}, Phone 2: {{ row.contact?.mob2 || 'N/A' }}, "
-                  matTooltipPosition="above"
-                  class="text-info"
+                  class="text-info" 
+                  [attr.id]="'id'+row.billing_address.id"   (mouseover)="showAddressTooltip(row.billing_address)"
                 >
+                  <mat-icon>info</mat-icon>
+                </button>
+               
+                <button
+                *ngIf="cols.ref === 'contact'"
+                mat-icon-button
+                class="text-info"
+                [attr.id]="'id'+row.contact.id"   (mouseover)="showContactTooltip(row.contact)"
+              >
                   <mat-icon>info</mat-icon>
                 </button>
               </div>
@@ -107,10 +107,10 @@
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['vendors.update']">
+              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['suppliers.update']">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['vendors.delete']">
+              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['suppliers.delete']">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
@@ -129,9 +129,9 @@
     <div class="pt-5">
       <mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
       <mat-paginator
-        [pageSize]="dataSource.paginatorTotal$ | async"
-        [length]="dataSource.paginatorTotal$ | async"
-      ></mat-paginator>
+      [pageSizeOptions]="[5, 10, 20, 50, 100]"
+      [length]="dataSource.paginatorTotal$ | async"
+    ></mat-paginator>
 
       <div class="mat-table__floating-modal" *ngIf="selection.selected.length">
         <div class="floating-modal">

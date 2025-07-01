@@ -22,6 +22,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { AddCountryComponent } from './add-country/add-country.component';
 import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 'rxjs';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-country',
@@ -38,6 +39,7 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
   filter: any = {};
+  isLoading = false;
   displayableCol = ['select', 'id', 'name', 'action'];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -58,13 +60,13 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: CountryService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new CountryDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Country List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
     this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page).pipe(
       tap(() => {
@@ -76,6 +78,8 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
    ngAfterViewInit(): void {
+    this.isLoading= false;
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -95,7 +99,7 @@ loadData() {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['roles'];
+    this.filter.with = ['country'];
     this.dataSource.find(_.pickBy(this.filter));
   }
 
@@ -120,6 +124,7 @@ loadData() {
   }
 
   delete(item: CountryModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -131,14 +136,26 @@ loadData() {
       .afterClosed()
       .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Country has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
+              this.spinnerService.hide()
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+              this.spinnerService.hide()
+            },
           });
+        } else {
+          this.isLoading = false;
+          this.spinnerService.hide()
         }
       });
   }

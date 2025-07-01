@@ -277,34 +277,40 @@
             <span class="menu-icon">
               <app-keenicon name="{{ menuItem?.icon }}" class="fs-2"></app-keenicon>
             </span>
-            <span class="menu-title" data-link="/error">{{ menuItem?.name }} </span>
+            <span
+              class="menu-title"
+              [attr.data-link]="
+                menuItem?.name === 'User Management'
+                  ? 'app/usermanagement/users'
+                  : menuItem?.name === 'Settings'
+                    ? 'app/settings/city'
+                    : '/error'
+              "
+            >
+              {{ menuItem?.name }}
+            </span>
             <span class="menu-arrow"></span>
           </span>
           <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
             <div *ngFor="let chieldMenus of menuItem.children" class="menu-item">
-              <a class="menu-link without-sub" 
-              [routerLink]="[chieldMenus?.page]" 
-              routerLinkActive="active">
-             <span class="menu-bullet">
-               <span class="bullet bullet-dot"></span>
-             </span>
-             <span class="menu-title">{{ chieldMenus?.name }}</span>
-           </a>
+              <a class="menu-link without-sub" [routerLink]="[chieldMenus?.page]" routerLinkActive="active">
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
+                <span class="menu-title">{{ chieldMenus?.name }}</span>
+              </a>
             </div>
           </div>
         </div>
       </ng-container>
       <ng-template #noChild>
         <div class="menu-item">
-          <a class="menu-link without-sub" 
-          routerLink="{{ menuItem?.page }}"
-          routerLinkActive="active">
-         <span class="menu-bullet">
-           <span class="bullet bullet-dot"></span>
-         </span>
-         <span class="menu-title">{{ menuItem?.name }}</span>
-       </a>
-          
+          <a class="menu-link without-sub" routerLink="{{ menuItem?.page }}" routerLinkActive="active">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">{{ menuItem?.name }}</span>
+          </a>
         </div>
       </ng-template>
     </ng-container>
@@ -479,6 +485,7 @@
       </div>
     </div>
   </div> -->
-  <!--end::Menu-->
+    <!--end::Menu-->
+  </div>
+  <!--end::Menu wrapper-->
 </div>
-<!--end::Menu wrapper-->

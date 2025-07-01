@@ -5,6 +5,8 @@ import { LoginComponent } from './components/login/login.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { VrfcnMessageComponent } from './components/email-vrfcn-message/vrfcn-message.component';
+import { EmailVerificationSuccessMessageComponent } from './components/email-verified-success/email-verification-success-message';
 
 const routes: Routes = [
   {
@@ -26,6 +28,14 @@ const routes: Routes = [
         component: RegistrationComponent,
       },
       {
+        path: 'vrfcn-message',
+        component: VrfcnMessageComponent,
+      },
+      {
+        path: 'email-verified',
+        component: EmailVerificationSuccessMessageComponent,
+      },
+      {
         path: 'forgot-password',
         component: ForgotPasswordComponent,
       },
@@ -35,6 +45,7 @@ const routes: Routes = [
       },
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: '**', redirectTo: 'login', pathMatch: 'full' },
+
     ],
   },
 ];

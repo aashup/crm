@@ -25,7 +25,9 @@ import { SaleModel } from './sale.model';
 import { SaleService } from './sale.service';
 import { AddSaleComponent } from './add-sale/add-sale.component';
 import { AddressModel } from '../../settings/address/address.model';
-
+import { SpinnerService } from 'src/app/services/spinner.service';
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 @Component({
     selector: 'app-sale',
@@ -41,6 +43,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = [
@@ -86,6 +89,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private cityService: CityService,
     private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new SaleDatasource(this.service);
   }
@@ -93,7 +97,6 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getAllCities()
     this.loadData();
     this.checkPermissions()
-    this.commonService.page.updateTitle('Sale List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -125,6 +128,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+      this.isLoading = false; 
+      this.spinnerService.hide();
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -185,33 +190,60 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: SaleModel) {
+   
     this.dialog
       .open(ConfirmationDialogComponent, {
+        
         data: {
           title: 'Delete Sale Item',
-          body: `Are you sure you want to delete this Sale Item `,
+          body: `Are you sure you want to delete this Sale Item?`,
           okBtnName: 'Delete',
         },
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Sale has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
+              this.spinnerService.hide();
+
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+              this.spinnerService.hide();
+            },
           });
+        } else {
+          this.isLoading = false; 
+          this.spinnerService.hide();
         }
       });
   }
-
+  showContactTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Contact Name :</strong> ${data.name}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
+  }
   add() {
-    
     this.dialog
       .open(AddSaleComponent, {
-        width:"1000px",
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: new SaleModel().clear(),
           isEdit: false,
@@ -219,13 +251,20 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe(() =>this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 
-edit(item: SaleModel) {
-  
+  edit(item: SaleModel) {
     this.dialog
       .open(AddSaleComponent, {
+        height: 'auto',
+        width: '80%',
+        maxWidth:"100%",
         data: {
           model: item,
           isEdit: true,
@@ -233,6 +272,11 @@ edit(item: SaleModel) {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe(() =>this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+          this.cdr.detectChanges(); 
+        }
+      });
   }
 }

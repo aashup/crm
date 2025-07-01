@@ -14,6 +14,7 @@ import { StateService } from './state.service';
 import { AddStateComponent } from './add-state/add-state.component';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-state',
@@ -27,6 +28,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<StateModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
+  isLoading = false; 
   search: any = { all: '' };
 
   filter: any = {};
@@ -51,13 +53,13 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: StateService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new StateDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Country List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
     this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page).pipe(
       tap(() => {
@@ -69,6 +71,8 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
    ngAfterViewInit(): void {
+    this.isLoading= false;
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -87,7 +91,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['roles'];
+      this.filter.with = ['country'];
       this.dataSource.find(_.pickBy(this.filter));
     }
   masterToggle() {
@@ -111,6 +115,7 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: StateModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -121,14 +126,26 @@ export class StateComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('State has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
+              this.spinnerService.hide()
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+              this.spinnerService.hide()
+            },
           });
+        } else {
+          this.isLoading = false; 
+          this.spinnerService.hide()
         }
       });
   }

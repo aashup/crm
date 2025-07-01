@@ -12,6 +12,7 @@ import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
 import { AddPermissionComponent } from './add-permission/add-permission.component';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-permission',
@@ -24,6 +25,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: PermissionDatasource;
   selection = new SelectionModel<PermissionModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
+  isLoading = false;
   readonly dialog = inject(MatDialog);
   search: any = { all: '' };
   filter: any = {};
@@ -50,13 +52,13 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: PermissionService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new PermissionDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Permission List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -75,6 +77,8 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
   ngAfterViewInit(): void {
+    this.isLoading= false;
+    this.spinnerService.hide()
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -119,6 +123,7 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(item: PermissionModel) {
+    
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -128,15 +133,28 @@ export class PermissionComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Permission has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
+              this.spinnerService.hide()
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+              this.spinnerService.hide()
+            },
           });
+        } else {
+          this.isLoading = false; 
+          this.spinnerService.hide()
         }
       });
   }

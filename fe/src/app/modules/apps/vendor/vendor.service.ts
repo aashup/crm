@@ -7,7 +7,7 @@ import { HttpUtils } from '../../core/http-util';
     providedIn: 'root'
 })
 export class VendorService {
-    readonly endpoint = 'vendor';
+    readonly endpoint = 'supplier';
 
     constructor(
         private http: HttpClient,

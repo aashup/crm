@@ -7,6 +7,7 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { PermissionService } from '../permission.service';
 import { MenuService } from 'src/app/modules/settings/menu/menu.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-add-permission',
@@ -19,6 +20,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   model: PermissionModel;
   clone: any;
   isEdit: boolean = false;
+  isLoading: boolean = false;
   menus:any = [];
   readonly dialogRef = inject(MatDialogRef<AddPermissionComponent>);
   readonly data = inject<{
@@ -31,6 +33,7 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
     private service: PermissionService,
     private find: FindService,
     private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -38,11 +41,17 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.isLoading= false;
+    this.spinnerService.hide()
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false; 
+      this.spinnerService.hide()
+    });
+  
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
   }
-
   initForm(model: PermissionModel) {
     this.form = this.fb.group({
       id: [this.model.id, []],
@@ -64,22 +73,34 @@ export class AddPermissionComponent implements AfterViewInit, OnInit {
     
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+    this.spinnerService.show()
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'Permission has been updated.' : 'Permission has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
+        this.spinnerService.hide()
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false; 
+        this.spinnerService.hide()
+      },
     });
   }
 }

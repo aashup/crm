@@ -9,6 +9,7 @@ import { UsersModel } from '../users.model';
 import { UsersService } from '../users.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-add-users',
@@ -20,6 +21,7 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   model: UsersModel;
   clone: any;
+  isLoading: boolean = false;
   isEdit: boolean = false;
   isPasswordChanged: boolean = false;
   showPasswordFields: boolean = false; 
@@ -44,10 +46,11 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
     private service: UsersService,
     private find: FindService,
     private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
-
+    
     this.find.getRoles().subscribe(
       (data) => {
         this.fechedRoles = data.data;
@@ -63,54 +66,76 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
     this.isPasswordChanged = !this.isPasswordChanged;
   }
 
-  ngAfterViewInit(): void {
-    this.model = this.data.model;
-    this.isEdit = this.data.isEdit;
-    this.isPasswordChanged = this.data.isPasswordChanged;
-    this.initForm(this.model);
-  }
+ ngAfterViewInit(): void {
+  this.isLoading= false;
+  this.spinnerService.hide();
+  this.dialogRef.afterClosed().subscribe(() => {
+    this.isLoading = false;
+    this.spinnerService.hide();
+  });
+
+  this.model = this.data.model;
+  this.isEdit = this.data.isEdit;
+  this.isPasswordChanged = this.data.isPasswordChanged;
+  this.initForm(this.model);
+}
 
   
-  initForm(model: UsersModel) {
-    this.form = this.fb.group({
-      id: [model.id, []],
-      name: [
-        model.name,
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(200),
-        ],
+initForm(model: UsersModel) {
+  this.form = this.fb.group({
+    id: [model.id || null, []], 
+    name: [
+      model.name || '', 
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(200),
       ],
-      status: [model.status, [Validators.required]],
-      email: [model.email, [Validators.required, Validators.email]],
-      password: [model.password],
-      cpassword: [model.cpassword],
-      roles: [model.roles, [Validators.required]],
-    });
-    this.clone = this.form.value;
-  }
+    ],
+    status: [model.status || 1, [Validators.required]], 
+    email: [model.email || '', [Validators.required, Validators.email]], 
+    password: [model.password || null], 
+    cpassword: [model.cpassword || null], 
+    roles: [
+      model.roles ? model.roles.map((role: any) => role.id) : [], 
+      [Validators.required],
+    ],
+  });
+  this.clone = this.form.value;
+}
 
 
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+  
+    this.isLoading = true; 
+    this.spinnerService.show();
+  
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
         this.commonService.toastr.success(
           this.isEdit ? 'User has been updated.' : 'User has been created.'
         );
-        this.dialogRef.close(true);
+        this.dialogRef.close(true); 
+        this.isLoading = false; 
+        this.spinnerService.hide();
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.handleError(err);
+        this.isLoading = false;
+        this.spinnerService.hide(); 
+      },
     });
   }
 }

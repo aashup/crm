@@ -15,14 +15,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { CommonService } from '../../core/common.service';
-import _, { merge } from 'lodash';
-import { debounceTime, distinctUntilChanged, fromEvent, take, tap } from 'rxjs';
+import _ from 'lodash';
+import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 'rxjs';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { UsersDatasource } from './users.datasource';
 import { UsersModel } from './users.model';
 import { UsersService } from './users.service';
 import { AddUsersComponent } from './add-users/add-users.component';
 import { DatePipe } from '@angular/common';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'app-users',
@@ -38,7 +40,7 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<UsersModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-
+  isLoading = false;
   filter: any = {};
   search: any = { all: '' };
   displayableCol = ['select', 'id', 'name', 'email', 'status', 'created_at', 'roles', 'action'];
@@ -84,14 +86,22 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private service: UsersService,
     private commonService: CommonService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private spinner: NgxSpinnerService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new UsersDatasource(this.service);
   }
   ngOnInit(): void {
-    this.loadData();
-    this.commonService.page.updateTitle('Users List');
+    this.dataSource.loading$.subscribe((isLoading) => {
+      if (isLoading) {
+        this.spinnerService.show();
+      } else {
+        this.spinnerService.hide();
+      }
+    });
 
+    this.loadData();
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
     this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
       .pipe(
@@ -105,6 +115,8 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
   ngAfterViewInit(): void {
+    this.isLoading= false;
+    this.spinnerService.hide();
     this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
       .pipe(
         debounceTime(500),
@@ -120,9 +132,10 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   loadData() {
     this.filter.orderField = this.sort.active;
-    this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize || 20;
+      this.filter.orderBy = this.sort.direction;
+      this.filter.page = this.paginator.pageIndex + 1;
+      this.filter.pageSize = this.paginator.pageSize || 20;
+      this.filter.filter = JSON.stringify(_.pickBy(this.search));
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
     this.filter.with = ['roles'];
     this.dataSource.find(_.pickBy(this.filter));
@@ -152,14 +165,26 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
       .afterClosed()
       .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true;
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('User has been deleted.');
               this.loadData();
+              this.cdr.detectChanges();
+              this.isLoading = false;
+              this.spinnerService.hide();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+              this.spinnerService.hide();
+            },
           });
+        } else {
+          this.isLoading = false;
+          this.spinnerService.hide();
         }
       });
   }

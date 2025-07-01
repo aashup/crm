@@ -14,6 +14,7 @@ import { RolesService } from "./roles.service";
 import { AddRolesComponent } from "./add-roles/add-roles.component";
 import { DatePipe } from "@angular/common";
 import { Router } from "@angular/router";
+import { SpinnerService } from "src/app/services/spinner.service";
 
 
 @Component({
@@ -29,7 +30,7 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<RolesModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
-      
+  isLoading = false; 
   
   search: any = { all: '' };
   filter: any = {};
@@ -74,13 +75,13 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: RolesService,
     private router: Router,
     private commonService: CommonService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new RolesDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Roles List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -99,6 +100,8 @@ export class RolesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
    ngAfterViewInit(): void {
+    this.isLoading= false;
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -144,24 +147,38 @@ loadData() {
     this.router.navigate([`/app/usermanagement/roles/edit-permission/${id}`]);
   }
   delete(item: RolesModel) {
+   
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Roles',
+          title: 'Delete Role',
           body: `Are you sure you want to delete this Role <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Role has been deleted.');
               this.loadData();
+              this.cdr.detectChanges(); 
+              this.isLoading = false; 
+              this.spinnerService.hide()
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+              this.isLoading = false;
+              this.spinnerService.hide()
+            },
           });
+        } else {
+          this.isLoading = false; 
+          this.spinnerService.hide()
         }
       });
   }

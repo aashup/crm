@@ -26,6 +26,7 @@ import { InventoryService } from './inventory.service';
 import { ProductService } from '../product/product.service';
 import { UnitService } from '../../settings/unit/unit.service';
 import { UsersService } from '../../usermanagement/users/users.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 
 @Component({
@@ -41,6 +42,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<InventoryModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   productCache: { [key: string]: string } = {};
+  isLoading = false;
   unitCache: { [key: string]: string } = {};
   userCache: { [key: string]: string } = {};
   readonly dialog = inject(MatDialog);
@@ -92,6 +94,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     private productService: ProductService,
     private unitService: UnitService,
     private userService: UsersService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new InventoryDatasource(this.service);
   }
@@ -100,7 +103,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     this.prefetchProductNames()
     this.prefetchUnitNames()
     this.prefetchUserNames();
-    this.commonService.page.updateTitle('Inventory List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -140,11 +142,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   prefetchUserNames() {
     this.userService.find({}).subscribe((users: any) => {
-      console.log("-----------");
-      console.log(users);
-      console.log("-----------");
-      
-      
       users.data.forEach((user:any) => {
         this.userCache[user.id] = user.name;
       });
@@ -159,6 +156,8 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+      this.isLoading = false; 
+      this.spinnerService.hide();
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -227,13 +226,21 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Inventory has been deleted.');
               this.loadData();
+              this.isLoading = false; 
+              this.spinnerService.hide();
             },
-            error: (err:any) => this.commonService.handleError(err),
+            error: (err:any) => {
+              this.commonService.handleError(err);
+              this.isLoading = false; 
+              this.spinnerService.hide();
+            },
           });
         }
       });

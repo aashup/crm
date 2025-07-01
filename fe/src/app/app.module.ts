@@ -38,6 +38,7 @@ function appInitializer(authService: AuthService) {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    NgxSpinnerModule.forRoot({ type: 'ball-spin-fade-rotating' }),
     TranslateModule.forRoot(),
     HttpClientModule,
     ClipboardModule,

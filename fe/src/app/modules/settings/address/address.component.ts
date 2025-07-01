@@ -12,6 +12,7 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { SubscriptionHandler } from '../../core/subscription.handler';
 import { AddressService } from './address.service';
 import { AddAddressComponent } from './add-address/add-address.component';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-address',
@@ -22,6 +23,7 @@ import { AddAddressComponent } from './add-address/add-address.component';
 export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   dataSource: AddressDatasource;
+  isLoading = false;
   selection = new SelectionModel<AddressModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
@@ -62,13 +64,13 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: AddressService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new AddressDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Address List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -106,7 +108,7 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['roles', 'city', 'createdBy']; 
+    this.filter.with = [ 'city', 'createdBy']; 
     this.dataSource.find(_.pickBy(this.filter));
   }
   masterToggle() {
@@ -140,13 +142,22 @@ export class AddressComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show()
+
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.toastr.success('Address has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.spinnerService.hide()
+              this.commonService.handleError(err);
+            },
           });
         }
       });

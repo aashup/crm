@@ -24,6 +24,9 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { AddCustomersComponent } from './add-customers/add-customers.component';
 import { CityService } from '../../settings/city/city.service';
 import { AuthService } from '../../auth';
+import { SpinnerService } from 'src/app/services/spinner.service';
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 @Component({
     selector: 'app-customers',
@@ -41,8 +44,9 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   cities: any = [];
   search: any = { all: '' };
   filter: any = {};
+  isLoading = false
   displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
-
+  name="Pawan"
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
@@ -70,14 +74,15 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private cityService: CityService,
     private authService: AuthService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new CustomersDatasource(this.service);
   }
   ngOnInit(): void {
+   
     this.getAllCities()
     this.loadData();
     this.checkPermissions()
-    this.commonService.page.updateTitle('Customer List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -94,7 +99,6 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   getAllCities() {
     this.cityService.find({}).subscribe((res:any) => {
-      console.log(res.data);
       if(res.data.length){
         this.cities=res.data
       }
@@ -110,6 +114,9 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
     ngAfterViewInit(): void {
+     
+      this.isLoading = false; 
+      this.spinnerService.hide()
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
           debounceTime(500),
@@ -147,9 +154,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   checkPermissions() {
-    const userData = this.authService.getCurrentUser(); 
-   console.log(userData.permissions);
-   
+    const userData = this.authService.getCurrentUser();    
   }
   isAllSelected(): boolean {
     return (
@@ -158,6 +163,32 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
+  showAddressTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Address Name :</strong> ${data.address}</br>
+      <strong>City :</strong> ${this.getCityName(data.city_id)}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      <strong>Pin :</strong> ${data.pin}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
+  }
+  showContactTooltip(data:any){
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Contact Name :</strong> ${data.name}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true
+    });
+  }
   delete(item: CustomersModel) {
     this.dialog
       .open(ConfirmationDialogComponent, {
@@ -169,15 +200,23 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading=true;
+        this.spinnerService.show();
         if (res) {
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Customer has been deleted.');
               this.loadData();
+              this.spinnerService.hide();
+              this.isLoading = false;
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.commonService.handleError(err);
+            },
           });
         }
+        this.spinnerService.hide();
+        this.isLoading = false; 
       });
   }
 
@@ -191,9 +230,14 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+        }
+        this.loadData();
+        this.isLoading = false; 
+      });
   }
-
   edit(item: CustomersModel) {
     this.dialog
       .open(AddCustomersComponent, {
@@ -204,6 +248,33 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((flag) => {
+        if (flag) {
+          this.loadData();
+        }
+        this.isLoading = false; 
+        this.loadData();
+      });
+  }
+  getAddressTooltip(row: any): string {
+    const address = row?.address || {};
+    const city = this.getCityName(address.city_id);
+    return `
+      <strong>Address Name:</strong> ${address.address || 'N/A'}<br>
+      <strong>Phone 1:</strong> ${address.mob1 || 'N/A'}<br>
+      <strong>Phone 2:</strong> ${address.mob2 || 'N/A'}<br>
+      <strong>City:</strong> ${city}<br>
+      <strong>Zip Code:</strong> ${address.pin || 'N/A'}<br>
+      <strong>Type:</strong> ${address.type === 1 ? 'Billing' : 'Shipping'}
+    `;
+  }
+  
+  getContactTooltip(row: any): string {
+    const contact = row?.contact || {};
+    return `
+      <strong>Name:</strong> ${contact.name || 'N/A'}<br>
+      <strong>Phone 1:</strong> ${contact.mob1 || 'N/A'}<br>
+      <strong>Phone 2:</strong> ${contact.mob2 || 'N/A'}
+    `;
   }
 }

@@ -25,6 +25,10 @@ export const routes: Routes = [
     loadChildren: () => import('./unit/unit.module').then((m) => m.UnitModule),
   },
   {
+    path: 'unit-conversion',
+    loadChildren: () => import('./unit-conversion/unitconversion.module').then((m) => m.UnitConversionModule),
+  },
+  {
     path: 'contact',
     loadChildren: () => import('./contact/contact.module').then((m) => m.ContactModule),
   },

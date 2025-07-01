@@ -23,13 +23,16 @@ import { VendorDatasource } from './vendor.datasource';
 import { VendorModel } from './vendor.model';
 import { VendorService } from './vendor.service';
 import { AddVendorComponent } from './add-vendor/add-vendor.component';
-
+import { AddressService } from '../../settings/address/address.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 @Component({
-    selector: 'app-vendor',
-    templateUrl: './vendor.component.html',
-    styleUrl: './vendor.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-vendor',
+  templateUrl: './vendor.component.html',
+  styleUrl: './vendor.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
@@ -38,27 +41,65 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  address: any = [];
+  shippingAddress: any;
   search: any = { all: '' };
   filter: any = {};
-  displayableCol = ['select', 'id', 'name', 'contact', 'address', 'action'];
+  isLoading = false;
+  displayableCol = [
+    'select',
+    'id',
+    'name',
+    'shipping_address_id',
+    'billing_address_id',
+    'contact',
+    'type',
+    'level',
+    'status',
+    'action',
+  ];
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'select', style: { width: '70px' } },
+    { ref: 'select', name: 'Select', style: { width: '70px' } },
     {
       ref: 'id',
       name: 'ID',
       style: { 'max-width': '30px' },
     },
     { ref: 'name', name: 'Name' },
-    { ref: 'address', name: 'Address Name', mutator: (item: any) => item?.address?.address },
+    {
+      ref: 'shipping_address_id',
+      name: 'Shipping Address',
+      mutator: (item: any) => item?.shipping_address?.address || 'N/A',
+    },
+    {
+      ref: 'billing_address_id',
+      name: 'Billing Address',
+      mutator: (item: any) => item?.billing_address?.address || 'N/A',
+    },
     {
       ref: 'contact',
       name: 'Contact Person',
-      mutator: (item: any) => item?.contact?.name,
+      mutator: (item: any) => item?.contact?.name || 'N/A',
+    },
+    {
+      ref: 'type',
+      name: 'Type',
+    },
+    {
+      ref: 'level',
+      name: 'Level',
+    },
+    {
+      ref: 'status',
+      name: 'Status',
+      mutator: (item: any) => {
+        return item.status == '1' ? 'Active' : 'Inactive';
+      },
     },
     { ref: 'action', name: 'Actions' },
   ];
@@ -68,20 +109,22 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: VendorService,
     private commonService: CommonService,
     private cityService: CityService,
+    private addressService: AddressService,
+    private spinnerService: SpinnerService
   ) {
     this.dataSource = new VendorDatasource(this.service);
   }
   ngOnInit(): void {
-    this.getAllCities()
+    this.paginator.pageSize = 20; 
+  this.paginator.pageIndex = 0;
+    this.getAllAddresses();
+    this.getAllCities();
     this.loadData();
-    this.commonService.page.updateTitle('Vendor List');
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
-      () => (this.paginator.pageIndex = 0)
-    );
-    this.subscriptionHandler.subscribe = merge(
-      this.sort.sortChange,
-      this.paginator.page
-    )
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+    });
+
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
       .pipe(
         tap(() => {
           this.loadData();
@@ -89,85 +132,109 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       .subscribe();
   }
-  getAllCities() {
-    this.cityService.find({}).subscribe((res:any) => {
-      console.log(res.data);
-      if(res.data.length){
-        this.cities=res.data
+
+  getAllAddresses() {
+    this.addressService.find({}).subscribe((res: any) => {
+      if (res.data.length) {
+        this.address = res.data;
       }
-    }
-    );
+    });
   }
 
-  getCityName(id:any){
-    const city = this.cities.find((city:any) => city.id === id);
+  getAllCities() {
+    this.cityService.find({}).subscribe((res: any) => {
+      if (res.data.length) {
+        this.cities = res.data;
+      }
+    });
+  }
+
+  getCityName(id: any) {
+    const city = this.cities.find((city: any) => city.id === id);
     return city ? city.name : '';
   }
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
-    ngAfterViewInit(): void {
-      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-        .pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          tap(() => {
-            this.paginator.pageIndex = 0;
-            this.search.all = this.searchElementRef.nativeElement.value;
-            this.loadData();
-          })
-        )
-        .subscribe();
-    }
+  ngAfterViewInit(): void {
+    this.isLoading = false;
+    this.spinnerService.hide();
 
-    loadData() {
-      this.filter.orderField = this.sort.active;
-      this.filter.orderBy = this.sort.direction;
-      this.filter.page = this.paginator.pageIndex + 1;
-      this.filter.pageSize = this.paginator.pageSize || 20;
-      this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; // Include contact and address
-      this.filter.cols = ['id', 'name', 'contact_id', 'address_id', 'created_at', 'updated_at']; // Specify required columns
-      this.dataSource.find(_.pickBy(this.filter));
-    }
+    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.search.all = this.searchElementRef.nativeElement.value;
+          this.loadData();
+        })
+      )
+      .subscribe();
+  }
+
+  loadData(): void {
+    this.filter.orderField = this.sort.active;
+    this.filter.orderBy = this.sort.direction;
+    this.filter.page = this.paginator.pageIndex + 1;
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.with = ['contact', 'BillingAddress', 'ShippingAddress'];
+    this.filter.cols = [
+      'id',
+      'name',
+      'contact_id',
+      'shipping_address_id',
+      'billing_address_id',
+      'notes',
+      'type',
+      'level',
+      'status',
+      'created_at',
+      'updated_at',
+    ];
+    this.dataSource.find(_.pickBy(this.filter));
+  }
   masterToggle() {
-    if (
-      this.selection.selected.length ===
-      this.dataSource.originalData.data.length
-    ) {
+    if (this.selection.selected.length === this.dataSource.originalData.data.length) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: VendorModel) =>
-        this.selection.select(row)
-      );
+      this.dataSource.originalData.data.forEach((row: VendorModel) => this.selection.select(row));
     }
   }
 
   isAllSelected(): boolean {
-    return (
-      this.dataSource.originalData.data.length ===
-      this.selection.selected.length
-    );
+    return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
 
   delete(item: VendorModel) {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Vendor',
-          body: `Are you sure you want to delete this Vendor <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete Supplier',
+          body: `Are you sure you want to delete this Supplier <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
       .afterClosed()
       .subscribe((res) => {
         if (res) {
+          this.isLoading = true;
+          this.spinnerService.show();
           this.service.delete(item).subscribe({
             complete: () => {
-              this.commonService.toastr.success('Vendor has been deleted.');
+              this.isLoading = false;
+              this.spinnerService.hide();
+              this.commonService.toastr.success('Supplier has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false;
+              this.spinnerService.hide();
+              console.log('err', err.error.message);
+              this.commonService.toastr.error(err.error.message || 'Some error occurred.');
+              // this.commonService.handleError(err.error.message);
+            },
           });
         }
       });
@@ -182,8 +249,13 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .pipe(
+        take(1),
+        tap(() => {
+          this.loadData();
+        })
+      )
+      .subscribe();
   }
 
   edit(item: VendorModel) {
@@ -195,7 +267,38 @@ export class VendorComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .pipe(
+        take(1),
+        tap(() => {
+          this.loadData();
+        })
+      )
+      .subscribe();
+  }
+  showAddressTooltip(data: any) {
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Address Name :</strong> ${data.address}</br>
+      <strong>City :</strong> ${this.getCityName(data.city_id)}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      <strong>Pin :</strong> ${data.pin}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true,
+    });
+  }
+  showContactTooltip(data: any) {
+    tippy(`#id${data.id}`, {
+      content: `
+      <strong>Contact Name :</strong> ${data.name}</br>
+      <strong>Mobile 1 :</strong> ${data.mob1}</br>
+      <strong>Mobile 2:</strong> ${data.mob2}</br>
+      `,
+      placement: 'top',
+      animation: 'scale',
+      allowHTML: true,
+    });
   }
 }

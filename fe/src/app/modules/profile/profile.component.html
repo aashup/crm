@@ -1,32 +1,34 @@
 <div class="card mb-5 mb-xl-10">
   <div class="card-body pt-9 pb-0">
     <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
-      <div class="me-7 mb-4">
-        <div
-          class="
-            symbol symbol-100px symbol-lg-160px symbol-fixed
-            position-relative
-          "
-        >
-          <img src="./assets/media/avatars/300-1.jpg" alt="Metronic" />
-          <div
-            class="
-              position-absolute
-              translate-middle
-              bottom-0
-              start-100
-              mb-6
-              bg-success
-              rounded-circle
-              border border-4 border-white
-              h-20px
-              w-20px
-            "
-          ></div>
+      <div class="card mb-5 mb-xl-10">
+        <div class="card-body pt-9 pb-0">
+          <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
+            <div class="me-7 mb-4">
+              <div
+                style="
+                  width: 100px;
+                  height: 100px;
+                  border-radius: 50%;
+                  background-color: #007bff;
+                  color: #fff;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 36px;
+                  font-weight: bold;
+                  text-transform: uppercase;
+                "
+              >
+                {{ loggedInUser?.name?.split(' ')?.[0]?.charAt(0)?.toUpperCase() }}
+                {{ loggedInUser?.name?.split(' ')?.[1]?.charAt(0)?.toUpperCase() }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="flex-grow-1">
+      <!-- <div class="flex-grow-1">
         <div
           class="
             d-flex
@@ -36,80 +38,7 @@
             mb-2
           "
         >
-          <div class="d-flex flex-column">
-            <div class="d-flex align-items-center mb-2">
-              <a
-                class="
-                  text-gray-800 text-hover-primary
-                  fs-2
-                  fw-bolder
-                  me-1
-                  cursor-pointer
-                "
-              >
-                Max Smith
-              </a>
-              <a class="cursor-pointer">
-                <app-keenicon name="verify" class="fs-1 text-primary"></app-keenicon>
-              </a>
-              <a
-                class="
-                  btn btn-sm btn-light-success
-                  fw-bolder
-                  ms-2
-                  fs-8
-                  py-1
-                  px-3
-                  cursor-pointer
-                "
-                data-bs-toggle="modal"
-                data-bs-target="#kt_modal_upgrade_plan"
-              >
-                Upgrade to Pro
-              </a>
-            </div>
-
-            <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
-              <a
-                class="
-                  d-flex
-                  align-items-center
-                  text-gray-500 text-hover-primary
-                  me-5
-                  mb-2
-                  cursor-pointer
-                "
-              >
-                <app-keenicon name="profile-circle" class="fs-4 me-1"></app-keenicon>
-                Developer
-              </a>
-              <a
-                class="
-                  d-flex
-                  align-items-center
-                  text-gray-500 text-hover-primary
-                  me-5
-                  mb-2
-                  cursor-pointer
-                "
-              >
-                <app-keenicon name="geolocation" class="fs-4 me-1"></app-keenicon>
-                SF, Bay Area
-              </a>
-              <a
-                class="
-                  d-flex
-                  align-items-center
-                  text-gray-500 text-hover-primary
-                  mb-2
-                  cursor-pointer
-                "
-              >
-                <app-keenicon name="sms" class="fs-4 me-1"></app-keenicon>
-                max&#64;kt.com
-              </a>
-            </div>
-          </div>
+          
 
           <div class="d-flex my-4">
             <a
@@ -234,9 +163,20 @@
             </div>
           </div>
         </div>
+      </div> -->
+      <div style="margin-left: 20px;">
+        <p><strong>Name:</strong>{{loggedInUser?.name}}</p>
+        <p><strong>Email:</strong>{{loggedInUser?.email}}</p>
+        <div>
+          <strong>Roles:</strong>
+          <span *ngFor="let role of loggedInUser?.roles; let last = last">
+            {{ role.name }}<span *ngIf="!last">, </span>
+          </span> 
+          
+        </div>
       </div>
     </div>
-
+   
     <div class="d-flex overflow-auto h-55px">
       <ul
         class="
@@ -259,13 +199,13 @@
         <li class="nav-item">
           <a
             class="nav-link text-active-primary me-6"
-            routerLink="/crafted/pages/profile/projects"
+            routerLink="/crafted/pages/profile/permissions"
             routerLinkActive="active"
           >
-            Projects
+            Permissions
           </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a
             class="nav-link text-active-primary me-6"
             routerLink="/crafted/pages/profile/campaigns"
@@ -291,7 +231,7 @@
           >
             Connections
           </a>
-        </li>
+        </li> -->
       </ul>
     </div>
   </div>

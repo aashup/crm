@@ -12,6 +12,7 @@ import { merge, tap, take, debounceTime, distinctUntilChanged, fromEvent } from 
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { SubscriptionHandler } from '../../core/subscription.handler';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-unit',
@@ -25,6 +26,7 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   selection = new SelectionModel<UnitModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
+  isLoading = false;
   search: any = { all: '' };
   filter: any = {};
   displayableCol = ['select', 'id', 'name', 'status', 'action'];
@@ -48,13 +50,13 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private service: UnitService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private spinnerService:SpinnerService
   ) {
     this.dataSource = new UnitDatasource(this.service);
   }
   ngOnInit(): void {
     this.loadData();
-    this.commonService.page.updateTitle('Unit List');
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
     );
@@ -73,6 +75,8 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptionHandler.unsubscribe();
   }
   ngAfterViewInit(): void {
+    this.isLoading = false; 
+    this.spinnerService.hide()
      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
        .pipe(
          debounceTime(500),
@@ -127,13 +131,22 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
+        this.isLoading = true; 
+        this.spinnerService.show()
         if (res) {
+          
           this.service.delete(item).subscribe({
             complete: () => {
+              this.isLoading = false; 
+              this.spinnerService.hide()
               this.commonService.toastr.success('Unit has been deleted.');
               this.loadData();
             },
-            error: (err) => this.commonService.handleError(err),
+            error: (err) => {
+              this.isLoading = false; 
+              this.spinnerService.hide()
+              this.commonService.handleError(err);
+            },
           });
         }
       });

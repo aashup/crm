@@ -1,4 +1,7 @@
 <div class="card">
+  <ngx-spinner bdColor = "rgba(0, 0, 0, 0.6)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true">
+      <p style="color: white" > Loading... </p>
+  </ngx-spinner>
   <div class="card-header border-0 pt-6">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
@@ -26,6 +29,8 @@
         mode="indeterminate"
         *ngIf="dataSource.loading$ | async"
       ></mat-progress-bar>
+     
+    
       <table
         #table
         cdk-table
@@ -128,7 +133,7 @@
         *ngIf="dataSource.loading$ | async"
       ></mat-spinner>
       <mat-paginator
-        [pageSize]="dataSource.paginatorTotal$ | async"
+        [pageSizeOptions]="[5, 10, 20, 50, 100]"
         [length]="dataSource.paginatorTotal$ | async"
       ></mat-paginator>
 
