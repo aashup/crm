@@ -9,9 +9,29 @@ import { ProductUnitComponent } from './product-unit/product-unit.component';
 import { StepperComponent } from './stepper/stepper.component';
 import { AddProductUnitComponent } from './add-product-unit/add-product-unit.component';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { AddProductInventryComponent } from './add-product-inventry /add-product-inventry.component';
+import { ProductInventryComponent } from './product-inventry/product-inventry.component';
+import { ProductSellerComponent } from './product-seller/product-seller.component';
+import { AddProductSellerComponent } from './add-product-seller/add-product-seller.component';
+import { CompleteComponent } from './complete/complete.component';
+import { UnitConversionComponent } from './unit-conversion/unitconversion.component';
+import { AddUnitConversionComponent } from './unit-conversion/add-unit-conversion/add-unit-conversion.component';
 
 @NgModule({
-  declarations: [ProductComponent, AddProductComponent, ProductUnitComponent, StepperComponent, AddProductUnitComponent],
+  declarations: [
+    ProductComponent,
+    AddProductComponent,
+    ProductUnitComponent,
+    StepperComponent,
+    AddProductUnitComponent,
+    AddProductInventryComponent,
+    UnitConversionComponent,
+    AddUnitConversionComponent,
+    ProductInventryComponent,
+    ProductSellerComponent,
+    AddProductSellerComponent,
+    CompleteComponent,
+  ],
   imports: [
     CommonModule,
     SharedMaterialModuleModule,
@@ -20,8 +40,8 @@ import { NgxPermissionsModule } from 'ngx-permissions';
       { path: 'add', component: StepperComponent },
       { path: 'add/:id', component: StepperComponent },
     ]),
-     NgxPermissionsModule.forChild(),
-    SharedModule
+    NgxPermissionsModule.forChild(),
+    SharedModule,
   ],
 })
 export class ProductModule {}

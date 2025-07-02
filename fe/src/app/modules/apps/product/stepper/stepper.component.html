@@ -1,4 +1,3 @@
-
 <div
   class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
   id="kt_create_account_stepper"
@@ -13,7 +12,6 @@
           class="stepper-item"
           [ngClass]="{
             current: currentStep$.value === 1,
-
           }"
         >
           <!--begin::Wrapper-->
@@ -21,7 +19,7 @@
             <!--begin::Icon-->
             <div class="stepper-icon w-40px h-40px">
               <i class="stepper-check fas fa-check"></i>
-              <button class="stepper-number" mat-icon-button (click)="gotoStep(1)">1</button>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(1)"  [disabled]="!form.valid">1</button>
             </div>
             <!--end::Icon-->
 
@@ -44,7 +42,6 @@
           class="stepper-item"
           [ngClass]="{
             current: currentStep$.value === 2,
-
           }"
         >
           <!--begin::Wrapper-->
@@ -59,9 +56,7 @@
             <!--begin::Label-->
             <div class="stepper-label">
               <h3 class="stepper-title">Unit Settings</h3>
-              <div class="stepper-desc fw-semibold">
-                Setup Units for product
-              </div>
+              <div class="stepper-desc fw-semibold">Setup Units for product</div>
             </div>
             <!--end::Label-->
           </div>
@@ -76,7 +71,6 @@
           class="stepper-item"
           [ngClass]="{
             current: currentStep$.value === 3,
-
           }"
         >
           <!--begin::Wrapper-->
@@ -106,7 +100,6 @@
           class="stepper-item"
           [ngClass]="{
             current: currentStep$.value === 4,
-
           }"
         >
           <!--begin::Wrapper-->
@@ -132,10 +125,7 @@
           <!--end::Line-->
         </div>
 
-        <div
-          class="stepper-item"
-          [ngClass]="{ current: currentStep$.value === 5 }"
-        >
+        <div class="stepper-item" [ngClass]="{ current: currentStep$.value === 5 }">
           <!--begin::Wrapper-->
           <div class="stepper-wrapper">
             <!--begin::Icon-->
@@ -157,35 +147,36 @@
       </div>
     </div>
   </div>
-  <!--begin::Aside-->
 
-  <!--begin::Content-->
   <div class="d-flex flex-row-fluid flex-center bg-body rounded">
-    <form
-      class="py-20 w-100 w-xl-700px px-9"
-      noValidate
-      id="kt_create_account_form"
-    >
+    <form class="py-20 w-100 w-xl-700px px-9" noValidate id="kt_create_account_form">
       <div class="current">
-        <ng-container *ngIf="currentStep$.value === 1">
+        <ng-container *ngIf="currentStep$.value === 1" >
           <ng-container *ngIf="this.loadCompleted">
-            <app-add-product [next]="nextStep.bind(this)" [state]="state"></app-add-product>
+            <app-add-product [form]="form" [next]="nextStep.bind(this)"></app-add-product>
           </ng-container>
         </ng-container>
-
         <ng-container *ngIf="currentStep$.value === 2">
           <ng-container *ngIf="this.loadCompleted">
-            <app-product-unit [state]="state" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-unit>
+            <app-product-unit [form]="form" [next]="nextStep.bind(this)"[prev]="prevStep.bind(this)" ></app-product-unit>
+        </ng-container>
+        </ng-container>
+        <ng-container *ngIf="currentStep$.value === 3">
+          <ng-container *ngIf="this.loadCompleted">
+            <app-unit-conversion [form]="form" [next]="nextStep.bind(this)"[prev]="prevStep.bind(this)" ></app-unit-conversion>
           </ng-container>
         </ng-container>
-
-        <ng-container *ngIf="currentStep$.value === 3"> step 3 </ng-container>
-
-        <ng-container *ngIf="currentStep$.value === 4"> step 4 </ng-container>
-
-        <ng-container *ngIf="currentStep$.value === 5"> step 5 </ng-container>
+        <ng-container *ngIf="currentStep$.value === 4"> 
+         
+            <!-- <app-product-seller [form]="sellerInfo" [next]="nextStep.bind(this)" [prev]="prevStep.bind(this)"></app-product-seller> -->
+    
+        </ng-container>
+        <ng-container *ngIf="currentStep$.value === 5">
+          <!-- <app-complete [form]="form">
+           
+          </app-complete>   -->
+        </ng-container>
       </div>
     </form>
   </div>
-  <!--end::Content-->
 </div>

@@ -1,25 +1,20 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   Input,
   OnDestroy,
-  OnInit,
+  OnInit
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import _ from 'lodash';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
-import { ProductModel } from '../product.model';
-import { ProductService } from '../product.service';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { MatDialog } from '@angular/material/dialog';
 import { AddProductUnitComponent } from '../add-product-unit/add-product-unit.component';
 import { ProductUnitModel } from './product-unit.model';
 import { ProductUnitService } from './product-unit.service';
-import { AppStateManager } from '../stepper/state.manager';
 
 @Component({
   selector: 'app-product-unit',
@@ -28,12 +23,15 @@ import { AppStateManager } from '../stepper/state.manager';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductUnitComponent implements OnInit, OnDestroy {
-  @Input() state: AppStateManager;
+  
   productUnits: ProductUnitModel[];
+  productId: number = 0;
+
   private unsubscribe = new SubscriptionHandler();
-  @Input() next: () => void;
-  @Input() prev: () => void;
-  product: ProductModel;
+  @Input() form!: FormGroup;
+  @Input() next!: () => void;
+  @Input() prev!: () => void;
+  
 
   constructor(
     private service: ProductUnitService,
@@ -45,12 +43,17 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.product = this.state.get('product') as ProductModel;
+    this.productId = this.form.value.productInfo.id
+
+    console.log(this.form);
+    console.log(this.productId);
+    
+   if(this.productId)
     this.loadUnit();
   }
 
   loadUnit() {
-    this.service.find(this.product?.id).subscribe({
+    this.service.find(this.productId).subscribe({
       next: (resp: any) => {
         this.productUnits = resp.data;
         this.cdr.detectChanges();
@@ -63,26 +66,48 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
         data: {
-          product: this.product,
+          product: this.form.value,
+          isEdit: false,
+          productId: this.productId,
         },
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadUnit());
+      .subscribe((result) => {
+        console.log("result is ",result);
+        this.form.value.unitInfo=[...this.form.value.unitInfo,result];
+        console.log("form",this.form);
+        this.loadUnit();
+      });
+     
+      
   }
 
   update() {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
         data: {
-          product: this.product,
+          product: this.form,
+          isEdit: true,
+          productId: this.productId,
         },
       })
       .afterClosed()
-      .subscribe((v) => v && this.loadUnit());
+      .subscribe((result) => {
+        if (result) {
+          this.form.patchValue(result);
+          this.loadUnit();
+          this.commonService.toastr.success('Product unit updated successfully');
+        } else {
+          this.commonService.toastr.error('Failed to update product unit');
+        }
+        this.cdr.markForCheck();
+        this.loadUnit();
+        this.cdr.detectChanges();
+      });
   }
 
   delete(unit_id: number) {
-    this.service.delete(this.product.id, { id: unit_id }).subscribe({
+    this.service.delete(this.productId, { id: unit_id }).subscribe({
       complete: () =>
         this.commonService.toastr.success('Unit has been detached.') && this.loadUnit(),
       error: (err) => this.commonService.handleError(err),

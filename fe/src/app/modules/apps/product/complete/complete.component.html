@@ -1,0 +1,60 @@
+<div class="card">
+    <div class="card-body">
+      <h2 class="text-center">Product Details</h2>
+  
+      <!-- Product Details -->
+      <mat-card class="mb-3">
+        <mat-card-title>Product</mat-card-title>
+        <mat-card-content>
+          <p><strong>Name:</strong>  {{productInfo.name}}</p>
+          <p><strong>Status:</strong> {{productInfo.status=="1"?"Active":
+          "Inactive"}}</p>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Unit Details -->
+      <mat-card class="mb-3">
+        <mat-card-title>Unit Details</mat-card-title>
+        <mat-card-content>
+          <p><strong>Unit Name:</strong> {{ unitName }}</p>
+          <p><strong>Sale Price:</strong> {{unitInfo.sale_price}}</p>
+          <p><strong>Purchase Price:</strong> {{unitInfo.purchase_price}}</p>
+          <p><strong>Status:</strong> {{unitInfo.status=="1"?"Active":
+            "Inactive"}}</p>
+            <p><strong>Notes:</strong> {{unitInfo.notes}}</p>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Inventory Details -->
+      <mat-card class="mb-3">
+        <mat-card-title>Inventory Details</mat-card-title>
+        <mat-card-content>
+          <p><strong>Inventory Name:</strong> {{ unitName }}</p>
+          <p><strong>Sale Price:</strong> {{inventoryInfo.sale_price}}</p>
+          <p><strong>Purchase Price:</strong> {{inventoryInfo.purchase_price}}</p>
+          <p><strong>Status:</strong> {{inventoryInfo.status=="1"?"Active":
+            "Inactive"}}</p>
+            <p><strong>Notes:</strong> {{unitInfo.notes}}</p>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Seller Details -->
+      <mat-card class="mb-3">
+        <mat-card-title>Seller Details</mat-card-title>
+        <mat-card-content>
+          <p><strong>Seller Name:</strong> {{ sellerName }}</p>
+          <p><strong>Sale Price:</strong> {{sellerInfo.sale_price}}</p>
+          <p><strong>Purchase Price:</strong> {{sellerInfo.purchase_price}}</p>
+          <p><strong>Status:</strong> {{sellerInfo.status=="1"?"Active":
+            "Inactive"}}</p>
+            <p><strong>Notes:</strong> {{sellerInfo.notes}}</p>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center mt-4">
+        <button mat-raised-button color="primary" class="mr-2" (click)="submit()">Submit</button>
+        <button mat-raised-button color="warn" >Cancel</button>
+      </div>
+    </div>
+  </div>

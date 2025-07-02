@@ -1,36 +1,34 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { ProductModel } from '../product.model';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { ProductService } from '../product.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
-import { AddUnitComponent } from 'src/app/modules/settings/unit/add-unit/add-unit.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { ICreateAccount, inits } from 'src/app/modules/wizards/create-account.helper';
-import { AppStateManager } from '../stepper/state.manager';
 
 @Component({
-    selector: 'app-add-product',
-    templateUrl: './add-product.component.html',
-    styleUrl: './add-product.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-add-product',
+  templateUrl: './add-product.component.html',
+  styleUrl: './add-product.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
-  form: FormGroup;
-  model: ProductModel;
-  clone: any;
-  isEdit: boolean = false;
-  isSubmitted: boolean = false;
-
-  @Input() product: ProductModel |  null;
-  @Input() next: () => void;
-  @Input() state: AppStateManager;
-
-  private unsubscribe: Subscription[] = [];
-
+  @Input() form: FormGroup;
+  @Input() next: () => void = () => {};
+  productInfoForm!: FormGroup;
+  productId: string;
+  isProductCreated = false;
   constructor(
     private fb: FormBuilder,
     private service: ProductService,
@@ -38,60 +36,51 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     private commonService: CommonService,
     private router: Router,
     private ar: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.model = this.state.get('product') as ProductModel;
-    this.initForm(this.model);
+    console.log(this.form.value.productInfo);
+    this.initForm()
   }
+  ngAfterViewInit(): void {}
 
-  ngAfterViewInit(): void {
-
-  }
-
-  initForm(model: ProductModel) {
-    this.form = this.fb.group({
-      id: [this.model.id, []],
-      name: [this.model.name, [Validators.required]],
-      slug: [this.model.slug],
-      status: [this.model.status],
+  initForm() {
+    this.productInfoForm = this.fb.group({
+      id: [''],
+      name: ['', [Validators.required]],
+      status: ['', [Validators.required]],
+      slug: [''],
     });
-    this.clone = this.form.value;
   }
 
   submit() {
-    this.commonService.markFormGroupTouched(this.form);
-    if (!this.form.valid) {
-      this.commonService.toastr.error('Please fix all errors.');
-      return;
-    }
-    if (_.isEqual(this.form.value, this.clone)) {
-      this.commonService.toastr.error('Nothing changed.');
-      return;
-    }
-    this.isSubmitted = true;
-    this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
-      next: ({ data }: any) => {
-          this.product = data;
-          this.state.set('product', data);
+    this.service.create(this.productInfoForm.value).subscribe({
+      next: (res: any) => {
+        this.commonService.toastr.success('Product created successfully');
+        console.log(res);
+        this.productId = res.data.id;
+        this.form.value.productInfo=res.data
+        this.isProductCreated = true;
+        this.cdr.detectChanges();
       },
       complete: () => {
-        this.commonService.toastr.success(
-          this.isEdit ? 'Product has been updated.' : 'Product has been created.'
-        );
-        this.next();
-        this.commonService.app.tick();
+        this.productInfoForm.markAsPristine();
+        this.productInfoForm.markAsUntouched();
+        this.productInfoForm.markAsPending();
+        this.productInfoForm.updateValueAndValidity();
+        this.productInfoForm.disable();
+        this.productInfoForm.disable();
+
+        this.isProductCreated = true;
+
+        this.cdr.detectChanges();
+        // this.router.navigate([`/app/product/add/${this.productId}`])
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (err) => {
+        this.commonService.toastr.error('Failed to create product');
+      },
     });
   }
-
-  ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
-  }
-
-  nextStep() {
-    this.submit();
-    this.next();
-  }
+  ngOnDestroy() {}
 }

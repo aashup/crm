@@ -18,7 +18,6 @@ import {
 } from 'src/app/modules/wizards/create-account.helper';
 import { ProductModel } from '../product.model';
 import { ProductService } from '../product.service';
-import { AppStateManager, AppState } from './state.manager';
 
 @Component({
   selector: 'app-stepper',
@@ -27,11 +26,11 @@ import { AppStateManager, AppState } from './state.manager';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
-  form: FormGroup;
+  form!: FormGroup;
   model: ProductModel;
   clone: any;
   isEdit: boolean = false;
-  state: AppStateManager = new AppStateManager();
+  
 
   formsCount = 5;
   account$: BehaviorSubject<ICreateAccount> =
@@ -45,7 +44,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   product: ProductModel;
   productId: number = 0;
   loadCompleted = false;
-
+  
   constructor(
     private fb: FormBuilder,
     private service: ProductService,
@@ -54,25 +53,69 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
     private router: Router,
     private ar: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    
+  }
 
   async ngOnInit(): Promise<void> {
+    this.form = this.fb.group({
+      productInfo: this.fb.group({
+        id:[""],
+        name: ['', [Validators.required]],
+        status: ['',  [Validators.required]],
+        slug: ['']
+      }),
+      unitInfo: this.fb.array([]),
+      unitConversionInfo: this.fb.array([]),
+      inventoryInfo:this.form = this.fb.group({
+        id: ["", []],
+        product_id: ["", [Validators.required]],
+        unit_id: ["", [Validators.required]],
+        sale_price: ["", [Validators.required]],
+        purchase_price: [""],
+        notes: [""],
+        status: [""],
+      }),
+      sellerInfo:this.fb.group({
+        id: ["", []],
+        product_id: ["", [Validators.required]],
+        unit_id: ["", [Validators.required]],
+        sale_price: ["", [Validators.required]],
+        purchase_price: [""],
+        notes: [""],
+        status: [""],
+      })
+    });
     this.productId = Number(this.ar.snapshot.paramMap.get('id'));
     if(this.productId)
       this.loadProduct(this.productId)
     else {
       this.product = new ProductModel();
       this.product.clear();
-      this.state.set('product', this.product);
+      
       (this.loadCompleted = true);
     }
+  }
+
+  get productInfo(): FormGroup {
+    return this.form.get('productInfo') as FormGroup;
+  }
+  
+  get unitInfo(): FormGroup {
+    return this.form.get('unitInfo') as FormGroup;
+  }
+  get inventoryInfo(): FormGroup {
+    return this.form.get('inventoryInfo') as FormGroup;
+  }
+  get sellerInfo(): FormGroup {
+    return this.form.get('sellerInfo') as FormGroup;
   }
 
   loadProduct(productId: number) {
     this.service.get({ id: productId, with: ['units'] }).subscribe({
       next: ({ data }: any) => {
         this.product = data;
-        this.state.set('product', data);
+        
         this.cdr.markForCheck();
         this.loadCompleted = true;
       },
@@ -111,7 +154,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
-    this.state.complete();
+   
   }
 
   gotoStep(i: number) {
