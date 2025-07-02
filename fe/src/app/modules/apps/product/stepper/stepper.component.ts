@@ -158,6 +158,8 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   gotoStep(i: number) {
+    if(!this.form.value.productInfo.id)
+      return
     this.currentStep$.next(i);
   }
 }

@@ -9,13 +9,14 @@ import { ProductUnitComponent } from './product-unit/product-unit.component';
 import { StepperComponent } from './stepper/stepper.component';
 import { AddProductUnitComponent } from './add-product-unit/add-product-unit.component';
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { AddProductInventryComponent } from './add-product-inventry /add-product-inventry.component';
-import { ProductInventryComponent } from './product-inventry/product-inventry.component';
+
 import { ProductSellerComponent } from './product-seller/product-seller.component';
 import { AddProductSellerComponent } from './add-product-seller/add-product-seller.component';
 import { CompleteComponent } from './complete/complete.component';
 import { UnitConversionComponent } from './unit-conversion/unitconversion.component';
 import { AddUnitConversionComponent } from './unit-conversion/add-unit-conversion/add-unit-conversion.component';
+import { ProductInventoryComponent } from './product-inventory/product-inventory.component';
+import { AddProductInventoryComponent } from './product-inventory/add-product-inventory/add-product-inventory.component';
 
 @NgModule({
   declarations: [
@@ -24,10 +25,10 @@ import { AddUnitConversionComponent } from './unit-conversion/add-unit-conversio
     ProductUnitComponent,
     StepperComponent,
     AddProductUnitComponent,
-    AddProductInventryComponent,
+    AddProductInventoryComponent,
     UnitConversionComponent,
     AddUnitConversionComponent,
-    ProductInventryComponent,
+    ProductInventoryComponent,
     ProductSellerComponent,
     AddProductSellerComponent,
     CompleteComponent,
