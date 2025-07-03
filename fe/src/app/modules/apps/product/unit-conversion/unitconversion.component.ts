@@ -64,8 +64,6 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   }
   ngOnInit(): void {
     this.productId=this.form.value.productInfo.id
-    console.log("product id",this.productId);
-    
     this.loadData();
     console.log(this.form);
     this.cdr.detectChanges()

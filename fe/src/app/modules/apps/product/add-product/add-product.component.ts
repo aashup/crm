@@ -40,7 +40,14 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.ar.params.subscribe((params) => {
+      this.productId = params['id'];
+      console.log('Product ID from URL:', this.productId);
+    });
     console.log(this.form.value.productInfo);
+    if (this.productId) {
+      this.loadProductDetails(this.productId); 
+    }
     this.initForm()
   }
   ngAfterViewInit(): void {}
@@ -53,11 +60,30 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       slug: [''],
     });
   }
+  loadProductDetails(productId: string) {
+    this.service.get({id:productId,with:""}).subscribe({
+      next: (product:any) => {
+        console.log('Product details:', product);
+        
+        this.productInfoForm.patchValue({
+          id: product.data.id,
+          name: product.data.name,
+          status: product.data.status,
+          slug: product.data.slug,
+        });
+        
+      },
+      error: (err) => {
+        this.commonService.toastr.error('Failed to load product details');
+        console.error(err);
+      },
+    });
+  }
 
   submit() {
-    this.service.create(this.productInfoForm.value).subscribe({
+    this.service[this.productId ? 'update' : 'create'](this.productInfoForm.value).subscribe({
       next: (res: any) => {
-        this.commonService.toastr.success('Product created successfully');
+        this.commonService.toastr.success(this.productId?'Prouduct updated successfully':'Product created successfully');
         console.log(res);
         this.productId = res.data.id;
         this.form.value.productInfo=res.data
@@ -71,11 +97,8 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
         this.productInfoForm.updateValueAndValidity();
         this.productInfoForm.disable();
         this.productInfoForm.disable();
-
         this.isProductCreated = true;
-
         this.cdr.detectChanges();
-        // this.router.navigate([`/app/product/add/${this.productId}`])
       },
       error: (err) => {
         this.commonService.toastr.error('Failed to create product');

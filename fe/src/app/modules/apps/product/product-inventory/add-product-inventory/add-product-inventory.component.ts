@@ -122,18 +122,18 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
     }
     console.log("payload ",payload);
     
-    this.service[this.isEdit ? 'update' : 'create'](payload).subscribe({
-      complete: () => {
+    this.service[this.isEdit ? 'update' : 'create'](payload).subscribe((res: any) => {
+      
         this.commonService.toastr.success(this.isEdit ? 'Inventory has been updated.' : 'Inventory has been created.');
         this.isLoading = false;
         this.spinnerService.hide();
-        this.dialogRef.close(true);
-      },
-      error: (err) => {
+        this.dialogRef.close({...res.data, product_id: this.data.productId});
+      }
+    )
+    , (err: any) => {
         this.commonService.handleError(err);
         this.isLoading = false;
         this.spinnerService.hide();
-      },
-    });
+      };
   }
 }

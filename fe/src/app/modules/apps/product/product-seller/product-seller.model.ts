@@ -1,19 +1,38 @@
-import { UnitModel } from "src/app/modules/settings/unit/unit.model";
-
 export class ProductSellerModel {
-  id: number;
-  product_id: number;
-  name:string
-  unit_id: number;
-  sale_price: number;
-  purchase_price: number;
-  notes: string;
-  status: number;
+  id: number | null;
+  name: string;
+  contact_id: number | null;
+  level: string | null;
+  type: string | null;
+  status: string | null;
+  billing_address_id: number | null;
+  shipping_address_id: number | null;
+  created_at: Date | null;
+  updated_at: Date | null;
 
-  unit?: UnitModel
+  constructor() {
+    this.id = null;
+    this.name = '';
+    this.contact_id = null;
+    this.billing_address_id = null;
+    this.shipping_address_id = null;
+    this.level = null;
+    this.type = null;
+    this.status = null;
+    this.created_at = null;
+    this.updated_at = null;
+  }
 
   clear() {
-      this.status = 1;
-      return this;
+    this.name = '';
+    this.contact_id = null;
+    this.billing_address_id = null;
+    this.shipping_address_id = null;
+    this.created_at = null;
+    this.updated_at = null;
+    this.level = null;
+    this.type = null;
+    this.status = null;
+    return this;
   }
 }

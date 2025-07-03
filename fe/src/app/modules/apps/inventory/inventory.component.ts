@@ -71,10 +71,10 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
-    { ref: 'product_id', name: 'Product Name', mutator: (row: any) => this.getProductName(row.product_id) },
+    { ref: 'product_id', name: 'Product Name', mutator: (row: any) => row.product?.name || '—' },
 
     { ref: 'unit_id', name: 'Unit ID'
-      , mutator: (row: any) => this.getUnitName(row.unit_id)  
+      ,mutator: (row: any) => row.unit?.name || '—' 
      },
     { ref: 'created_by', name: 'Created By',mutator: (row: any) => this.getUserName(row.created_by) },
     { ref: 'qty', name: 'Quantity' },
@@ -100,8 +100,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.prefetchProductNames()
-    this.prefetchUnitNames()
     this.prefetchUserNames();
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
       () => (this.paginator.pageIndex = 0)
@@ -117,29 +115,8 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       .subscribe();
   }
-  prefetchProductNames() {
-    this.productService.find().subscribe((products: any) => {
-      products.data.forEach((product:any) => {
-        this.productCache[product.id] = product.name;
-      });
-    });
-  }
-  
-  getProductName(id: any): string {
-    return this.productCache[id] || 'Loading...';
-  }
 
-  prefetchUnitNames() {
-    this.unitService.find().subscribe((units: any) => {
-      units.data.forEach((unit:any) => {
-        this.unitCache[unit.id] = unit.name;
-      });
-    });
-  }
-  
-  getUnitName(id: any): string {
-    return this.unitCache[id] || 'Loading...';
-  }
+ 
   prefetchUserNames() {
     this.userService.find({}).subscribe((users: any) => {
       users.data.forEach((user:any) => {
@@ -177,7 +154,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; // Include related data if necessary
+      this.filter.with = ['product', 'unit']; // Include related data if necessary
       this.filter.cols = [
         'id',
         'product_id',

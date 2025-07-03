@@ -39,7 +39,7 @@ import { FormGroup } from '@angular/forms';
 })
 export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
-  @Input() form!: FormGroup;
+  @Input() form: FormGroup;
   @Input() next!: () => void;
   @Input() prev!: () => void;
   dataSource: ProductInventoryDatasource;
@@ -103,6 +103,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   }
   ngOnInit(): void {
     this.productId = this.form.value.productInfo.id;
+    console.log("inventory page ",this.form);
     if (this.productId) this.loadData();
     this.prefetchUserNames();
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
@@ -243,8 +244,12 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
         },
       })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((result) => {
+        console.log("result of inventory page ",result);
+         this.form.value.inventoryInfo=[...this.form.value.inventoryInfo,result];
+        console.log("result is this ",result);
+        this.loadData();
+      });
   }
 
   edit(item: ProductInventoryModel) {
@@ -256,7 +261,11 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
         },
       })
       .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => flag && this.loadData());
+      .subscribe((result) => {
+        console.log("result of inventory page ",result);
+         this.form.value.inventoryInfo=[...this.form.value.inventoryInfo,result];
+        console.log("result is this ",result);
+        this.loadData();
+      });;
   }
 }
