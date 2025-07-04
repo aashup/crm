@@ -40,9 +40,9 @@ export class CompleteComponent  implements AfterViewInit, OnInit, OnDestroy {
   }
 
   getAllSellers(){
-    this.sellerService.getAll().subscribe((result:any) => {
-      this.sellers = result.data;      
-    });
+    // this.sellerService.getAll().subscribe((result:any) => {
+    //   this.sellers = result.data;      
+    // });
   }
 ngOnInit(): void {
   console.log("final details", this.form.value);

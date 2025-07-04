@@ -28,8 +28,11 @@
           <td scope="row">{{ item.status ? 'Active' : 'In-Active' }}</td>
           <td scope="row">{{ item.notes }}</td>
           <td>
-            <button mat-icon-button class="text-danger" (click)="delete(item.id)">
+            <button mat-icon-button class="text-danger" (click)="delete(item.unit_id)">
               <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-icon-button class="text-info" (click)="update(item)">
+              <mat-icon>edit</mat-icon>
             </button>
           </td>
         </tr>

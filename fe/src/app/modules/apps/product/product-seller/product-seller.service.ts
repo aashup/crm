@@ -1,44 +1,34 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpUtils } from 'src/app/modules/core/http-util';
+import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { HttpUtils } from 'src/app/modules/core/http-util';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ProductSellerService {
-
-readonly endpoint = 'supplier';
+    readonly endpoint = 'supplier';
 
     constructor(
         private http: HttpClient,
     ) { }
 
-    getAll(){
-        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}`)
-    }
-    find(pid: number, params = {}) {
-        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit`, {
+    find(params = {}) {
+        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}`, {
             params: HttpUtils.toHttpParams(params)
         })
     }
 
-    get(pid: number, items: { id: any; with: any }) {
-        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit/${items.id}`, {
-          params: HttpUtils.toHttpParams(items)
-      })
+    update(items: { id: any; }) {
+        return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items)
     }
 
-    update(pid: number, items: { id: any; [key: string]: any; }) {
-        return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit/${items.id}`, items)
+    create(items: any) {
+        return this.http.post(`${environment.API_ENDPOINT}/${this.endpoint}`, items)
     }
 
-    create(pid: number, items: {[key: string]: any}) {
-        return this.http.post(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit`, items)
-    }
-
-    delete(pid: number, items: { id: any; }) {
-        return this.http.delete(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit/${items.id}`)
+    delete(items: { id: any; }) {
+        return this.http.delete(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`)
     }
 
     /** UI */

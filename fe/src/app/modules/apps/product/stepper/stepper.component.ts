@@ -67,15 +67,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
       }),
       unitInfo: this.fb.array([]),
       unitConversionInfo: this.fb.array([]),
-      inventoryInfo:this.form = this.fb.group({
-        id: ["", []],
-        product_id: ["", [Validators.required]],
-        unit_id: ["", [Validators.required]],
-        sale_price: ["", [Validators.required]],
-        purchase_price: [""],
-        notes: [""],
-        status: [""],
-      }),
+      inventoryInfo:this.fb.array([]),
       sellerInfo:this.fb.group({
         id: ["", []],
         product_id: ["", [Validators.required]],
@@ -158,6 +150,8 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   gotoStep(i: number) {
+    if(!this.form.value.productInfo.id)
+      return
     this.currentStep$.next(i);
   }
 }

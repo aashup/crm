@@ -94,14 +94,14 @@
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <!-- <button
+              <button
                 mat-icon-button
                 class="text-info blod"
                 (click)="edit(item)"
                 *ngxPermissionsOnly="['unit.conversions.update']"
               >
                 <mat-icon>edit</mat-icon>
-              </button> -->
+              </button>
               <button
                 mat-icon-button
                 class="text-danger"
@@ -140,6 +140,18 @@
           </p>
           <div class="floating-modal__divider"></div>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer text-muted">
+    <div class="d-flex justify-content-center pt-10">
+      <div class="mr-2">
+        <button type="button" class="btn btn-outline-info" (click)="prev()">
+          Back
+        </button>
+        <button type="button" class="btn btn-outline-info" (click)="next()">
+          Next
+        </button>
       </div>
     </div>
   </div>

@@ -5,9 +5,10 @@
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" >
+              <mat-label>Please enter Unit Name </mat-label>
               <mat-label>Unit </mat-label>
-              <mat-select placeholder="Unit" formControlName="unit_id">
+              <mat-select placeholder="Unit" formControlName="unit_id"  [disabled]="true">
                 <mat-option *ngFor="let item of units" [value]="item.id">
                   {{ item.name }}
                 </mat-option>

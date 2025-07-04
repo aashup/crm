@@ -5,12 +5,7 @@
         <div class="col-12 kt-margin-bottom-20-mobile">
           <mat-form-field class="w-100">
             <mat-label>Please enter Name </mat-label>
-            <input
-              matInput
-              placeholder="Enter Name"
-              formControlName="name"
-              maxlength="200"
-            />
+            <input matInput placeholder="Enter Name" formControlName="name" maxlength="200" />
             <mat-error
               >Name is <strong>required</strong> and must be
               <strong>characters only</strong>
@@ -32,8 +27,10 @@
         <button type="button" class="btn btn-outline-primary" [disabled]="!productInfoForm.valid" (click)="submit()">
           Save
         </button>
-       
-        <button type="button" class="btn btn-outline-primary"  (click)="next()" [disabled]="!isProductCreated">Next</button>
+
+        <button type="button" class="btn btn-outline-primary" (click)="next()" [disabled]="!(productId || isProductCreated)">
+          Next
+        </button>
       </div>
     </form>
   </div>
