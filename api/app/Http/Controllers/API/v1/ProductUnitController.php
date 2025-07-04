@@ -55,14 +55,11 @@ class ProductUnitController extends Controller
      *
      * @throws
      */
-    public function update(Request $request, ProductUnit $productUnit, Product $product)
+    public function update(Request $request, Product $product, $productUnit)
     {
-        $model = $productUnit;
-        $request->validate($model->validationRule(), $model->validationMessage());
-        $model->fill($request->all());
-        $model->save();
+        $res = $product->units()->where('unit_id', $productUnit)->update($request->all());
 
-        return BaseResponse::success($model);
+        return BaseResponse::success($res ? "Product unit updated successfully." : "Product unit not found.");
     }
 
     /**
