@@ -44,7 +44,6 @@ export class AddUnitConversionComponent implements AfterViewInit, OnInit {
 
   ngOnInit(): void {
     console.log('pid', this.data.productId);
-
     this.getAllProducts();
     this.getAllUnit();
     this.model = this.data.model;
@@ -59,7 +58,6 @@ export class AddUnitConversionComponent implements AfterViewInit, OnInit {
 
   initForm(model: UnitConversionModel) {
     this.form = this.fb.group({
-     
       from_unit_id: [model.from_unit_id, [Validators.required]],
       to_unit_id: [model.to_unit_id, [Validators.required]],
       conversion_factor: [model.conversion_factor, [Validators.required, Validators.min(0)]],

@@ -94,14 +94,14 @@
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <!-- <button
+              <button
                 mat-icon-button
                 class="text-info blod"
                 (click)="edit(item)"
                 *ngxPermissionsOnly="['unit.conversions.update']"
               >
                 <mat-icon>edit</mat-icon>
-              </button> -->
+              </button>
               <button
                 mat-icon-button
                 class="text-danger"
