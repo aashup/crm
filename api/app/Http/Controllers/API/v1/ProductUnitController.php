@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductUnitController extends Controller
 {
@@ -43,7 +44,7 @@ class ProductUnitController extends Controller
     {
         $productUnit->load($productUnit->getWith($request->with));
 
-        return BaseResponse::success( $productUnit);
+        return BaseResponse::success($productUnit);
     }
 
     /**
@@ -57,7 +58,7 @@ class ProductUnitController extends Controller
     public function update(Request $request, ProductUnit $productUnit, Product $product)
     {
         $model = $productUnit;
-        $request->validate( $model->validationRule(), $model->validationMessage());
+        $request->validate($model->validationRule(), $model->validationMessage());
         $model->fill($request->all());
         $model->save();
 
@@ -71,9 +72,17 @@ class ProductUnitController extends Controller
      *
      * @throws
      */
-    public function destroy(Product $product, ProductUnit $productUnit)
+    public function destroy($productId, $unitId)
     {
-        abort_unless($product->id === $productUnit->product_id, 403);
-        return $productUnit->delete() ? BaseResponse::success('deleted'): BaseResponse::error('failed.');
+        $deleted = DB::table('product_has_unit')
+            ->where('product_id', $productId)
+            ->where('unit_id', $unitId)
+            ->delete();
+
+        if (!$deleted) {
+            return response()->json(['message' => 'Unit not found for this product.'], 404);
+        }
+
+        return response()->json(['message' => 'Unit removed from product successfully.']);
     }
 }
