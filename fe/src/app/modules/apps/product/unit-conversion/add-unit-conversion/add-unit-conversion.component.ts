@@ -58,6 +58,7 @@ export class AddUnitConversionComponent implements AfterViewInit, OnInit {
 
   initForm(model: UnitConversionModel) {
     this.form = this.fb.group({
+      id:[model.id, []],
       from_unit_id: [model.from_unit_id, [Validators.required]],
       to_unit_id: [model.to_unit_id, [Validators.required]],
       conversion_factor: [model.conversion_factor, [Validators.required, Validators.min(0)]],
