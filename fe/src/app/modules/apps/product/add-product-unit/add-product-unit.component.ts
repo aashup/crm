@@ -84,7 +84,6 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     let payload:any = {}
     if(this.isEdit){
       payload={
-        id:this.data.unit.unit_id,
         sale_price: this.form.value.sale_price,
         purchase_price: this.form.value.purchase_price,
         notes: this.form.value.notes,
@@ -93,9 +92,10 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     }else{
       payload=this.form.value;
     }
-    this.service[this.isEdit ? 'update' : 'create'](this.data.productId, payload).subscribe({
+    this.service[this.isEdit ? 'update' : 'create'](this.data.productId,this.data?.unit?.unit_id||"", payload).subscribe({
       complete: () => {
         console.log("called");
+        if(!this.isEdit)
         this.commonService.toastr.success("Unit has been added.");
         this.loadUnits()
         this.form.value.product_id = this.data.productId;

@@ -26,11 +26,11 @@ readonly endpoint = 'product';
       })
     }
 
-    update(pid: number, items: { id: any; [key: string]: any; }) {
-        return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit/${items.id}`, items)
+    update(pid: number,unit_id="", items: any) {
+        return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit/${unit_id}`, items)
     }
 
-    create(pid: number, items: {[key: string]: any}) {
+    create(pid: number, dummy:any,items: {[key: string]: any}) {
         return this.http.post(`${environment.API_ENDPOINT}/${this.endpoint}/${pid}/product-unit`, items)
     }
 
