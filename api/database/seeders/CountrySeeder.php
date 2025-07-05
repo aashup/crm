@@ -13,7 +13,7 @@ class CountrySeeder extends Seeder
      */
     public function run(): void
     {
-        $sql = $countries = [
+        $countries = [
             ['name' => 'Afghanistan', 'status' => 0],
             ['name' => 'Albania', 'status' => 0],
             ['name' => 'Algeria', 'status' => 0],
@@ -210,6 +210,6 @@ class CountrySeeder extends Seeder
             ['name' => 'Zimbabwe', 'status' => 0],
         ];
 
-        DB::table('countries')->insert($sql);
+        DB::table('countries')->insert($countries);
     }
 }
