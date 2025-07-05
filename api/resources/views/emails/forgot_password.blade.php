@@ -2,14 +2,14 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Fire Inspection Platform</title>
+        <title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     </head>
     <body style="padding: 10px; background-color: #e6e6e6;">
         <table style="width: 100%; margin: 0; padding: 0;" border="0">
             <tr>
                 <td style="background-color: #ffffff; border-bottom: 1px solid #e6e6e6; padding: 20px 10px;">
-                    <span style="color: #333; font-size: 25px;">Vijay kanaujia</span>
+                    <span style="color: #333; font-size: 25px;">KISAN</span>
                 </td>
             </tr>
             <tr>
@@ -24,7 +24,7 @@ You can reset your password by clicking the button below:<br/><br/>
             </tr>
             <tr>
                 <td style="background-color: #ffffff; border-bottom: 1px solid #e6e6e6; padding: 20px 10px; text-align: center;">
-                    <span style="font-size: 15px;">Copyright &copy; 2019</span>
+                    <span style="font-size: 15px;">Copyright &copy; 2025</span>
                 </td>
             </tr>
         </table>
