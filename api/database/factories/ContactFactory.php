@@ -17,10 +17,11 @@ class ContactFactory extends Factory
     public function definition(): array
     {
         return [
-            'address' => $this->faker->address,
-            'pin' => $this->faker->postcode,
+            'name' => $this->faker->name,
             'mob1'    => $this->faker->phoneNumber,
-            'type'    => 1,
+            'mob2'    => $this->faker->phoneNumber,
+            'status' => 1,
+            'created_by' => 1
         ];
     }
 }

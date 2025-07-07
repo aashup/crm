@@ -18,7 +18,7 @@ class PosController extends Controller
      */
     public function index(Request $request)
     {
-        $contacts = Contact::select(['id', 'address', 'pin', 'mob1', 'mob2', 'type', 'status'])->where('status', 1)->get();
+        $contacts = Contact::select(['id', 'name', 'mob1', 'mob2', 'status'])->where('status', 1)->get();
         $products = Product::with([
             'productUnit' => function ($q) {
                 return $q->with('unit')->select([
