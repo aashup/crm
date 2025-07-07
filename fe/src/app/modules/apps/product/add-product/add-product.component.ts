@@ -46,7 +46,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     });
     console.log(this.form.value.productInfo);
     if (this.productId) {
-      this.loadProductDetails(this.productId); 
+      this.loadProductDetails(this.productId);
     }
     this.initForm()
   }
@@ -56,7 +56,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     this.productInfoForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required]],
-      status: ['', [Validators.required]],
+      status: [1, [Validators.required]],
       slug: [''],
     });
   }
@@ -64,14 +64,14 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     this.service.get({id:productId,with:""}).subscribe({
       next: (product:any) => {
         console.log('Product details:', product);
-        
+
         this.productInfoForm.patchValue({
           id: product.data.id,
           name: product.data.name,
           status: product.data.status,
           slug: product.data.slug,
         });
-        
+
       },
       error: (err) => {
         this.commonService.toastr.error('Failed to load product details');

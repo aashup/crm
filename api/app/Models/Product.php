@@ -75,8 +75,13 @@ class Product extends Model
         ];
     }
 
-    public function units() {
+    public function units()
+    {
         return $this->hasMany(ProductUnit::class, 'product_id');
     }
 
+    public function productUnit()
+    {
+        return $this->hasMany(ProductUnit::class, 'unit_id');
+    }
 }

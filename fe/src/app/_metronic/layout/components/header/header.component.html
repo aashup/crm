@@ -48,7 +48,7 @@
   </ng-container>
 
   <!--begin::Header wrapper-->
-  <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1" id="kt_app_header_wrapper">
+  <div class="d-flex align-items-stretch justify-content-end flex-lg-grow-1" id="kt_app_header_wrapper">
     <ng-container *ngIf="appHeaderDefaultContent === 'menu' && appHeaderDefaulMenuDisplay">
       <!--begin::Menu wrapper-->
       <div class="
@@ -76,9 +76,9 @@
       </div>
       <!--end::Menu wrapper-->
     </ng-container>
-    <!-- <ng-container *ngIf="appHeaderDefaultContent === 'page-title' && appPageTitleDisplay">
+    <ng-container *ngIf="appHeaderDefaultContent === 'page-title' && appPageTitleDisplay">
       <app-page-title #ktPageTitle class="page-title d-flex"></app-page-title>
-    </ng-container> -->
+    </ng-container>
     <app-navbar class="app-navbar flex-shrink-0" [appHeaderDefaulMenuDisplay]="appHeaderDefaulMenuDisplay"
       [isRtl]="false"></app-navbar>
   </div>
