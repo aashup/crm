@@ -81,7 +81,9 @@ class ProductUnit extends Model
         ];
     }
 
-    public function unit() {
+    public function unit()
+    {
         return $this->belongsTo(Unit::class, 'unit_id');
     }
+
 }

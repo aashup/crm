@@ -3,7 +3,7 @@ import { UnitModel } from "../../settings/unit/unit.model";
 export class ProductDetailsModel {
   id: number | null;
   mrp: number | null;
-  status: number;
+  status: number = 1;
   comment: string;
   product_id: number | null;
   created_at: Date;

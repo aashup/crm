@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
     protected $table = 'products';
 
     protected $fillable = [
@@ -75,8 +76,13 @@ class Product extends Model
         ];
     }
 
-    public function units() {
+    public function units()
+    {
         return $this->hasMany(ProductUnit::class, 'product_id');
     }
 
+    public function productUnit()
+    {
+        return $this->hasMany(ProductUnit::class, 'unit_id');
+    }
 }

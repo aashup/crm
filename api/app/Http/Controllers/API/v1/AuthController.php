@@ -32,14 +32,16 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
         $user = User::whereEmail($request->email)->first();
-
-        if ($user && (!$user->email_verified_at || !$user->status)) {
-            return $this->error('Unauthorised User or Email not verified!!');
+        if(!$user) {
+            return $this->error('Unauthorised User or Email not verified!!', $request->all());
         }
-        if ($user && Hash::check($request->password, $user->password)) {
+        if (!($user->email_verified_at && $user->status)) {
+            return $this->error('Unauthorised User or Email not verified!');
+        }
+        if (Hash::check($request->password, $user->password)) {
             return $this->success('Login Successfully!', $this->generateToken($user));
         }
-        return $this->error('Unauthorised User or Email not verified!!', $request->all());
+        return $this->error('Unauthorised User or Email not verified!', $request->all());
     }
 
     protected function generateToken(User $user)
