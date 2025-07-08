@@ -30,3 +30,18 @@ section {
   width: 140px;
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  min-width: 1000px;
+  white-space: nowrap;
+}
+
+th, td {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}

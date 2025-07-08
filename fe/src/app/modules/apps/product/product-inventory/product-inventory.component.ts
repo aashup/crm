@@ -77,7 +77,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
-    { ref: 'product_id', name: 'Product Name', mutator: (row: any) => row.product?.name || '—' },
+    { ref: 'product_id', name: 'Product', mutator: (row: any) => row.product?.name || '—' },
 
     { ref: 'unit_id', name: 'Unit ID', mutator: (row: any) => row.unit?.name || '—' },
     { ref: 'created_by', name: 'Created By', mutator: (row: any) => this.getUserName(row.created_by) },

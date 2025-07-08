@@ -1,7 +1,12 @@
 <div class="card">
   <div class="card-header">
-    <div class="card-toolbar w-100 justify-content-end">
-      <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['units.create']">
+    <div class="card-toolbar w-100 d-flex justify-content-end gap-2">
+      <button
+        mat-flat-button
+        class="bg-success"
+        (click)="add()"
+        *ngxPermissionsOnly="['units.create']"
+      >
         Add New
       </button>
       <button mat-icon-button (click)="loadUnit()">
@@ -10,45 +15,64 @@
     </div>
   </div>
   <div class="card-body">
-    <table
-      class="table table-row-bordered table-row-gray-300 fs-6 align-middle gs-0"
-    >
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Sale Price</th>
-          <th>Purchase Price</th>
-          <th>Status</th>
-          <th>Notes</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of productUnits">
-          <td scope="row">{{ item?.unit?.name }}</td>
-          <td scope="row">{{ item.sale_price }}</td>
-          <td scope="row">{{ item.purchase_price }}</td>
-          <td scope="row">{{ item.status ? 'Active' : 'In-Active' }}</td>
-          <td scope="row">{{ item.notes }}</td>
-          <td>
-            <button mat-icon-button class="text-danger" (click)="delete(item.unit_id)">
-              <mat-icon>delete</mat-icon>
-            </button>
-            <button mat-icon-button class="text-info" (click)="update(item)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table
+        class="table table-row-bordered table-row-gray-300 fs-6 align-middle gs-0"
+        style="min-width: 1000px;"
+      >
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Sale Price</th>
+            <th>Purchase Price</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of productUnits">
+            <td scope="row">{{ item?.unit?.name }}</td>
+            <td scope="row">{{ item.sale_price }}</td>
+            <td scope="row">{{ item.purchase_price }}</td>
+            <td scope="row">{{ item.status ? 'Active' : 'In-Active' }}</td>
+            <td scope="row">{{ item.notes }}</td>
+            <td>
+              <button
+                mat-icon-button
+                class="text-danger"
+                (click)="delete(item.unit_id)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="text-info"
+                (click)="update(item)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="card-footer text-muted">
     <div class="d-flex justify-content-center pt-10">
       <div class="mr-2">
-        <button type="button" class="btn btn-outline-info" (click)="prev()">
+        <button
+          type="button"
+          class="btn btn-outline-info"
+          (click)="prev()"
+        >
           Back
         </button>
-        <button type="button" class="btn btn-outline-info" (click)="next()">
+        <button
+          type="button"
+          class="btn btn-outline-info"
+          (click)="next()"
+        >
           Next
         </button>
       </div>

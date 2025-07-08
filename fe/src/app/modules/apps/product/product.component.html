@@ -70,7 +70,7 @@
           <td
             cdk-cell
             *matCellDef="let row"
-            [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }"
+            [ngStyle]="{ 'text-align': 'left', 'justify-content': 'center' }"
           >
             {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
           </td>
