@@ -1,8 +1,11 @@
 <div class="card">
   <div class="card-header">
     <div class="card-toolbar w-100 justify-content-end">
-      <button type="button" class="btn btn-outline-info" (click)="add()">
+      <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['units.create']">
         Add New
+      </button>
+      <button mat-icon-button (click)="loadUnit()">
+        <mat-icon>sync</mat-icon>
       </button>
     </div>
   </div>
