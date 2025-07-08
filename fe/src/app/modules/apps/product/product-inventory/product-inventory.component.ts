@@ -29,6 +29,7 @@ import { UsersService } from 'src/app/modules/usermanagement/users/users.service
 import { ConfirmationDialogComponent } from 'src/app/modules/core/confirmation-dialog/confirmation-dialog.component';
 import { AddProductInventoryComponent } from './add-product-inventory/add-product-inventory.component';
 import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-product-inventory',
@@ -97,12 +98,13 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     private productService: ProductService,
     private unitService: UnitService,
     private userService: UsersService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private ar :ActivatedRoute
   ) {
     this.dataSource = new ProductInventoryDatasource(this.service);
   }
   ngOnInit(): void {
-    this.productId = this.form.value.productInfo.id;
+    this.productId = this.form.value.productInfo.id||this.ar.snapshot.params['id'];
     console.log("inventory page ",this.form);
     if (this.productId) this.loadData();
     this.prefetchUserNames();
@@ -115,21 +117,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       )
       .subscribe();
   }
-  prefetchProductNames() {
-    this.productService.find().subscribe((products: any) => {
-      products.data.forEach((product: any) => {
-        this.productCache[product.id] = product.name;
-      });
-    });
-  }
-
-  prefetchUnitNames() {
-    this.unitService.find().subscribe((units: any) => {
-      units.data.forEach((unit: any) => {
-        this.unitCache[unit.id] = unit.name;
-      });
-    });
-  }
+ 
 
   prefetchUserNames() {
     this.userService.find({}).subscribe((users: any) => {
@@ -149,17 +137,17 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
-    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        tap(() => {
-          this.paginator.pageIndex = 0;
-          this.search.all = this.searchElementRef.nativeElement.value;
-          this.loadData();
-        })
-      )
-      .subscribe();
+    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+    //   .pipe(
+    //     debounceTime(500),
+    //     distinctUntilChanged(),
+    //     tap(() => {
+    //       this.paginator.pageIndex = 0;
+    //       this.search.all = this.searchElementRef.nativeElement.value;
+    //       this.loadData();
+    //     })
+    //   )
+    //   .subscribe();
   }
 
   loadData() {
@@ -188,8 +176,15 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       'deleted_at',
       'status',
     ];
-
-    this.dataSource.find(_.pickBy(this.filter));
+  
+    this.dataSource.find(_.pickBy(this.filter)).subscribe({
+      next: (response: any) => {
+        this.form.value.inventoryInfo = response.data; // Store the fetched data in the variable
+      },
+      error: (err:any) => {
+        console.error('Error while fetching inventory data:', err);
+      },
+    });
   }
   masterToggle() {
     if (this.selection.selected.length === this.dataSource.originalData.data.length) {
@@ -240,7 +235,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
         data: {
           model: new ProductInventoryModel().clear(),
           isEdit: false,
-          productId: this.form.value.productInfo.id,
+          productId: this.productId,
         },
       })
       .afterClosed()

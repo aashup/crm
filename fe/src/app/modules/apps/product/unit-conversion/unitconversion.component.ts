@@ -91,17 +91,17 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
     this.spinnerService.hide();
   
     
-    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(500), 
-        distinctUntilChanged(), 
-        tap(() => {
-          this.paginator.pageIndex = 0; 
-          this.search.all = this.searchElementRef.nativeElement.value.trim(); 
-          this.loadData();
-        })
-      )
-      .subscribe();
+    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+    //   .pipe(
+    //     debounceTime(500), 
+    //     distinctUntilChanged(), 
+    //     tap(() => {
+    //       this.paginator.pageIndex = 0; 
+    //       this.search.all = this.searchElementRef.nativeElement.value.trim(); 
+    //       this.loadData();
+    //     })
+    //   )
+    //   .subscribe();
   }
  
   loadData() {
@@ -114,9 +114,15 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
       product_id: this.productId, 
     }); 
     this.filter.with = ['product', 'fromUnit', 'toUnit']; 
-    console.log('Filter:', this.filter);
-  
-    this.dataSource.find(_.pickBy(this.filter)); 
+    this.dataSource.find(_.pickBy(this.filter)).subscribe({
+      next: (response:any) => {
+        this.form.value.unitConversionInfo = response.data; 
+        
+      },
+      error: (err) => {
+        console.error('Error while fetching data:', err);
+      },
+    });
   }
 
   masterToggle() {

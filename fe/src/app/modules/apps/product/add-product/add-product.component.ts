@@ -71,7 +71,12 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
           status: product.data.status,
           slug: product.data.slug,
         });
-        
+        this.form.value.productInfo={
+          id: product.data.id,
+          name: product.data.name,
+          status: product.data.status,
+          slug: product.data.slug,
+        }
       },
       error: (err) => {
         this.commonService.toastr.error('Failed to load product details');
