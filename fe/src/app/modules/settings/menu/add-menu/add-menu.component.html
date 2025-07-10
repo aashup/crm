@@ -24,8 +24,8 @@
             <mat-form-field class="w-100">
               <mat-label>Is Root? </mat-label>
               <mat-select placeholder="Root" formControlName="root">
-                <mat-option [value]="1">True</mat-option>
-                <mat-option [value]="0">False</mat-option>
+                <mat-option [value]="1">Yes</mat-option>
+                <mat-option [value]="0">No</mat-option>
               </mat-select>
               <mat-error
                 >Root is <strong>required</strong>
@@ -79,8 +79,8 @@
             <mat-form-field class="w-100">
               <mat-label>Status? </mat-label>
               <mat-select placeholder="Status" formControlName="status">
-                <mat-option [value]="1">True</mat-option>
-                <mat-option [value]="0">False</mat-option>
+                <mat-option [value]="1">Active</mat-option>
+                <mat-option [value]="2">Inactive</mat-option>
               </mat-select>
               <mat-error
                 >Root is <strong>required</strong>
