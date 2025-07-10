@@ -9,20 +9,25 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { ProductService } from '../product/product.service';
 import { SaleService } from '../sale/sale.service';
 import { DirectSaleService } from './direct-sale.service';
+import { map, startWith } from 'rxjs/operators';
+import { ContactModel, ProductModel } from '../product/product.model';
+import { Observable } from 'rxjs';
+import { MatOption } from '@angular/material/core';
 
 @Component({
   selector: 'app-direct-sale',
   templateUrl: './direct-sale.component.html',
-  styleUrl: './direct-sale.component.scss'
+  styleUrl: './direct-sale.component.scss',
 })
 export class DirectSaleComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   contacts: any[] = [];
+  filteredContacts: Observable<ContactModel[]>;
   products: any[] = [];
+  filteredProducts: Observable<ProductModel[]>;
   isLoading = false;
   isEdit = false;
   readonly _ = _;
-
 
   constructor(
     private fb: FormBuilder,
@@ -32,7 +37,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-
     this.getAllProducts();
     this.initializeForm();
   }
@@ -40,9 +44,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
-
   }
-
 
   getAllProducts() {
     this.service.find().subscribe({
@@ -52,7 +54,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       },
       error: (err) => {
         console.error('Error fetching products:', err);
-      }
+      },
     });
   }
 
@@ -64,16 +66,35 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     this.form = this.fb.group({
       contact_id: [null, Validators.required],
       mobile: [null],
+      name: [null],
       unit_id: [null, Validators.required],
       amount: [null, [Validators.required, Validators.min(1)]],
       discount_amount: [null, [Validators.required, Validators.min(0)]],
-      discount_type: [null, Validators.required],
+      discount_type: [1, Validators.required],
       net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       notes: [''],
       status: [1, Validators.required],
-      saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)])
+      saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)]),
     });
 
+    this.filteredContacts = this.form.controls.mobile.valueChanges.pipe(
+      startWith(''),
+      map((value) => this._filter<ContactModel>(value || ''))
+    );
+  }
+
+  private _filter<T>(value: string): T[] {
+    const filterValue = this._normalizeValue(value);
+    return this.contacts.filter((contact) => this._normalizeValue(contact.mob1).includes(filterValue));
+  }
+
+  private _normalizeValue(value: string): string {
+    return value.toLowerCase().replace(/\s/g, '');
+  }
+
+  contactSelected(val: any) {
+    const tmp = this._filter(val?.option?.value)[0] as any;
+    this.form.patchValue({ name: tmp.name, contact_id: tmp.id });
   }
 
   createSaleDetailWithCalculation(index: number): FormGroup {
@@ -84,7 +105,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       amount: [0, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
-      net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]]
+      net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
     });
 
     group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index)); // Added quantity change listener
@@ -119,7 +140,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     if (discountType === 1) {
       net -= discountAmount;
     } else if (discountType === 2) {
-      net -= (amount * discountAmount / 100) * quantity;
+      net -= ((amount * discountAmount) / 100) * quantity;
     }
 
     net = Math.max(0, parseFloat(net.toFixed(2)));
@@ -129,7 +150,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   }
   calculateNetTotal(): void {
     let total = 0;
-    this.saleDetails.controls.forEach(ctrl => {
+    this.saleDetails.controls.forEach((ctrl) => {
       total += ctrl.get('net')?.value || 0;
     });
     this.form.get('net_total')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
@@ -157,7 +178,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
           quantity: detail.quantity || 1, // Patch quantity value
           amount: detail.amount || 0,
           discount_amount: detail.discount_amount || 0,
-          discount_type: detail.discount_type || 1
+          discount_type: detail.discount_type || 1,
         });
         this.saleDetails.push(group);
         this.calculateNet(index);
@@ -180,6 +201,5 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     const payload = {
       ...this.form.getRawValue(),
     };
-
   }
 }

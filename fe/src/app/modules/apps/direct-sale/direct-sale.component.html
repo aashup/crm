@@ -9,18 +9,23 @@
             <mat-form-field class="w-100">
               <mat-label>Mobile</mat-label>
               <input matInput formControlName="mobile" [matAutocomplete]="autoMob" />
-              <mat-autocomplete #autoMob="matAutocomplete">
-                <mat-option *ngFor="let contact of contacts" [value]="contact.name">
-                  {{ contact.name }}
+              <mat-autocomplete
+                #autoMob="matAutocomplete"
+                (optionActivated)="this.contactSelected($event)"
+                (optionSelected)="contactSelected($event)"
+              >
+                <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
+                  {{ contact.mob1 }} <small>[{{ contact.name }}]</small>
                 </mat-option>
               </mat-autocomplete>
-              <mat-error>Contact Name is <strong>required</strong></mat-error>
+              <mat-error>Mobile Number is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
           <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
-              <mat-label>Contact Name</mat-label>
-              <input matInput formControlName="contact_id" [matAutocomplete]="auto" />
+              <mat-label>Name</mat-label>
+              <input class="d-none" formControlName="contact_id" />
+              <input matInput formControlName="name" [matAutocomplete]="auto" />
               <mat-autocomplete #auto="matAutocomplete">
                 <mat-option *ngFor="let contact of contacts" [value]="contact.name">
                   {{ contact.name }}
@@ -29,74 +34,12 @@
               <mat-error>Contact Name is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Unit</mat-label>
-              <mat-select formControlName="unit_id">
-                <mat-option *ngFor="let unit of [{ name: '', id: 1 }]" [value]="unit.id">
-                  {{ unit.name }}
-                </mat-option>
-              </mat-select>
-              <mat-error>Unit is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
 
           <!-- Amount and Discount Amount -->
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Amount</mat-label>
-              <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
-              <mat-error>Amount is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Discount Amount</mat-label>
-              <input matInput type="number" formControlName="discount_amount" placeholder="Enter Discount Amount" />
-              <mat-error>Discount Amount is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
-
-          <!-- Discount Type and Net Total -->
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Discount Type</mat-label>
-              <mat-select formControlName="discount_type">
-                <mat-option [value]="1">Flat</mat-option>
-                <mat-option [value]="2">Percentage</mat-option>
-              </mat-select>
-              <mat-error>Discount Type is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Net Total</mat-label>
-              <input matInput type="number" formControlName="net_total" placeholder="Enter Net Total" />
-              <mat-error>Net Total is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
-
-          <!-- Notes and Status -->
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Notes</mat-label>
-              <textarea matInput formControlName="notes" placeholder="Enter Notes"></textarea>
-            </mat-form-field>
-          </div>
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Status</mat-label>
-              <mat-select formControlName="status">
-                <mat-option [value]="1">Active</mat-option>
-                <mat-option [value]="2">Inactive</mat-option>
-              </mat-select>
-              <mat-error>Status is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
         </div>
 
         <!-- Sale Details -->
-        <h3>Sale Details</h3>
+        <div class="row border-2 border-gray-400 border-top-dashed pb-5"></div>
         <div formArrayName="saleDetails" class="col-12">
           <div
             *ngFor="let detail of saleDetails.controls; let i = index"
@@ -104,7 +47,7 @@
             class="row align-items-center mb-3"
           >
             <!-- Product -->
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-6">
               <mat-form-field class="w-100">
                 <mat-label>Product</mat-label>
                 <mat-select formControlName="product_id">
@@ -121,7 +64,7 @@
               <mat-form-field class="w-100">
                 <mat-label>Unit</mat-label>
                 <mat-select formControlName="unit_id">
-                  <mat-option *ngFor="let unit of units" [value]="unit.id">
+                  <mat-option *ngFor="let unit of [{ id: 1, name: 'A' }]" [value]="unit.id">
                     {{ unit.name }}
                   </mat-option>
                 </mat-select>
@@ -144,28 +87,6 @@
                 <mat-error>Amount is <strong>required</strong></mat-error>
               </mat-form-field>
             </div>
-
-            <!-- Discount -->
-            <div class="col-12 col-md-2">
-              <mat-form-field class="w-100">
-                <mat-label>Discount</mat-label>
-                <input matInput type="number" formControlName="discount_amount" placeholder="Enter Discount" />
-                <mat-error>Discount is <strong>required</strong></mat-error>
-              </mat-form-field>
-            </div>
-
-            <!-- Discount Type -->
-            <div class="col-12 col-md-2">
-              <mat-form-field class="w-100">
-                <mat-label>Discount Type</mat-label>
-                <mat-select formControlName="discount_type">
-                  <mat-option [value]="1">Flat</mat-option>
-                  <mat-option [value]="2">Percentage</mat-option>
-                </mat-select>
-                <mat-error>Discount Type is <strong>required</strong></mat-error>
-              </mat-form-field>
-            </div>
-
             <!-- Action Buttons -->
             <div class="col-12 col-md-1 d-flex flex-row justify-content-end align-items-end" style="margin-top: -15px">
               <button mat-icon-button color="primary" (click)="addSaleDetail()" type="button">
@@ -181,6 +102,38 @@
                 <mat-icon>remove_circle</mat-icon>
               </button>
             </div>
+          </div>
+        </div>
+        <div class="row border-2 border-gray-400 border-top-dashed pb-5"></div>
+        <div class="row">
+          <div class="col-12 kt-margin-bottom-20-mobile justify-content-end">
+            <mat-form-field>
+              <mat-label>Amount</mat-label>
+              <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
+              <mat-error>Amount is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field>
+              <mat-label>Discount Amount</mat-label>
+              <input matInput type="text" formControlName="discount_amount" placeholder="Enter Discount Amount" />
+              <mat-error>Discount Amount is <strong>required</strong></mat-error>
+
+              <mat-select matSuffix formControlName="discount_type">
+                <mat-option [value]="1">INR</mat-option>
+                <mat-option [value]="2">%</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Discount Type and Net Total -->
+          <div class="col-12 kt-margin-bottom-20-mobile"></div>
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Net Total</mat-label>
+              <input matInput type="number" formControlName="net_total" placeholder="Enter Net Total" />
+              <mat-error>Net Total is <strong>required</strong></mat-error>
+            </mat-form-field>
           </div>
         </div>
       </form>

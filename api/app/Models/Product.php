@@ -83,6 +83,6 @@ class Product extends Model
 
     public function productUnit()
     {
-        return $this->hasMany(ProductUnit::class, 'unit_id');
+        return $this->hasMany(ProductUnit::class, 'product_id');
     }
 }
