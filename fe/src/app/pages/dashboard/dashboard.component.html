@@ -1,41 +1,40 @@
 <!--begin::Row-->
 <!-- <div class="row g-5 g-xl-10 mb-5 mb-xl-10"> -->
-  <!--begin::Col-->
-  <!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
     <app-cards-widget20 cssClass="h-md-50 mb-5 mb-xl-10" description="Active Projects" color="#F1416C"
       img="./assets/media/patterns/vector-1.png"></app-cards-widget20>
 
     <app-cards-widget7 cssClass="h-md-50 mb-5 mb-xl-10" [icon]="false" [stats]="357" description="Professionals"
       labelColor="dark" textColor="gray-300"></app-cards-widget7>
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 
-  <!--begin::Col-->
-  <!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
     <app-cards-widget17 cssClass="h-md-50 mb-5 mb-xl-10"></app-cards-widget17>
     <app-lists-widget26 class="h-lg-50"></app-lists-widget26>
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 
-
-  <!--begin::Col-->
-  <!-- <app-engage-widget10 class="col-xxl-6" cssClass="h-md-100"></app-engage-widget10> -->
-  <!--end::Col-->
+<!--begin::Col-->
+<!-- <app-engage-widget10 class="col-xxl-6" cssClass="h-md-100"></app-engage-widget10> -->
+<!--end::Col-->
 <!-- </div> -->
 <!--end::Row-->
 
 <!--begin::Row-->
 <!-- <div class="row gx-5 gx-xl-10"> -->
-  <!--begin::Col-->
-  <!-- <div class="col-xxl-6 mb-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-xxl-6 mb-5 mb-xl-10">
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 
-  <!--begin::Col-->
-  <!-- <div class="col-xxl-6 mb-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-xxl-6 mb-5 mb-xl-10">
     <app-cards-widget18 cssClass="h-xl-100" image="./assets/media/stock/600x600/img-65.jpg"></app-cards-widget18>
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 <!-- </div> -->
 <!--end::Row-->
 
@@ -119,78 +118,39 @@
       <div class="row">
         <!-- Sales by Product Chart -->
         <div class="col-md-6 mb-4">
-          <div class="card p-3">
-            <h6>Sales (Amount) by Product/Category</h6>
-            <apx-chart
-              [series]="salesByProductData"
-              [chart]="salesByProductOptions"
-              [xaxis]="chartXAxis"
-            ></apx-chart>
-          </div>
+          <app-sales-product></app-sales-product>
         </div>
 
         <!-- Actual Sales vs Target Chart -->
         <div class="col-md-6 mb-4">
-          <div class="card p-3">
-            <h6>Actual Sales vs Target</h6>
-            <apx-chart
-              [series]="actualSalesData"
-              [chart]="actualSalesOptions"
-              [xaxis]="chartXAxis"
-            ></apx-chart>
-          </div>
+          <app-sales-actual-target></app-sales-actual-target>
         </div>
       </div>
 
       <div class="row">
         <!-- Sales by Region Chart -->
         <div class="col-md-6 mb-4">
-          <div class="card p-3">
-            <h6>Sales (Amount) by Region</h6>
-            <apx-chart
-              [series]="salesByRegionData"
-              [chart]="salesByRegionOptions"
-              [xaxis]="chartXAxis"
-            ></apx-chart>
-          </div>
+          <app-sales-by-region></app-sales-by-region>
         </div>
 
         <!-- Sales by Channel Pie Chart -->
         <div class="col-md-6 mb-4">
-          <div class="card p-3">
-            <h6>Sales by Channel</h6>
-            <apx-chart
-              [series]="salesByChannelData"
-              [chart]="salesByChannelOptions"
-            ></apx-chart>
-          </div>
+          <app-sales-by-channel></app-sales-by-channel>
         </div>
       </div>
 
       <div class="row">
         <!-- Inventory Days Outstanding -->
         <div class="col-md-6 mb-4">
-          <div class="card p-3">
-            <h6>Inventory Days Outstanding</h6>
-            <apx-chart
-              [series]="inventoryDaysData"
-              [chart]="inventoryDaysOptions"
-            ></apx-chart>
-          </div>
+          <app-sales-inventory></app-sales-inventory>
         </div>
-
         <!-- Receivable Days Outstanding -->
         <div class="col-md-6 mb-4">
-          <div class="card p-3">
-            <h6>Receivable Days Outstanding</h6>
-            <apx-chart
-              [series]="receivableDaysData"
-              [chart]="receivableDaysOptions"
-            ></apx-chart>
-          </div>
+          <app-sales-receivable></app-sales-receivable>
         </div>
       </div>
+      <hr>
+      <app-purchase-graph></app-purchase-graph>
     </div>
   </div>
 </div>
-
