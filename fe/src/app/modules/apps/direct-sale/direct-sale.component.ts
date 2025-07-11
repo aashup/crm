@@ -23,6 +23,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   contacts: any[] = [];
   filteredContacts: Observable<ContactModel[]>;
+  filteredNames: Observable<ContactModel[]>;
   products: any[] = [];
   filteredProducts: Observable<ProductModel[]>;
   isLoading = false;
@@ -78,7 +79,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)]),
     });
 
-    this.filteredContacts = this.form.controls.name.valueChanges.pipe(
+    this.filteredNames = this.form.controls.name.valueChanges.pipe(
       startWith(''),
       map((value) => this._filter<ContactModel>(value || ''))
     );
@@ -91,7 +92,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
   private _filter<T>(value: string): T[] {
     const filterValue = this._normalizeValue(value);
-    return this.contacts.filter((contact) => this._normalizeValue(contact.mob1).includes(filterValue));
+    return this.contacts.filter((contact) => this._normalizeValue(contact.mob1 + contact.name).includes(filterValue));
   }
 
   private _normalizeValue(value: string): string {
