@@ -1,4 +1,4 @@
-<div class="sale-details-container ">
+-<div class="sale-details-container ">
   <!-- Print Button -->
   <div class="print-button-container">
     <button class="print-button" (click)="printInvoice()">Print Invoice</button>
@@ -37,11 +37,11 @@
       <tbody>
         <tr *ngFor="let item of saleDetails?.sale_details">
          
-          <td>{{ getProductByid(item.product_id).name }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.status || 'Packed' }}</td>
-          <td>{{ item.amount | number: '1.2-2' }}</td>
-          <td>{{ item.amount*item.quantity | number: '1.2-2' }}</td>
+          <td>{{ getProductByid(item.product_id)?.name }}</td>
+          <td>{{ item?.quantity }}</td>
+          <td>{{ item?.status || 'Packed' }}</td>
+          <td>{{ item?.amount | number: '1.2-2' }}</td>
+          <td>{{ item?.amount*item.quantity | number: '1.2-2' }}</td>
         </tr>
       </tbody>
     </table>
@@ -107,11 +107,11 @@
           <tr *ngFor="let item of saleDetails?.sale_details; let i = index">
             <td style="border: 1px solid #000; padding: 5px;">{{ i + 1 }}</td>
             <td style="border: 1px solid #000; padding: 5px;">{{ item.product_id }}</td>
-            <td style="border: 1px solid #000; padding: 5px;">{{ getProductByid(item.product_id).name }}</td>
-            <td style="border: 1px solid #000; padding: 5px;">{{ item.quantity }}</td>
-            <td style="border: 1px solid #000; padding: 5px;">₹{{ item.amount }}</td>
-            <td style="border: 1px solid #000; padding: 5px;">₹{{ item.discount_amount }}</td>
-            <td style="border: 1px solid #000; padding: 5px;">₹{{ item.net }}</td>
+            <td style="border: 1px solid #000; padding: 5px;">{{ getProductByid(item.product_id)?.name }}</td>
+            <td style="border: 1px solid #000; padding: 5px;">{{ item?.quantity }}</td>
+            <td style="border: 1px solid #000; padding: 5px;">₹{{ item?.amount }}</td>
+            <td style="border: 1px solid #000; padding: 5px;">₹{{ item?.discount_amount }}</td>
+            <td style="border: 1px solid #000; padding: 5px;">₹{{ item?.net }}</td>
           </tr>
         </tbody>
       </table>

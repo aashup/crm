@@ -56,19 +56,24 @@ export class AddVendorComponent implements AfterViewInit, OnInit {
     }
     );
   }
-  getAddresses() {
-    this.addressService.find().subscribe((res: any) => {
-      this.addresses = res.data;
-      this.addresses.filter((address: any) => {
-        if (address.type =='1') {
+  getAddresses(page: number = 1) {
+    this.addressService.find({ page }).subscribe((res: any) => {
+      const fetchedAddresses = res.data;
+      this.addresses = [...this.addresses, ...fetchedAddresses];
+  
+      fetchedAddresses.forEach((address: any) => {
+        if (address.type == '1') {
           this.billingAddress.push(address);
         } else if (address.type == '2') {
           this.shippingAddress.push(address);
         }
+      });
+  
+     
+      if (fetchedAddresses.length > 0) {
+        this.getAddresses(page + 1); 
       }
-      );
-    }
-    );
+    });
   }
   ngAfterViewInit(): void {
     this.model = this.data.model;
