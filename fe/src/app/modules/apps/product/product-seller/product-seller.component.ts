@@ -39,8 +39,8 @@ import { FormGroup } from '@angular/forms';
 export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
   @Input() form: FormGroup;
-  @Input() next!: () => void;
-  @Input() prev!: () => void;
+  @Input() next: () => void;
+  @Input() prev: () => void;
   dataSource: ProductSellerDatasource;
   selection = new SelectionModel<ProductSellerModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
@@ -125,6 +125,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
     this.getAllAddresses();
     this.getAllCities();
     this.loadData();
+    console.log('Product Seller Component Initialized ',this.form);
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
     });
@@ -165,17 +166,17 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
     this.isLoading = false;
     this.spinnerService.hide();
 
-    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        tap(() => {
-          this.paginator.pageIndex = 0;
-          this.search.all = this.searchElementRef.nativeElement.value;
-          this.loadData();
-        })
-      )
-      .subscribe();
+    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+    //   .pipe(
+    //     debounceTime(500),
+    //     distinctUntilChanged(),
+    //     tap(() => {
+    //       this.paginator.pageIndex = 0;
+    //       this.search.all = this.searchElementRef.nativeElement.value;
+    //       this.loadData();
+    //     })
+    //   )
+    //   .subscribe();
   }
 
   loadData(): void {

@@ -28,6 +28,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   isLoading = false;
   isEdit = false;
   readonly _ = _;
+  units:any = [];
 
   constructor(
     private fb: FormBuilder,

@@ -1,60 +1,246 @@
 <div class="card">
-    <div class="card-body">
-      <h2 class="text-center">Product Details</h2>
+  <div class="card-body">
+    
+    <h2 class="text-center text-primary mb-4">Product Summary</h2>
+
+    <!-- Product Details -->
+    <mat-card class="mb-4 shadow-sm">
+      <mat-card-title class="text-accent" style="padding: 15px;" >Product Information</mat-card-title>
+      <mat-card-content>
+        <p><strong>Name:</strong> {{ productInfo.name }}</p>
+        <p><strong>Status:</strong> {{ productInfo.status == 1 ? 'Active' : 'Inactive' }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Unit Details in Table -->
+    <mat-card class="mb-4 shadow-sm">
+      <mat-card-title class="text-accent" style="padding: 15px;">Unit Details</mat-card-title>
+      <mat-card-content>
+        <table mat-table [dataSource]="unitInfo" class="mat-elevation-z2 full-width">
+          <ng-container matColumnDef="unit">
+            <th mat-header-cell *matHeaderCellDef>Unit</th>
+            <td mat-cell *matCellDef="let unit">{{ unit.unit.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="sale_price">
+            <th mat-header-cell *matHeaderCellDef>Sale Price</th>
+            <td mat-cell *matCellDef="let unit">₹{{ unit.sale_price }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="purchase_price">
+            <th mat-header-cell *matHeaderCellDef>Purchase Price</th>
+            <td mat-cell *matCellDef="let unit">₹{{ unit.purchase_price }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let unit">{{ unit.status == 1 ? 'Active' : 'Inactive' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="notes">
+            <th mat-header-cell *matHeaderCellDef>Notes</th>
+            <td mat-cell *matCellDef="let unit">{{ unit.notes }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="unitDisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: unitDisplayedColumns"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Inventory Details in Table -->
+    <mat-card class="mb-4 shadow-sm">
+      <mat-card-title class="text-accent" style="padding: 15px;">Inventory Details</mat-card-title>
+      <mat-card-content>
+        <table mat-table [dataSource]="inventoryInfo" class="mat-elevation-z2 full-width">
+          <ng-container matColumnDef="unit">
+            <th mat-header-cell *matHeaderCellDef>Unit</th>
+            <td mat-cell *matCellDef="let inventory">{{ inventory.unit.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="qty">
+            <th mat-header-cell *matHeaderCellDef>Qty</th>
+            <td mat-cell *matCellDef="let inventory">{{ inventory.qty }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="rem_qty">
+            <th mat-header-cell *matHeaderCellDef>Remaining</th>
+            <td mat-cell *matCellDef="let inventory">{{ inventory.rem_qty }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="sale_price">
+            <th mat-header-cell *matHeaderCellDef>Sale Price</th>
+            <td mat-cell *matCellDef="let inventory">₹{{ inventory.sale_price }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="purchase_price">
+            <th mat-header-cell *matHeaderCellDef>Purchase Price</th>
+            <td mat-cell *matCellDef="let inventory">₹{{ inventory.purchase_price }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let inventory">{{ inventory.status == 1 ? 'Active' : 'Inactive' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="notes">
+            <th mat-header-cell *matHeaderCellDef>Notes</th>
+            <td mat-cell *matCellDef="let inventory">{{ inventory.notes }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="inventoryDisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: inventoryDisplayedColumns"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Unit Conversion Table -->
+    <mat-card class="mb-4 shadow-sm">
+      <mat-card-title class="text-accent" style="padding: 15px;">Unit Conversion Details</mat-card-title>
+      <mat-card-content>
+        <table mat-table [dataSource]="unitConversionInfo" class="mat-elevation-z2 full-width">
+          <ng-container matColumnDef="from">
+            <th mat-header-cell *matHeaderCellDef>From</th>
+            <td mat-cell *matCellDef="let uc">{{ uc.from_unit.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="to">
+            <th mat-header-cell *matHeaderCellDef>To</th>
+            <td mat-cell *matCellDef="let uc">{{ uc.to_unit.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="factor">
+            <th mat-header-cell *matHeaderCellDef>Factor</th>
+            <td mat-cell *matCellDef="let uc">{{ uc.conversion_factor | number: '1.2-2' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let uc">{{ uc.description }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let uc">{{ uc.status == 1 ? 'Active' : 'Inactive' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="unitConversionDisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: unitConversionDisplayedColumns"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Seller Details -->
+    <!-- <mat-card class="mb-4 shadow-sm">
+      <mat-card-title class="text-accent">Seller Details</mat-card-title>
+      <mat-card-content>
+        <p><strong>Seller Name:</strong> {{ sellerName }}</p>
+        <p><strong>Sale Price:</strong> ₹{{ sellerInfo.sale_price }}</p>
+        <p><strong>Purchase Price:</strong> ₹{{ sellerInfo.purchase_price }}</p>
+        <p><strong>Status:</strong> {{ sellerInfo.status == 1 ? "Active" : "Inactive" }}</p>
+        <p><strong>Notes:</strong> {{ sellerInfo.notes }}</p>
+      </mat-card-content>
+    </mat-card> -->
+
+    <!-- Action Buttons -->
   
-      <!-- Product Details -->
-      <mat-card class="mb-3">
-        <mat-card-title>Product</mat-card-title>
-        <mat-card-content>
-          <p><strong>Name:</strong>  {{productInfo.name}}</p>
-          <p><strong>Status:</strong> {{productInfo.status=="1"?"Active":
-          "Inactive"}}</p>
-        </mat-card-content>
-      </mat-card>
-  
-      <!-- Unit Details -->
-      <mat-card class="mb-3">
-        <mat-card-title>Unit Details</mat-card-title>
-        <mat-card-content>
-          <p><strong>Unit Name:</strong> {{ unitName }}</p>
-          <p><strong>Sale Price:</strong> {{unitInfo.sale_price}}</p>
-          <p><strong>Purchase Price:</strong> {{unitInfo.purchase_price}}</p>
-          <p><strong>Status:</strong> {{unitInfo.status=="1"?"Active":
-            "Inactive"}}</p>
-            <p><strong>Notes:</strong> {{unitInfo.notes}}</p>
-        </mat-card-content>
-      </mat-card>
-  
-      <!-- Inventory Details -->
-      <mat-card class="mb-3">
-        <mat-card-title>Inventory Details</mat-card-title>
-        <mat-card-content>
-          <p><strong>Inventory Name:</strong> {{ unitName }}</p>
-          <p><strong>Sale Price:</strong> {{inventoryInfo.sale_price}}</p>
-          <p><strong>Purchase Price:</strong> {{inventoryInfo.purchase_price}}</p>
-          <p><strong>Status:</strong> {{inventoryInfo.status=="1"?"Active":
-            "Inactive"}}</p>
-            <p><strong>Notes:</strong> {{unitInfo.notes}}</p>
-        </mat-card-content>
-      </mat-card>
-  
-      <!-- Seller Details -->
-      <mat-card class="mb-3">
-        <mat-card-title>Seller Details</mat-card-title>
-        <mat-card-content>
-          <p><strong>Seller Name:</strong> {{ sellerName }}</p>
-          <p><strong>Sale Price:</strong> {{sellerInfo.sale_price}}</p>
-          <p><strong>Purchase Price:</strong> {{sellerInfo.purchase_price}}</p>
-          <p><strong>Status:</strong> {{sellerInfo.status=="1"?"Active":
-            "Inactive"}}</p>
-            <p><strong>Notes:</strong> {{sellerInfo.notes}}</p>
-        </mat-card-content>
-      </mat-card>
-  
-      <!-- Action Buttons -->
-      <div class="d-flex justify-content-center mt-4">
-        <button mat-raised-button color="primary" class="mr-2" (click)="submit()">Submit</button>
-        <button mat-raised-button color="warn" >Cancel</button>
-      </div>
+    <div class="text-center mt-4">
+      <button mat-flat-button color="primary" class="mx-2" (click)="navigateToProduct()">Back</button>
+      <button mat-flat-button color="warn" class="mx-2" (click)="submit()">Print</button>
     </div>
   </div>
+
+
+
+  <div id="printContent" style="display: none;">
+    <div style="max-width: 1000px; margin: auto;">
+      <h2 style="text-align: center; color: #1976d2; margin-bottom: 20px;">Product Summary</h2>
+    
+      <!-- Product Details -->
+      <div style="border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; padding: 15px;">
+        <h3 style="color: #696466;">Product Information</h3>
+        <p><strong>Name:</strong> {{ productInfo.name }}</p>
+        <p><strong>Status:</strong> {{ productInfo.status == 1 ? 'Active' : 'Inactive' }}</p>
+      </div>
+    
+      <!-- Unit Details Table -->
+      <div style="border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; padding: 15px;">
+        <h3 style="color: #696466;">Unit Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f0f0f0;">
+              <th style="padding: 8px; border: 1px solid #ddd;">Unit</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Sale Price</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Purchase Price</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let unit of unitInfo">
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ unit.unit.name }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">₹{{ unit.sale_price }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">₹{{ unit.purchase_price }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ unit.status == 1 ? 'Active' : 'Inactive' }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ unit.notes }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      <!-- Inventory Details Table -->
+      <div style="border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; padding: 15px;">
+        <h3 style="color: #696466;">Inventory Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f0f0f0;">
+              <th style="padding: 8px; border: 1px solid #ddd;">Unit</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Qty</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Remaining</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Sale Price</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Purchase Price</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let inventory of inventoryInfo">
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ inventory.unit.name }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ inventory.qty }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ inventory.rem_qty }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">₹{{ inventory.sale_price }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">₹{{ inventory.purchase_price }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ inventory.status == 1 ? 'Active' : 'Inactive' }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ inventory.notes }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      <!-- Unit Conversion Table -->
+      <div style="border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; padding: 15px;">
+        <h3 style="color: #696466;">Unit Conversion Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f0f0f0;">
+              <th style="padding: 8px; border: 1px solid #ddd;">From</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">To</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Factor</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Description</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let uc of unitConversionInfo">
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ uc.from_unit.name }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ uc.to_unit.name }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ uc.conversion_factor | number: '1.2-2' }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ uc.description }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ uc.status == 1 ? 'Active' : 'Inactive' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </div>
+</div>

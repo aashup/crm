@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateInventoryRequest;
 use App\Models\Contact;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 
 class PosController extends Controller
@@ -35,7 +36,9 @@ class PosController extends Controller
             'slug',
             'type'
         ])->where('status', 1)->get();
-        return BaseResponse::success(['contacts' => $contacts, 'products' => $products]);
+
+        $units = Unit::select(['id', 'name', 'status'])->where('status', 1)->get();
+        return BaseResponse::success(['contacts' => $contacts, 'products' => $products, 'units' => $units]);
     }
 
     /**
@@ -49,7 +52,9 @@ class PosController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInventoryRequest $request) {}
+    public function store(StoreInventoryRequest $request) {
+        
+    }
 
     /**
      * Display the specified resource.

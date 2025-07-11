@@ -32,7 +32,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   isEdit: boolean = false;
   
 
-  formsCount = 5;
+  formsCount = 6;
   account$: BehaviorSubject<ICreateAccount> =
     new BehaviorSubject<ICreateAccount>(inits);
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
@@ -129,6 +129,8 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   };
 
   nextStep() {
+    console.log('Next Step Called', this.currentStep$.value, this.formsCount);
+    
     const nextStep = this.currentStep$.value + 1;
     if (nextStep > this.formsCount) {
       return;
@@ -150,6 +152,7 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   gotoStep(i: number) {
+    return
     if(!this.form.value.productInfo.id)
       return
     this.currentStep$.next(i);

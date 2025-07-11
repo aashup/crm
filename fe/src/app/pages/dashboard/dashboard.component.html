@@ -1,41 +1,40 @@
 <!--begin::Row-->
 <!-- <div class="row g-5 g-xl-10 mb-5 mb-xl-10"> -->
-  <!--begin::Col-->
-  <!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
     <app-cards-widget20 cssClass="h-md-50 mb-5 mb-xl-10" description="Active Projects" color="#F1416C"
       img="./assets/media/patterns/vector-1.png"></app-cards-widget20>
 
     <app-cards-widget7 cssClass="h-md-50 mb-5 mb-xl-10" [icon]="false" [stats]="357" description="Professionals"
       labelColor="dark" textColor="gray-300"></app-cards-widget7>
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 
-  <!--begin::Col-->
-  <!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
     <app-cards-widget17 cssClass="h-md-50 mb-5 mb-xl-10"></app-cards-widget17>
     <app-lists-widget26 class="h-lg-50"></app-lists-widget26>
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 
-
-  <!--begin::Col-->
-  <!-- <app-engage-widget10 class="col-xxl-6" cssClass="h-md-100"></app-engage-widget10> -->
-  <!--end::Col-->
+<!--begin::Col-->
+<!-- <app-engage-widget10 class="col-xxl-6" cssClass="h-md-100"></app-engage-widget10> -->
+<!--end::Col-->
 <!-- </div> -->
 <!--end::Row-->
 
 <!--begin::Row-->
 <!-- <div class="row gx-5 gx-xl-10"> -->
-  <!--begin::Col-->
-  <!-- <div class="col-xxl-6 mb-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-xxl-6 mb-5 mb-xl-10">
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 
-  <!--begin::Col-->
-  <!-- <div class="col-xxl-6 mb-5 mb-xl-10">
+<!--begin::Col-->
+<!-- <div class="col-xxl-6 mb-5 mb-xl-10">
     <app-cards-widget18 cssClass="h-xl-100" image="./assets/media/stock/600x600/img-65.jpg"></app-cards-widget18>
   </div> -->
-  <!--end::Col-->
+<!--end::Col-->
 <!-- </div> -->
 <!--end::Row-->
 
@@ -81,3 +80,77 @@
 <button class="btn btn-primary" (click)="openModal()">Open modal</button> -->
 <!-- Note: Don't forget import ModalsModule (from _metronic/partials) into your module -->
 <!-- end:: Modal example -->
+<!-- dashboard.component.html -->
+<div class="container-fluid mt-4">
+  <h4 class="mb-4">Sale Dashboard</h4>
+  <div class="row">
+    <!-- KPI Column -->
+    <div class="col-md-2">
+      <div class="card mb-3 p-3 text-center">
+        <h6>Sales</h6>
+        <h4>16,461</h4>
+        <small class="text-success">YoY 43% ↑</small>
+      </div>
+      <div class="card mb-3 p-3 text-center">
+        <h6>Sales Target</h6>
+        <h4>15,907</h4>
+      </div>
+      <div class="card mb-3 p-3 text-center">
+        <h6>Target Achievement</h6>
+        <h4>103%</h4>
+      </div>
+      <div class="card mb-3 p-3 text-center">
+        <h6>Sales Last Year</h6>
+        <h4>11,545</h4>
+      </div>
+      <div class="card mb-3 p-3 text-center">
+        <h6>Gross Profit</h6>
+        <h4>5,868</h4>
+      </div>
+      <div class="card mb-3 p-3 text-center">
+        <h6>Gross Profit Margin</h6>
+        <h4>36%</h4>
+      </div>
+    </div>
+
+    <!-- Charts Column -->
+    <div class="col-md-10">
+      <div class="row">
+        <!-- Sales by Product Chart -->
+        <div class="col-md-6 mb-4">
+          <app-sales-product></app-sales-product>
+        </div>
+
+        <!-- Actual Sales vs Target Chart -->
+        <div class="col-md-6 mb-4">
+          <app-sales-actual-target></app-sales-actual-target>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Sales by Region Chart -->
+        <div class="col-md-6 mb-4">
+          <app-sales-by-region></app-sales-by-region>
+        </div>
+
+        <!-- Sales by Channel Pie Chart -->
+        <div class="col-md-6 mb-4">
+          <app-sales-by-channel></app-sales-by-channel>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Inventory Days Outstanding -->
+        <div class="col-md-6 mb-4">
+          <app-sales-inventory></app-sales-inventory>
+        </div>
+        <!-- Receivable Days Outstanding -->
+        <div class="col-md-6 mb-4">
+          <app-sales-receivable></app-sales-receivable>
+        </div>
+      </div>
+      <hr>
+      <app-purchase-graph></app-purchase-graph>
+    </div>
+  </div>
+</div>

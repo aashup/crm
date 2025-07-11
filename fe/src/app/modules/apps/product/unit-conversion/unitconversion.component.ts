@@ -16,6 +16,7 @@ import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { ConfirmationDialogComponent } from 'src/app/modules/core/confirmation-dialog/confirmation-dialog.component';
 import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-unit-conversion',
@@ -58,12 +59,13 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
     private service: UnitConversionService,
     private commonService: CommonService,
     private spinnerService:SpinnerService,
+    private ar: ActivatedRoute
     
   ) {
     this.dataSource = new UnitConversionDatasource(this.service);
   }
   ngOnInit(): void {
-    this.productId=this.form.value.productInfo.id
+    this.productId=this.form.value.productInfo.id||this.ar.snapshot.params['id'];;
     this.loadData();
     console.log(this.form);
     this.cdr.detectChanges()
@@ -89,17 +91,17 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
     this.spinnerService.hide();
   
     
-    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(500), 
-        distinctUntilChanged(), 
-        tap(() => {
-          this.paginator.pageIndex = 0; 
-          this.search.all = this.searchElementRef.nativeElement.value.trim(); 
-          this.loadData();
-        })
-      )
-      .subscribe();
+    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+    //   .pipe(
+    //     debounceTime(500), 
+    //     distinctUntilChanged(), 
+    //     tap(() => {
+    //       this.paginator.pageIndex = 0; 
+    //       this.search.all = this.searchElementRef.nativeElement.value.trim(); 
+    //       this.loadData();
+    //     })
+    //   )
+    //   .subscribe();
   }
  
   loadData() {
@@ -112,9 +114,15 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
       product_id: this.productId, 
     }); 
     this.filter.with = ['product', 'fromUnit', 'toUnit']; 
-    console.log('Filter:', this.filter);
-  
-    this.dataSource.find(_.pickBy(this.filter)); 
+    this.dataSource.find(_.pickBy(this.filter)).subscribe({
+      next: (response:any) => {
+        this.form.value.unitConversionInfo = response.data; 
+        
+      },
+      error: (err) => {
+        console.error('Error while fetching data:', err);
+      },
+    });
   }
 
   masterToggle() {
@@ -188,11 +196,14 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   edit(item: UnitConversionModel) {
+    console.log("item is ",item);
+    
     this.dialog
       .open(AddUnitConversionComponent, {
         data: {
           model: item,
           isEdit: true,
+          productId: this.productId,
         },
       })
       .afterClosed()

@@ -1,5 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ModalConfig, ModalComponent } from '../../_metronic/partials';
+import ApexCharts from 'apexcharts';
+import { ApexAxisChartSeries, ApexChart, ApexXAxis } from 'ng-apexcharts';
 
 @Component({
     selector: 'app-dashboard',
@@ -15,7 +17,7 @@ export class DashboardComponent {
   };
   @ViewChild('modal') private modalComponent: ModalComponent;
   constructor() {}
-
+  
   async openModal() {
     return await this.modalComponent.open();
   }

@@ -28,7 +28,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   productId: number = 0;
 
   private unsubscribe = new SubscriptionHandler();
-  @Input() form!: FormGroup;
+  @Input() form: FormGroup;
   @Input() next!: () => void;
   @Input() prev!: () => void;
   
@@ -58,7 +58,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
       next: (resp: any) => {
         this.productUnits = resp.data;
         console.log('Product Units:', this.productUnits);
-        
+        this.form.value.unitInfo = this.productUnits;
         this.cdr.detectChanges();
       },
       error: (err) => this.commonService.handleError(err),
@@ -97,7 +97,6 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
       .afterClosed()
       .subscribe((result) => {
         if (result) {
-          this.form.patchValue(result);
           this.loadUnit();
           this.commonService.toastr.success('Product unit updated successfully');
         } else {
