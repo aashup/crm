@@ -77,6 +77,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)]),
     });
 
+    this.filteredContacts = this.form.controls.name.valueChanges.pipe(
+      startWith(''),
+      map((value) => this._filter<ContactModel>(value || ''))
+    );
+
     this.filteredContacts = this.form.controls.mobile.valueChanges.pipe(
       startWith(''),
       map((value) => this._filter<ContactModel>(value || ''))
