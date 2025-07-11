@@ -14,9 +14,11 @@ class ProductSeeder extends Seeder
     {
         Product::factory(500)->create()->each(function ($product) {
             $product->productUnit()->create([
-                'unit_id' => rand(1,23),
+                'product_id' => $product->id,
+                'unit_id' => rand(1, 23),
                 'sale_price' => $sale = rand(50,500),
                 'purchase_price' => $sale - rand(1, 50),
+                'notes' => fake()->text(50),
                 'status' => 1
             ]);
         });
