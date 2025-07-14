@@ -175,7 +175,7 @@ return new class extends Migration
             Schema::create('sales', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger(column: 'contact_id');
-                $table->unsignedBigInteger('unit_id');
+                $table->unsignedBigInteger('unit_id')->nullable();
                 $table->unsignedBigInteger('created_by');
                 $table->decimal('amount')->nullable();
                 $table->decimal('discount_amount')->default(0);

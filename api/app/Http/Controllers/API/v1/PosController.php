@@ -9,8 +9,13 @@ use App\Http\Requests\UpdateInventoryRequest;
 use App\Models\Contact;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Models\ProductUnit;
+use App\Models\Sale;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PosController extends Controller
 {
@@ -52,8 +57,46 @@ class PosController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInventoryRequest $request) {
-        
+    public function store(StoreInventoryRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $validated = $request->validated();
+
+            if (!$validated['contact_id']) {
+                $contactExists = Contact::where('mob1', $validated['mobile'])->orWhere('mob2', $validated['mobile'])->orWhere('name', $validated['name'])->exists();
+                if ($contactExists) {
+                    return $this->error("Contact with this mobile or name already exists");
+                }
+                $contact = Contact::create([
+                    'name' => $validated['name'],
+                    'mob1' => $validated['mobile'],
+                    'status' => 1,
+                    'created_by' => Auth::id(),
+                ]);
+                $validated['contact_id'] = $contact->id;
+            }
+
+            $validated['created_by'] = Auth::id();
+
+            $sale = new Sale();
+            $sale->fill($validated);
+            $sale->save();
+
+            $sale->saleDetails()->createMany($validated['saleDetails']);
+            
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Sale Creation Failed: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
+            return $this->error("Unable to create Sale");
+        }
+
+        return $this->success("Sale created successfully", $sale);
     }
 
     /**
