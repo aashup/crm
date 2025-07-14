@@ -35,35 +35,35 @@
         <strong>Supplier Address:</strong><br />
         {{ purchaseDetails?.supplier?.name }}<br />
         <span *ngIf="purchaseDetails?.supplier?.billing_address_id && address.length > 0 && states.length > 0">
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).address }},
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.address }},
           <br />
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).mob1 }},{{
-            getAddressById(purchaseDetails?.supplier?.billing_address_id).mob2
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.mob1 }},{{
+            getAddressById(purchaseDetails?.supplier?.billing_address_id)?.mob2
           }},
 
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).city.name }},
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city?.name }},
 
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).name }},
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city?.state_id)?.name }},
 
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).country.name }}
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id).pin }}
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city?.state_id)?.country.name }}
+          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.pin }}
         </span>
       </p>
       <p>
         <strong>Delivery Address:</strong>
         <span *ngIf="purchaseDetails?.supplier?.shipping_address_id && address.length > 0 && states.length > 0">
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).address }},
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob1 }},{{
-            getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob2
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.address }},
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob1 }},{{
+            getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob2
           }}
 
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.name }},
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.name }},
 
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).name }},
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.name }},
 
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).country.name }},
+          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.country.name }},
 
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).pin }}
+          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.pin }}
         </span>
       </p>
     </div>
@@ -84,7 +84,7 @@
       </thead>
       <tbody *ngIf="products.length > 0">
         <tr *ngFor="let item of purchaseDetails?.purchase_details">
-          <td>{{ getProductByid(item.product_id).name }}</td>
+          <td>{{ getProductByid(item.product_id)?.name }}</td>
           <td>{{ item.quantity }}</td>
           <td>{{ item.status || 'Billed' }}</td>
           <td>{{ item.amount | number: '1.2-2' }}</td>
@@ -148,43 +148,43 @@
           <strong>Bill To:</strong><br />
           {{ purchaseDetails?.supplier?.name }}<br />
           <span *ngIf="purchaseDetails?.supplier?.billing_address_id && address.length > 0 && states.length > 0">
-            <strong>Address Name : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).address }}
+            <strong>Address Name : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.address }}
             <br />
-            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).mob1 }},{{
+            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.mob1 }},{{
               getAddressById(purchaseDetails?.supplier?.billing_address_id).mob2
             }}
             <br />
-            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).city.name }} <br />
+            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city.name }} <br />
             <strong>State : </strong
-            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).name }} <br />
+            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id)?.name }} <br />
             <strong>Country : </strong
             >{{
-              getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id).country.name
+              getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id)?.country.name
             }}
             <br />
-            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id).pin }} <br />
+            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.pin }} <br />
           </span>
         </td>
         <td style="width: 50%; padding: 10px; border: 1px solid #000">
           <strong>Shipping To:</strong><br />
           <span *ngIf="purchaseDetails?.supplier?.shipping_address_id && address.length > 0 && states.length > 0">
             <strong>Address Name : </strong
-            >{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).address }} <br />
-            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob1 }},{{
-              getAddressById(purchaseDetails?.supplier?.shipping_address_id).mob2
+            >{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.address }} <br />
+            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob1 }},{{
+              getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob2
             }}
             <br />
-            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.name }}
+            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.name }}
             <br />
             <strong>State : </strong
-            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).name }}
+            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.name }}
             <br />
             <strong>Country : </strong
             >{{
-              getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id).city.state_id).country.name
+              getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.country.name
             }}
             <br />
-            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id).pin }} <br />
+            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.pin }} <br />
           </span>
         </td>
       </tr>
