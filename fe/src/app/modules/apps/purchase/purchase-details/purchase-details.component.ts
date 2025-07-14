@@ -34,7 +34,7 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     private spinnerService: SpinnerService,
     private route: ActivatedRoute,
     private productService:ProductService,
-    private saleDetailsService:PurchaseDetailsService,
+    private purchaseDetailsService:PurchaseDetailsService,
     private addressService:AddressService,
     private stateService:StateService
   ) {}
@@ -45,7 +45,7 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     this.purchaseId = this.route.snapshot.paramMap.get('id');
     if (this.purchaseId) {
       this.spinnerService.show()
-      this.saleDetailsService.findById(this.purchaseId,{
+      this.purchaseDetailsService.findById(this.purchaseId,{
         "pageSize": 10,
         "with": ["purchaseDetails","contact","unit","supplier"],
         "page": 1,
