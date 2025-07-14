@@ -9,11 +9,7 @@
             <mat-form-field class="w-100">
               <mat-label>Mobile</mat-label>
               <input matInput formControlName="mobile" [matAutocomplete]="autoMob" />
-              <mat-autocomplete
-                #autoMob="matAutocomplete"
-                (optionActivated)="this.contactSelected($event)"
-                (optionSelected)="contactSelected($event)"
-              >
+              <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="contactSelected($event)">
                 <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
                   {{ contact.mob1 }} <small>[{{ contact.name }}]</small>
                 </mat-option>
@@ -26,7 +22,7 @@
               <mat-label>Name</mat-label>
               <input class="d-none" formControlName="contact_id" />
               <input matInput formControlName="name" [matAutocomplete]="autoName" />
-              <mat-autocomplete #autoName="matAutocomplete">
+              <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="nameSelected($event)">
                 <mat-option *ngFor="let contact of filteredNames | async" [value]="contact.name">
                   {{ contact.name }}
                 </mat-option>
@@ -55,7 +51,6 @@
                     {{ product.name }}
                   </mat-option>
                 </mat-select>
-                <mat-error>Product is <strong>required</strong></mat-error>
               </mat-form-field>
             </div>
 
@@ -64,11 +59,10 @@
               <mat-form-field class="w-100">
                 <mat-label>Unit</mat-label>
                 <mat-select formControlName="unit_id">
-                  <mat-option *ngFor="let unit of [{ id: 1, name: 'A' }]" [value]="unit.id">
+                  <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.id">
                     {{ unit.name }}
                   </mat-option>
                 </mat-select>
-                <mat-error>Unit is <strong>required</strong></mat-error>
               </mat-form-field>
             </div>
             <!-- Quantity -->
@@ -107,29 +101,36 @@
         <div class="row border-2 border-gray-400 border-top-dashed pb-5"></div>
         <div class="row">
           <div class="col-12 kt-margin-bottom-20-mobile justify-content-end">
-            <mat-form-field>
-              <mat-label>Amount</mat-label>
-              <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
-              <mat-error>Amount is <strong>required</strong></mat-error>
+            <mat-form-field appearance="outline" class="total-amount-field">
+              <mat-label>Total Amount</mat-label>
+              <input matInput type="number" formControlName="amount" [readonly]="true" />
+              <mat-error *ngIf="form.get('amount')?.hasError('required')">
+                Total Amount is <strong>required</strong>
+              </mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field>
-              <mat-label>Discount Amount</mat-label>
-              <input matInput type="text" formControlName="discount_amount" placeholder="Enter Discount Amount" />
-              <mat-error>Discount Amount is <strong>required</strong></mat-error>
-
-              <mat-select matSuffix formControlName="discount_type">
-                <mat-option [value]="1">INR</mat-option>
-                <mat-option [value]="2">%</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
+          <mat-form-field appearance="outline" class="discount-amount-field">
+            <mat-label>Discount Amount</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="discount_amount"
+              placeholder="Enter Discount Amount"
+              autocomplete="off"
+            />
+            <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px">
+              <mat-option [value]="1">INR</mat-option>
+              <mat-option [value]="2">%</mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('discount_amount')?.hasError('required')">
+              Discount Amount is <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
 
           <!-- Discount Type and Net Total -->
           <div class="col-12 kt-margin-bottom-20-mobile"></div>
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" class="total-amount-field">
               <mat-label>Net Total</mat-label>
               <input matInput type="number" formControlName="net_total" placeholder="Enter Net Total" />
               <mat-error>Net Total is <strong>required</strong></mat-error>

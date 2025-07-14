@@ -1,0 +1,16 @@
+.total-amount-field {
+    width: 100%;
+  
+    @media (min-width: 768px) {
+      max-width: 350px;
+    }
+  }
+  .discount-amount-field {
+    width: 100%;
+  
+    @media (min-width: 768px) {
+      max-width: 370px;
+    }
+  }
+
+  
