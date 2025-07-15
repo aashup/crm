@@ -17,6 +17,7 @@ export class DirectSaleService {
     });
   }
 
+
   update(items: { id: any }) {
     return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items);
   }

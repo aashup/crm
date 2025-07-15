@@ -21,7 +21,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
         component: DirectSaleComponent,
       },
       {
-        path: 'print',
+        path: 'print/:id',
         component: PrintComponent,
       },
     ]),
