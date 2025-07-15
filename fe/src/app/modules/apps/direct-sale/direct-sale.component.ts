@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -30,7 +30,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     private service: DirectSaleService,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -309,6 +310,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
         this.isLoading = false;
         this.spinnerService.hide();
         console.error('Error creating sale:', error);
+        this.cdr.detectChanges();
         this.commonService.toastr.error('Failed to create sale. Please try again.');
       },
     });
