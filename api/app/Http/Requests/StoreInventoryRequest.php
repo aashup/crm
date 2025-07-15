@@ -16,7 +16,7 @@ class StoreInventoryRequest extends FormRequest
     {
         return [
             'contact_id' => ['nullable', 'exists:contacts,id'],
-            'mobile' => ['required_without:contact_id', 'string', 'max:20', 'regex:/^\+[0-9]{7,15}$/'],
+            'mobile' => ['required_without:contact_id', 'string', 'max:20', 'regex:/^\+[0-9\s\-\(\)\.]{7,20}$/'],
             'name' => ['required_without:contact_id', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0'],
             'discount_type' => ['nullable', 'in:1,2'], // 1 = fixed, 2 = percentage
@@ -45,7 +45,11 @@ class StoreInventoryRequest extends FormRequest
 
             $saleDetails = $data['saleDetails'] ?? [];
 
-            $totalSaleAmount = collect($saleDetails)->sum('amount');
+            $totalSaleAmount = 0;
+
+            foreach ($saleDetails as $index => $detail) {
+                $totalSaleAmount += ($detail['amount']) ?? 0 * ($detail['quantity'] ?? 0);
+            }
 
             if (isset($data['amount']) && $data['amount'] > $totalSaleAmount) {
                 $validator->errors()->add('amount', 'The overall amount should not be greater than the total of sale item amounts.');
