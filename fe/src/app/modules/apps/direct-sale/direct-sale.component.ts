@@ -7,6 +7,7 @@ import { DirectSaleService } from './direct-sale.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { Router } from '@angular/router';
+import { find } from 'lodash';
 
 @Component({
   selector: 'app-direct-sale',
@@ -49,8 +50,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       next: (data: any) => {
         this.products = data.data.products;
         this.contacts = data.data.contacts;
-  
-        this.updateFilteredProducts(); 
+
+        this.updateFilteredProducts();
       },
       error: (err) => {
         console.error('Error fetching products:', err);
@@ -68,8 +69,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       mobile: [null, Validators.required],
       name: [null, Validators.required],
       unit_id: [null],
-      amount: [{ value: 0}, [Validators.required]],
-      discount_amount: [null, [Validators.required, Validators.min(0)]],
+      amount: [{ value: 0 }, [Validators.required]],
+      discount_amount: [0, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
       net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       notes: [''],
@@ -95,8 +96,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     const filterValue = value.toLowerCase().replace(/\s/g, '');
     return this.contacts.filter(
       (contact) =>
-        contact.mob1?.toLowerCase().includes(filterValue) ||
-        contact.name?.toLowerCase().includes(filterValue)
+        contact.mob1?.toLowerCase().includes(filterValue) || contact.name?.toLowerCase().includes(filterValue)
     );
   }
 
@@ -125,9 +125,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   }
 
   getSelectedProductIds(): number[] {
-    return this.saleDetails.controls
-      .map(control => control.get('product_id')?.value)
-      .filter(id => id !== null);
+    return this.saleDetails.controls.map((control) => control.get('product_id')?.value).filter((id) => id !== null);
   }
 
   updateFilteredProducts(): void {
@@ -135,9 +133,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
     this.filteredProductsList = this.saleDetails.controls.map((_, index) => {
       const currentSelected = this.saleDetails.at(index).get('product_id')?.value;
-      return this.products.filter(
-        product => !selectedIds.includes(product.id) || product.id === currentSelected
-      );
+      return this.products.filter((product) => !selectedIds.includes(product.id) || product.id === currentSelected);
     });
   }
 
@@ -158,22 +154,37 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
 
     group.get('product_id')?.valueChanges.subscribe((productId) => {
-      const selectedProduct:any = this.products.find(p => p.id === productId);
+      const selectedProduct: any = this.products.find((p) => p.id === productId);
+      console.log(selectedProduct);
       if (selectedProduct && Array.isArray(selectedProduct.product_unit)) {
         this.filteredUnitsList[index] = selectedProduct.product_unit.map((pu: any) => pu.unit);
         if (this.filteredUnitsList[index].length === 1) {
           group.get('unit_id')?.setValue(this.filteredUnitsList[index][0].id);
+          group.get('unit_id')?.valueChanges.subscribe((unitId) => this.setAmount(unitId, selectedProduct));
         } else {
           group.get('unit_id')?.reset();
+          group.get('unit_id')?.valueChanges.subscribe((unitId) => {
+            console.log(find(selectedProduct?.product_unit, ['unit_id', unitId])?.sale_price);
+            group.get('amount')?.setValue(find(selectedProduct?.product_unit, ['unit_id', unitId])?.sale_price);
+          });
         }
       } else {
         this.filteredUnitsList[index] = [];
         group.get('unit_id')?.reset();
+        group.get('unit_id')?.valueChanges.subscribe((unitId) => {
+          console.log(find(selectedProduct?.product_unit, ['unit_id', unitId])?.sale_price);
+          group.get('amount')?.setValue(find(selectedProduct?.product_unit, ['unit_id', unitId])?.sale_price);
+        });
       }
       this.updateFilteredProducts(); // ✅ update list on change
     });
 
     return group;
+  }
+
+  setAmount(unitId: any, selectedProduct: any) {
+    console.log(unitId, selectedProduct);
+    return 1;
   }
 
   addSaleDetail(): void {
@@ -274,7 +285,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     }
 
     this.calculateNetTotal();
-    this.updateFilteredProducts(); 
+    this.updateFilteredProducts();
   }
 
   onSubmit(): void {
@@ -292,7 +303,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
     const payload = {
       ...rawForm,
-
     };
 
     this.service.create(payload).subscribe({
