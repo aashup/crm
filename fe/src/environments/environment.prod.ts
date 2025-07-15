@@ -4,6 +4,7 @@
 
 export const environment = {
   production: true,
+  API_ENDPOINT: 'https://api.xtrox.com/api/v1',
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
