@@ -36,7 +36,7 @@ class StoreInventoryRequest extends FormRequest
         ];
     }
 
-    
+
 
     public function withValidator($validator)
     {
@@ -48,11 +48,17 @@ class StoreInventoryRequest extends FormRequest
             $totalSaleAmount = 0;
 
             foreach ($saleDetails as $index => $detail) {
-                $totalSaleAmount += ($detail['amount']) ?? 0 * ($detail['quantity'] ?? 0);
+                $amount = $detail['amount'] ?? 0;
+                $quantity = $detail['quantity'] ?? 0;
+                $totalSaleAmount += ($amount * $quantity);
             }
 
-            if (isset($data['amount']) && $data['amount'] > $totalSaleAmount) {
+            if (isset($data['amount']) && $data['amount'] < $totalSaleAmount) {
                 $validator->errors()->add('amount', 'The overall amount should not be greater than the total of sale item amounts.');
+            }
+
+            if (isset($data['discount_amount']) && $data['discount_amount'] > $data['amount']) {
+                $validator->errors()->add('discount_amount', 'The discount amount cannot be greater than the amount.');
             }
 
             if (isset($data['net_total']) && isset($data['amount']) && $data['net_total'] > $data['amount']) {
