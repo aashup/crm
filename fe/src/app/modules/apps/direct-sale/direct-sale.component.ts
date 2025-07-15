@@ -68,7 +68,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       mobile: [null, Validators.required],
       name: [null, Validators.required],
       unit_id: [null],
-      amount: [{ value: 0, disabled: true }, [Validators.required]],
+      amount: [{ value: 0}, [Validators.required]],
       discount_amount: [null, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
       net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],

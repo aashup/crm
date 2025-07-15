@@ -103,7 +103,7 @@
           <div class="col-12 kt-margin-bottom-20-mobile justify-content-end">
             <mat-form-field appearance="outline" class="total-amount-field">
               <mat-label>Total Amount</mat-label>
-              <input matInput type="number" formControlName="amount" [readonly]="true" />
+              <input matInput type="number" formControlName="amount" placeholder="Enter Amount"  />
               <mat-error *ngIf="form.get('amount')?.hasError('required')">
                 Total Amount is <strong>required</strong>
               </mat-error>
