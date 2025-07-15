@@ -1,18 +1,12 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import _ from 'lodash';
-import { ContactService } from 'src/app/modules/settings/contact/contact.service';
-import { UnitService } from 'src/app/modules/settings/unit/unit.service';
+import { map, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { ContactModel, ProductModel } from '../product/product.model';
+import { DirectSaleService } from './direct-sale.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { ProductService } from '../product/product.service';
-import { SaleService } from '../sale/sale.service';
-import { DirectSaleService } from './direct-sale.service';
-import { map, startWith } from 'rxjs/operators';
-import { ContactModel, ProductModel } from '../product/product.model';
-import { Observable } from 'rxjs';
-import { MatOption } from '@angular/material/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-direct-sale',
@@ -24,18 +18,20 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   contacts: any[] = [];
   filteredContacts: Observable<ContactModel[]>;
   filteredNames: Observable<ContactModel[]>;
-  products: any[] = [];
-  filteredProducts: Observable<ProductModel[]>;
+  products: ProductModel[] = [];
+  filteredProductsList: ProductModel[][] = [];
   isLoading = false;
   isEdit = false;
-  readonly _ = _;
-  units:any = [];
+  units: any[] = [];
+  filteredUnitsList: any[][] = [];
 
   constructor(
     private fb: FormBuilder,
     private service: DirectSaleService,
     private commonService: CommonService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +49,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       next: (data: any) => {
         this.products = data.data.products;
         this.contacts = data.data.contacts;
+  
+        this.updateFilteredProducts(); 
       },
       error: (err) => {
         console.error('Error fetching products:', err);
@@ -66,11 +64,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
   initializeForm(): void {
     this.form = this.fb.group({
-      contact_id: [null, Validators.required],
-      mobile: [null],
-      name: [null],
-      unit_id: [null, Validators.required],
-      amount: [null, [Validators.required, Validators.min(1)]],
+      contact_id: [null],
+      mobile: [null, Validators.required],
+      name: [null, Validators.required],
+      unit_id: [null],
+      amount: [{ value: 0}, [Validators.required]],
       discount_amount: [null, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
       net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
@@ -88,61 +86,121 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       startWith(''),
       map((value) => this._filter<ContactModel>(value || ''))
     );
+
+    this.form.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNetTotal());
+    this.form.get('discount_type')?.valueChanges.subscribe(() => this.calculateNetTotal());
   }
 
-  private _filter<T>(value: string): T[] {
-    const filterValue = this._normalizeValue(value);
-    return this.contacts.filter((contact) => this._normalizeValue(contact.mob1 + contact.name).includes(filterValue));
+  private _filter<T extends ContactModel>(value: string): T[] {
+    const filterValue = value.toLowerCase().replace(/\s/g, '');
+    return this.contacts.filter(
+      (contact) =>
+        contact.mob1?.toLowerCase().includes(filterValue) ||
+        contact.name?.toLowerCase().includes(filterValue)
+    );
   }
 
-  private _normalizeValue(value: string): string {
-    return value.toLowerCase().replace(/\s/g, '');
+  contactSelected(event: any) {
+    const selectedMob = event?.option?.value;
+    const matched = this.contacts.find((c) => c.mob1 === selectedMob);
+
+    if (matched) {
+      this.form.patchValue({
+        name: matched.name,
+        contact_id: matched.id,
+      });
+    }
   }
 
-  contactSelected(val: any) {
-    const tmp = this._filter(val?.option?.value)[0] as any;
-    this.form.patchValue({ name: tmp.name, contact_id: tmp.id });
+  nameSelected(event: any) {
+    const selectedName = event?.option?.value;
+    const matched = this.contacts.find((c) => c.name === selectedName);
+
+    if (matched) {
+      this.form.patchValue({
+        mobile: matched.mob1,
+        contact_id: matched.id,
+      });
+    }
+  }
+
+  getSelectedProductIds(): number[] {
+    return this.saleDetails.controls
+      .map(control => control.get('product_id')?.value)
+      .filter(id => id !== null);
+  }
+
+  updateFilteredProducts(): void {
+    const selectedIds = this.getSelectedProductIds();
+
+    this.filteredProductsList = this.saleDetails.controls.map((_, index) => {
+      const currentSelected = this.saleDetails.at(index).get('product_id')?.value;
+      return this.products.filter(
+        product => !selectedIds.includes(product.id) || product.id === currentSelected
+      );
+    });
   }
 
   createSaleDetailWithCalculation(index: number): FormGroup {
     const group = this.fb.group({
       product_id: [null, Validators.required],
       unit_id: [null, Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1)]], // Added quantity field
+      quantity: [1, [Validators.required, Validators.min(1)]],
       amount: [0, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
       net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
     });
 
-    group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index)); // Added quantity change listener
+    group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
+
+    group.get('product_id')?.valueChanges.subscribe((productId) => {
+      const selectedProduct:any = this.products.find(p => p.id === productId);
+      if (selectedProduct && Array.isArray(selectedProduct.product_unit)) {
+        this.filteredUnitsList[index] = selectedProduct.product_unit.map((pu: any) => pu.unit);
+        if (this.filteredUnitsList[index].length === 1) {
+          group.get('unit_id')?.setValue(this.filteredUnitsList[index][0].id);
+        } else {
+          group.get('unit_id')?.reset();
+        }
+      } else {
+        this.filteredUnitsList[index] = [];
+        group.get('unit_id')?.reset();
+      }
+      this.updateFilteredProducts(); // ✅ update list on change
+    });
 
     return group;
   }
 
   addSaleDetail(): void {
     const index = this.saleDetails.length;
+    this.filteredUnitsList[index] = [];
     this.saleDetails.push(this.createSaleDetailWithCalculation(index));
+    this.updateFilteredProducts(); // ✅
   }
 
   removeSaleDetail(index: number): void {
     if (this.saleDetails.length > 1) {
       this.saleDetails.removeAt(index);
+      this.filteredUnitsList.splice(index, 1);
+      this.filteredProductsList.splice(index, 1);
       this.calculateNetTotal();
+      this.updateFilteredProducts(); // ✅
     }
   }
 
   calculateNet(index: number): void {
     const item = this.saleDetails.at(index);
-    const quantity = item.get('quantity')?.value || 1; // Use quantity in calculation
+    const quantity = item.get('quantity')?.value || 1;
     const amount = item.get('amount')?.value || 0;
     const discountAmount = item.get('discount_amount')?.value || 0;
     const discountType = item.get('discount_type')?.value;
 
-    let net = amount * quantity; // Multiply amount by quantity
+    let net = amount * quantity;
 
     if (discountType === 1) {
       net -= discountAmount;
@@ -155,14 +213,35 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
     this.calculateNetTotal();
   }
+
   calculateNetTotal(): void {
-    let total = 0;
+    let totalAmount = 0;
+
     this.saleDetails.controls.forEach((ctrl) => {
-      total += ctrl.get('net')?.value || 0;
+      const quantity = ctrl.get('quantity')?.value || 1;
+      const amount = ctrl.get('amount')?.value || 0;
+      totalAmount += quantity * amount;
     });
-    this.form.get('net_total')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
+
+    this.form.get('amount')?.setValue(parseFloat(totalAmount.toFixed(2)), { emitEvent: false });
+
+    const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
+    const discountType = this.form.get('discount_type')?.value;
+    let netTotal = totalAmount;
+
+    if (discountType === 1) {
+      netTotal -= discountAmount;
+    } else if (discountType === 2) {
+      netTotal -= (totalAmount * discountAmount) / 100;
+    }
+
+    netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
+    this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
   }
 
+  navigateToSale(): void {
+    this.router.navigate(['/app/sale']);
+  }
   patchForm(sale: any): void {
     this.form.patchValue({
       contact_id: sale.contact_id || null,
@@ -175,14 +254,16 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     });
 
     this.saleDetails.clear();
+    this.filteredUnitsList = [];
+    this.filteredProductsList = [];
 
-    if (sale.sale_details && Array.isArray(sale.sale_details)) {
+    if (Array.isArray(sale.sale_details)) {
       sale.sale_details.forEach((detail: any, index: number) => {
         const group = this.createSaleDetailWithCalculation(index);
         group.patchValue({
           product_id: detail.product_id || null,
           unit_id: detail.unit_id || null,
-          quantity: detail.quantity || 1, // Patch quantity value
+          quantity: detail.quantity || 1,
           amount: detail.amount || 0,
           discount_amount: detail.discount_amount || 0,
           discount_type: detail.discount_type || 1,
@@ -193,7 +274,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     }
 
     this.calculateNetTotal();
+    this.updateFilteredProducts(); 
   }
+
   onSubmit(): void {
     this.commonService.markFormGroupTouched(this.form);
 
@@ -205,8 +288,31 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     this.isLoading = true;
     this.spinnerService.show();
 
+    const rawForm = this.form.getRawValue();
+
     const payload = {
-      ...this.form.getRawValue(),
+      ...rawForm,
+
     };
+
+    this.service.create(payload).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.spinnerService.hide();
+        this.commonService.toastr.success('Sale created successfully.');
+        this.form.reset();
+        this.saleDetails.clear();
+        this.filteredUnitsList = [];
+        this.filteredProductsList = [];
+        this.router.navigate(['/app/sale']);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.spinnerService.hide();
+        console.error('Error creating sale:', error);
+        this.cdr.detectChanges();
+        this.commonService.toastr.error('Failed to create sale. Please try again.');
+      },
+    });
   }
 }
