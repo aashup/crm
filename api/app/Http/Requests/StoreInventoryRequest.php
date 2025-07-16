@@ -25,6 +25,11 @@ class StoreInventoryRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:500'],
             'status' => ['required', 'in:1,2'], // 1 = active, 2 = inactive
 
+            'payment_method' => ['required', 'integer', 'in:1,2,3'], // 1 = Cash, 2 = Online, 3 = Split Payment
+            'cash_amount' => ['nullable', 'required_with:payment_method,1,3', 'numeric', 'min:0'],
+            'online_amount' => ['nullable', 'required_with:payment_method,2,3', 'numeric', 'min:0'],
+            'transaction_id' => ['nullable', 'required_with:payment_method,2,3', 'string', 'max:255'],
+
             'saleDetails' => ['required', 'array', 'min:1'],
             'saleDetails.*.product_id' => ['required', 'exists:products,id'],
             'saleDetails.*.unit_id' => ['required', 'exists:units,id'],
@@ -42,6 +47,18 @@ class StoreInventoryRequest extends FormRequest
     {
         $validator->after(function (Validator $validator) {
             $data = $this->all();
+
+            if($data['payment_method'] == 1 && $data['cash_amount'] != $data['net_total']) {
+                $validator->errors()->add('cash_amount', 'Cash amount must equal the net total for Cash payment method.');
+            }
+
+            if($data['payment_method'] == 2 && $data['online_amount'] != $data['net_total']) {
+                $validator->errors()->add('online_amount', 'Online amount must equal the net total for Online payment method.');
+            }
+
+            if($data['payment_method'] == 3 && ($data['cash_amount'] + $data['online_amount']) != $data['net_total']) {
+                $validator->errors()->add('payment_method', 'Total of Cash and Online amounts must equal the net total for Split Payment.');
+            }
 
             $saleDetails = $data['saleDetails'] ?? [];
 
