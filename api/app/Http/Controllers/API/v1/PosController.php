@@ -24,7 +24,7 @@ class PosController extends Controller
      */
     public function index(Request $request)
     {
-        $contacts = Contact::select(['id', 'name', 'mob1', 'mob2', 'status'])->where('status', 1)->orderBy('name')->get();
+        $contacts = Contact::select(['id', 'name', 'mob1', 'mob2', 'status'])->where('status', 1)->get();
         $products = Product::with([
             'productUnit' => function ($q) {
                 return $q->with('unit')->select([
@@ -40,9 +40,9 @@ class PosController extends Controller
             'status',
             'slug',
             'type'
-        ])->where('status', 1)->orderBy('name')->get();
+        ])->where('status', 1)->get();
 
-        $units = Unit::select(['id', 'name', 'status'])->where('status', 1)->orderBy('name')->get();
+        $units = Unit::select(['id', 'name', 'status'])->where('status', 1)->get();
         return BaseResponse::success(['contacts' => $contacts, 'products' => $products, 'units' => $units]);
     }
 
