@@ -3,13 +3,14 @@
   <div class="card m-auto">
     <div class="card-body">
       <form class="form" [formGroup]="form" *ngIf="form">
+        <!-- Mobile-->
         <div class="row">
-          <!-- Contact Name and Unit -->
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100 mb-5">
+          <div class="col-12 col-md-6" style="margin-bottom: 20px;">
+            <mat-form-field class="w-100">
               <mat-label>Mobile</mat-label>
-              <input matInput formControlName="mobile" [matAutocomplete]="autoMob" (blur)="onContactBlur()" />
-              <mat-autocomplete #autoMob="matAutocomplete">
+              <input matInput formControlName="mobile" [matAutocomplete]="autoMob" (blur)="onContactBlur()"
+                placeholder="Search or enter mobile" />
+              <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
                 <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
                   {{ contact.mob1 }} <small>[{{ contact.name }}]</small>
                 </mat-option>
@@ -17,12 +18,15 @@
               <mat-error>Mobile Number is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100 mb-5">
+
+          <!-- Name -->
+          <div class="col-12 col-md-6" style="margin-bottom: 20px;">
+            <mat-form-field class="w-100">
               <mat-label>Name</mat-label>
               <input class="d-none" formControlName="contact_id" />
-              <input matInput formControlName="name" [matAutocomplete]="autoName" (blur)="onNameBlur()" />
-              <mat-autocomplete #autoName="matAutocomplete">
+              <input matInput formControlName="name" [matAutocomplete]="autoName" (blur)="onNameBlur()"
+                placeholder="Search or enter name" />
+              <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="isNameSelected = true">
                 <mat-option *ngFor="let contact of filteredNames | async" [value]="contact.name">
                   {{ contact.name }}
                 </mat-option>
@@ -30,21 +34,16 @@
               <mat-error>Contact Name is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-
-          <!-- Amount and Discount Amount -->
         </div>
 
         <!-- Sale Details -->
-        <div class="row border-2 border-gray-400 border-top-dashed pb-5"></div>
+        <div class="row" style="border-top: 2px dashed #ccc; padding-bottom: 20px;"></div>
         <div formArrayName="saleDetails" class="col-12">
-          <div
-            *ngFor="let detail of saleDetails.controls; let i = index"
-            [formGroupName]="i"
-            class="row align-items-center mb-3"
-          >
+          <div *ngFor="let detail of saleDetails.controls; let i = index" [formGroupName]="i"
+            class="row align-items-center" style="margin-bottom: 15px;">
             <!-- Product -->
             <div class="col-12 col-md-6">
-              <mat-form-field class="w-100 mb-5">
+              <mat-form-field class="w-100">
                 <mat-label>Product</mat-label>
                 <mat-select [formControlName]="'product_id'">
                   <mat-option *ngFor="let product of filteredProductsList[i]" [value]="product.id">
@@ -56,7 +55,7 @@
 
             <!-- Unit -->
             <div class="col-12 col-md-2">
-              <mat-form-field class="w-100 mb-5">
+              <mat-form-field class="w-100">
                 <mat-label>Unit</mat-label>
                 <mat-select formControlName="unit_id">
                   <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.id">
@@ -65,78 +64,83 @@
                 </mat-select>
               </mat-form-field>
             </div>
+
             <!-- Quantity -->
             <div class="col-12 col-md-1">
-              <mat-form-field class="w-100 mb-5">
+              <mat-form-field class="w-100">
                 <mat-label>Quantity</mat-label>
                 <input matInput type="number" formControlName="quantity" placeholder="Enter Quantity" />
                 <mat-error>Quantity is <strong>required</strong></mat-error>
               </mat-form-field>
             </div>
+
             <!-- Amount -->
             <div class="col-12 col-md-2">
-              <mat-form-field class="w-100 mb-5">
+              <mat-form-field class="w-100">
                 <mat-label>Amount</mat-label>
                 <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
                 <mat-error>Amount is <strong>required</strong></mat-error>
               </mat-form-field>
             </div>
-            <!-- Action Buttons -->
-            <div class="col-12 col-md-1 d-flex flex-row justify-content-end align-items-end" style="margin-top: -15px">
+
+            <!-- Add/Remove Buttons -->
+            <div class="col-12 col-md-1"
+              style="display: flex; justify-content: flex-end; align-items: flex-end; margin-top: -15px;">
               <button mat-icon-button color="primary" (click)="addSaleDetail()" type="button">
                 <mat-icon>add_circle</mat-icon>
               </button>
-              <button
-                mat-icon-button
-                color="warn"
-                (click)="removeSaleDetail(i)"
-                type="button"
-                [disabled]="saleDetails.length === 1"
-              >
+              <button mat-icon-button color="warn" (click)="removeSaleDetail(i)" type="button"
+                [disabled]="saleDetails.length === 1">
                 <mat-icon>remove_circle</mat-icon>
               </button>
             </div>
           </div>
         </div>
-        <div class="row border-2 border-gray-400 border-top-dashed pb-5"></div>
-        <div class="row">
-          <div class="col-12 kt-margin-bottom-20-mobile justify-content-end">
-            <mat-form-field appearance="outline" class="total-amount-field mb-5">
+
+        <!-- Amount Fields -->
+        <div class="row" style="border-top: 2px dashed #ccc; padding-bottom: 20px;"></div>
+
+        <!-- Total Amount -->
+        <div class="row" style="display: flex; justify-content: flex-end; margin: 0;">
+          <div class="col-12 col-md-4" style="padding-right: 0;">
+            <mat-form-field appearance="outline" class="w-100 mb-3">
               <mat-label>Total Amount</mat-label>
-              <input matInput type="number" formControlName="amount" placeholder="Enter Amount"  />
+              <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
               <mat-error *ngIf="form.get('amount')?.hasError('required')">
                 Total Amount is <strong>required</strong>
               </mat-error>
             </mat-form-field>
           </div>
-          <mat-form-field appearance="outline" class="discount-amount-field mb-5">
-            <mat-label>Discount Amount</mat-label>
-            <input
-              matInput
-              type="text"
-              formControlName="discount_amount"
-              placeholder="Enter Discount Amount"
-              autocomplete="off"
-            />
-            <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px">
-              <mat-option [value]="1">INR</mat-option>
-              <mat-option [value]="2">%</mat-option>
-            </mat-select>
-            <mat-error *ngIf="form.get('discount_amount')?.hasError('required')">
-              Discount Amount is <strong>required</strong>
-            </mat-error>
-            <mat-error *ngIf="form.get('discount_amount')?.hasError('exceedsAmount')">
-              Discount cannot be more than total amount.
-            </mat-error>
-            <mat-error *ngIf="form.get('discount_amount')?.hasError('exceedsPercent')">
-              Discount percentage cannot exceed 100%.
-            </mat-error>
-          </mat-form-field>
+        </div>
 
-          <!-- Discount Type and Net Total -->
-          <div class="col-12 kt-margin-bottom-20-mobile"></div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100" class="total-amount-field mb-5">
+        <!-- Discount Amount -->
+        <div class="row" style="display: flex; justify-content: flex-end; margin: 0;">
+          <div class="col-12 col-md-4" style="padding-right: 0;">
+            <mat-form-field appearance="outline" class="w-100 mb-3">
+              <mat-label>Discount Amount</mat-label>
+              <input matInput type="text" formControlName="discount_amount" placeholder="Enter Discount Amount"
+                autocomplete="off" />
+              <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px;">
+                <mat-option [value]="1">INR</mat-option>
+                <mat-option [value]="2">%</mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.get('discount_amount')?.hasError('required')">
+                Discount Amount is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="form.get('discount_amount')?.hasError('exceedsAmount')">
+                Discount cannot be more than total amount.
+              </mat-error>
+              <mat-error *ngIf="form.get('discount_amount')?.hasError('exceedsPercent')">
+                Discount percentage cannot exceed 100%.
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Net Total -->
+        <div class="row" style="display: flex; justify-content: flex-end; margin: 0;">
+          <div class="col-12 col-md-4" style="padding-right: 0;">
+            <mat-form-field appearance="outline" class="w-100 mb-3">
               <mat-label>Net Total</mat-label>
               <input matInput type="number" formControlName="net_total" placeholder="Enter Net Total" />
               <mat-error>Net Total is <strong>required</strong></mat-error>
@@ -148,26 +152,26 @@
   </div>
 </div>
 
-<div mat-dialog-actions>
-  <button type="button" class="btn btn-primary" [disabled]="isLoading" style="margin-right: 5px" (click)="navigateToSale()">Cancel</button>
-  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit()" (keyup.enter)="onSubmit()" style="margin-right: 5px">
-    <ng-container *ngIf="!isLoading">
-      {{ isEdit ? 'Update' : 'Create' }}
-    </ng-container>
+<!-- Action Buttons -->
+<div mat-dialog-actions style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="navigateToSale()">Cancel</button>
+
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit()" (keyup.enter)="onSubmit()">
+    <ng-container *ngIf="!isLoading">{{ isEdit ? 'Update' : 'Create' }}</ng-container>
     <ng-container *ngIf="isLoading">
-      <span clas="indicator-progress" [style.display]="'block'">
-        Please wait...{{ ' ' }}
+      <span class="indicator-progress" style="display: block;">
+        Please wait...
         <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
       </span>
     </ng-container>
   </button>
-  <button type="button" class="btn btn-primary" [disabled]="isLoading"  (click)="onSubmit(true)" (keyup.enter)="onSubmit(true)">
-    <ng-container *ngIf="!isLoading">
-     Save and Print
-    </ng-container>
+
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit(true)"
+    (keyup.enter)="onSubmit(true)">
+    <ng-container *ngIf="!isLoading">Save and Print</ng-container>
     <ng-container *ngIf="isLoading">
-      <span clas="indicator-progress" [style.display]="'block'">
-        Please wait...{{ ' ' }}
+      <span class="indicator-progress" style="display: block;">
+        Please wait...
         <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
       </span>
     </ng-container>
