@@ -22,7 +22,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   filteredProductsList: ProductModel[][] = [];
   units: any[] = [];
   filteredUnitsList: any[][] = [];
-
+  isNameSelected = false;
+  isMobileSelected = false;
   isLoading = false;
   isEdit = false;
   isManualAmount: boolean = false;
@@ -41,8 +42,56 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     this.getAllProducts();
     this.initializeForm();
     this.validateDiscountAmount();
+  
+    // Filtered names
+    this.filteredNames = this.form.controls.name.valueChanges.pipe(
+      startWith(''),
+      map((value: string) => {
+        const val = value?.toLowerCase().trim();
+        return this.contacts.filter(
+          contact => contact.name.toLowerCase().includes(val)
+        );
+      })
+    );
+  
+    // Filtered mobiles
+    this.filteredContacts = this.form.controls.mobile.valueChanges.pipe(
+      startWith(''),
+      map((value: string) => {
+        const val = value?.toLowerCase().trim();
+        return this.contacts.filter(
+          contact => contact.mob1.toLowerCase().includes(val)
+        );
+      })
+    );
+  
+    this.form.get('name')?.valueChanges.subscribe(value => {
+      const match = this.contacts.find(c => c.name === value);
+      if (match) {
+        this.isNameSelected = true;
+        this.form.patchValue({
+          mobile: match.mob1,
+          contact_id: match.id
+        }, { emitEvent: false });
+      } else {
+        this.isNameSelected = false;
+      }
+    });
+  
+    this.form.get('mobile')?.valueChanges.subscribe(value => {
+      const match = this.contacts.find(c => c.mob1 === value);
+      if (match) {
+        this.isMobileSelected = true;
+        this.form.patchValue({
+          name: match.name,
+          contact_id: match.id
+        }, { emitEvent: false });
+      } else {
+        this.isMobileSelected = false;
+      }
+    });
   }
-
+  
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
@@ -59,6 +108,14 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
         console.error('Error fetching products:', err);
       },
     });
+  }
+  onInputNameChange(event: any): void {
+    const inputValue = event.target.value;  
+    console.log('Input value changed:', inputValue);  
+    const mobileValue = this.form.get('mobile')?.value;
+    const nameValue = this.form.get('name')?.value;
+    console.log('Mobile value:', mobileValue);
+    console.log('Name value:', nameValue);
   }
 
   get saleDetails(): FormArray {
@@ -112,26 +169,24 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
   onContactBlur(): void {
     const mobileValue = this.form.get('mobile')?.value;
-    const matched = this.contacts.find(c => c.mob1 === mobileValue);
-    if (matched) {
-      this.form.patchValue({
-        name: matched.name,
-        contact_id: matched.id,
-      });
+    const match = this.contacts.find(c => c.mob1 === mobileValue);
+  
+    if (!match && this.isNameSelected) {
+      // Clear name only if previously selected
+      this.form.patchValue({ name: '', contact_id: null });
+      this.isNameSelected = false;
     }
   }
-  
   onNameBlur(): void {
     const nameValue = this.form.get('name')?.value;
-    const matched = this.contacts.find(c => c.name === nameValue);
-    if (matched) {
-      this.form.patchValue({
-        mobile: matched.mob1,
-        contact_id: matched.id,
-      })
+    const match = this.contacts.find(c => c.name === nameValue);
+  
+    if (!match && this.isMobileSelected) {
+      // Clear mobile only if it was previously selected
+      this.form.patchValue({ mobile: '', contact_id: null });
+      this.isMobileSelected = false;
     }
   }
-  
   getSelectedProductIds(): number[] {
     return this.saleDetails.controls
       .map(control => control.get('product_id')?.value)
