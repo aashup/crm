@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -7,13 +7,15 @@ import { DirectSaleService } from './direct-sale.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { Router } from '@angular/router';
+import { SubscriptionHandler } from '../../core/subscription.handler';
 
 @Component({
   selector: 'app-direct-sale',
   templateUrl: './direct-sale.component.html',
   styleUrl: './direct-sale.component.scss',
 })
-export class DirectSaleComponent implements AfterViewInit, OnInit {
+export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
+  subscriptionHandler = new SubscriptionHandler();
   form: FormGroup;
   contacts: any[] = [];
   filteredContacts: Observable<ContactModel[]>;
@@ -49,7 +51,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       startWith(''),
       map((value: string) => {
         const val = value?.toLowerCase().trim();
-        return this.contacts.filter(contact => contact.name.toLowerCase().includes(val));
+        return this.contacts.filter((contact) => contact.name.toLowerCase().includes(val));
       })
     );
 
@@ -57,31 +59,37 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       startWith(''),
       map((value: string) => {
         const val = value?.toLowerCase().trim();
-        return this.contacts.filter(contact => contact.mob1.toLowerCase().includes(val));
+        return this.contacts.filter((contact) => contact.mob1.toLowerCase().includes(val));
       })
     );
 
-    this.form.get('name')?.valueChanges.subscribe(value => {
-      const match = this.contacts.find(c => c.name === value);
+    this.form.get('name')?.valueChanges.subscribe((value) => {
+      const match = this.contacts.find((c) => c.name === value);
       if (match) {
         this.isNameSelected = true;
-        this.form.patchValue({
-          mobile: match.mob1,
-          contact_id: match.id
-        }, { emitEvent: false });
+        this.form.patchValue(
+          {
+            mobile: match.mob1,
+            contact_id: match.id,
+          },
+          { emitEvent: false }
+        );
       } else {
         this.isNameSelected = false;
       }
     });
 
-    this.form.get('mobile')?.valueChanges.subscribe(value => {
-      const match = this.contacts.find(c => c.mob1 === value);
+    this.form.get('mobile')?.valueChanges.subscribe((value) => {
+      const match = this.contacts.find((c) => c.mob1 === value);
       if (match) {
         this.isMobileSelected = true;
-        this.form.patchValue({
-          name: match.name,
-          contact_id: match.id
-        }, { emitEvent: false });
+        this.form.patchValue(
+          {
+            name: match.name,
+            contact_id: match.id,
+          },
+          { emitEvent: false }
+        );
       } else {
         this.isMobileSelected = false;
       }
@@ -91,6 +99,16 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptionHandler.unsubscribe();
+    this.form.reset();
+    this.filteredUnitsList = [];
+    this.filteredProductsList = [];
+    this.contacts = [];
+    this.products = [];
+    this.units = [];
   }
 
   initializeForm(): void {
@@ -106,10 +124,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       notes: [''],
       status: [1, Validators.required],
       payment_method: [1, Validators.required],
-      cash_amount: [null,[Validators.required, Validators.min(0),this.nonNegativeValidator()]],
-      online_amount: [null,this.nonNegativeValidator()],
+      cash_amount: [null, [Validators.required, Validators.min(0), this.nonNegativeValidator()]],
+      online_amount: [null, this.nonNegativeValidator()],
       transaction_id: [null],
-      saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)])
+      saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)]),
     });
 
     this.form.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNetTotal());
@@ -128,53 +146,62 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       const cash = this.form.get('cash_amount');
       const online = this.form.get('online_amount');
       const txn = this.form.get('transaction_id');
-  
+
       // Clear all validators initially
       cash?.clearValidators();
       online?.clearValidators();
       txn?.clearValidators();
-  
+
       // Update visibility and validators based on selection
-      if (type == 1) { // Online
-         this.showCashFields = true;
-         this.showOnlineFields = false;
-         cash?.setValidators([Validators.required, Validators.min(0)]);
-      } else if (type == 2) { // Cash
-        this.showOnlineFields = true;
+      if (type == 1) {
+        // Online
+        this.showCashFields = true;
+        this.showOnlineFields = false;
+        online?.setValue(0);
+        txn?.setValue("");
+        cash?.setValidators([Validators.required, Validators.min(0)]);
+      } else if (type == 2) {
+        // Cash
+        this.showOnlineFields = false;
         this.showCashFields = false;
-        online?.setValidators([Validators.required, Validators.min(0.01)]);
-        txn?.setValidators([Validators.required]);
-      } else if (type == 3) { // Split
+        cash?.setValue(0);
+        online?.setValue(this.form.get('net_total')?.value || 0);
+        // online?.setValidators([Validators.required, Validators.min(0.01)]);
+        // txn?.setValidators([Validators.required]);
+      } else if (type == 3) {
+        // Split
         this.showCashFields = true;
         this.showOnlineFields = true;
         cash?.setValidators([Validators.required, Validators.min(0)]);
         online?.setValidators([Validators.required, Validators.min(0.01)]);
         txn?.setValidators([Validators.required]);
       }
-  
+
       // Apply validation updates
       cash?.updateValueAndValidity();
       online?.updateValueAndValidity();
       txn?.updateValueAndValidity();
     });
   }
-  
+
   get returnAmount(): number {
     const net = this.form.get('net_total')?.value || 0;
     const cash = parseFloat(this.form.get('cash_amount')?.value) || 0;
     const online = parseFloat(this.form.get('online_amount')?.value) || 0;
     const type = this.form.get('payment_method')?.value;
-  
+
     let returnAmt = 0;
-    if (type === 1) { // Cash
+    if (type === 1) {
       returnAmt = cash - net;
-    } else if (type === 3) { // Split
-      returnAmt = (cash + online) - net;
+    } else if (type === 2) {
+      returnAmt = online - net;
+    } else if (type === 3) {
+      returnAmt = cash + online - net;
     }
-  
+
     return returnAmt > 0 ? parseFloat(returnAmt.toFixed(2)) : 0;
   }
-  
+
   nonNegativeValidator() {
     return (control: AbstractControl) => {
       const value = parseFloat(control.value);
@@ -182,10 +209,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       return value < 0 ? { negativeValue: true } : null;
     };
   }
-  
 
   getAllProducts() {
-    this.service.find().subscribe({
+    this.subscriptionHandler.subscribe = this.service.find().subscribe({
       next: (data: any) => {
         this.products = data.data.products;
         this.contacts = data.data.contacts;
@@ -205,14 +231,13 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     const filterValue = value.toLowerCase().replace(/\s/g, '');
     return this.contacts.filter(
       (contact) =>
-        contact.mob1?.toLowerCase().includes(filterValue) ||
-        contact.name?.toLowerCase().includes(filterValue)
+        contact.mob1?.toLowerCase().includes(filterValue) || contact.name?.toLowerCase().includes(filterValue)
     );
   }
 
   onContactBlur(): void {
     const mobileValue = this.form.get('mobile')?.value;
-    const match = this.contacts.find(c => c.mob1 === mobileValue);
+    const match = this.contacts.find((c) => c.mob1 === mobileValue);
     if (!match && this.isNameSelected) {
       this.form.patchValue({ name: '', contact_id: null });
       this.isNameSelected = false;
@@ -221,7 +246,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
   onNameBlur(): void {
     const nameValue = this.form.get('name')?.value;
-    const match = this.contacts.find(c => c.name === nameValue);
+    const match = this.contacts.find((c) => c.name === nameValue);
     if (!match && this.isMobileSelected) {
       this.form.patchValue({ mobile: '', contact_id: null });
       this.isMobileSelected = false;
@@ -229,9 +254,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   }
 
   getSelectedProductIds(): number[] {
-    return this.saleDetails.controls
-      .map(control => control.get('product_id')?.value)
-      .filter(id => id !== null);
+    return this.saleDetails.controls.map((control) => control.get('product_id')?.value).filter((id) => id !== null);
   }
 
   updateFilteredProducts(): void {
@@ -239,9 +262,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
     this.filteredProductsList = this.saleDetails.controls.map((_, index) => {
       const currentSelected = this.saleDetails.at(index).get('product_id')?.value;
-      return this.products.filter(
-        product => !selectedIds.includes(product.id) || product.id === currentSelected
-      );
+      return this.products.filter((product) => !selectedIds.includes(product.id) || product.id === currentSelected);
     });
   }
 
@@ -249,9 +270,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     const group = this.fb.group({
       product_id: [null, Validators.required],
       unit_id: [null, Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1),this.nonNegativeValidator()]],
-      amount: [0, [Validators.required, Validators.min(1),this.nonNegativeValidator()]],
-      discount_amount: [0,this.nonNegativeValidator()],
+      quantity: [1, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
+      amount: [0, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
+      discount_amount: [0, this.nonNegativeValidator()],
       discount_type: [1],
       net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
     });
@@ -262,7 +283,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
 
     group.get('product_id')?.valueChanges.subscribe((productId) => {
-      const selectedProduct: any = this.products.find(p => p.id === productId);
+      const selectedProduct: any = this.products.find((p) => p.id === productId);
 
       if (selectedProduct && Array.isArray(selectedProduct.product_unit)) {
         this.filteredUnitsList[index] = selectedProduct.product_unit.map((pu: any) => pu.unit);
@@ -423,87 +444,85 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
 
   onSubmit(redirectToPrint: boolean = false): void {
     this.commonService.markFormGroupTouched(this.form);
-  
+
     const netTotal = this.form.get('net_total')?.value || 0;
     const cash = parseFloat(this.form.get('cash_amount')?.value) || 0;
     const online = parseFloat(this.form.get('online_amount')?.value) || 0;
     const method = this.form.get('payment_method')?.value;
     const returnAmt = this.returnAmount;
-  
- 
+
     if (returnAmt < 0) {
       this.commonService.toastr.error('Return amount cannot be negative.');
       return;
     }
-  
+
     if (method === 1 && cash < netTotal) {
       this.commonService.toastr.error('Cash amount must be greater than or equal to Net Total.');
       return;
     }
-  
+
     if (method === 2 && online < netTotal) {
       this.commonService.toastr.error('Online amount must be greater than or equal to Net Total.');
       return;
     }
-  
-    if (method === 3 && (cash + online) < netTotal) {
+
+    if (method === 3 && cash + online < netTotal) {
       this.commonService.toastr.error('Combined Cash and Online amount must cover Net Total.');
       return;
     }
-  
-    
-    const invalidFields = ['amount', 'discount_amount', 'cash_amount', 'online_amount']
-      .filter(field => {
-        const control = this.form.get(field);
-        return control?.hasError('negativeValue');
-      });
-  
+
+    const invalidFields = ['amount', 'discount_amount', 'cash_amount', 'online_amount'].filter((field) => {
+      const control = this.form.get(field);
+      return control?.hasError('negativeValue');
+    });
+
     if (invalidFields.length > 0) {
       this.commonService.toastr.error('Negative values are not allowed in in any amount fields.');
       return;
     }
-  
-    
-    const saleDetailsInvalid = this.saleDetails.controls.some(group => {
-      return group.get('amount')?.hasError('negativeValue') ||
-             group.get('discount_amount')?.hasError('negativeValue');
+
+    const saleDetailsInvalid = this.saleDetails.controls.some((group) => {
+      return group.get('amount')?.hasError('negativeValue') || group.get('discount_amount')?.hasError('negativeValue');
     });
-  
+
     if (saleDetailsInvalid) {
       this.commonService.toastr.error('Negative values are not allowed in sale item fields.');
       return;
     }
-  
+
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-  
+
     this.isLoading = true;
     this.spinnerService.show();
-  
+
     const rawForm = this.form.getRawValue();
     if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
       rawForm.mobile = '+91' + rawForm.mobile.trim();
     }
-  
+
     const payload = {
       ...rawForm,
       payment_method: rawForm.payment_method,
       cash_amount: rawForm.cash_amount || 0,
       online_amount: rawForm.online_amount || 0,
       transaction_id: rawForm.transaction_id || '',
-      return_amount: this.returnAmount
+      return_amount: this.returnAmount,
     };
-  
-    this.service.create(payload).subscribe({
+
+    console.log('Payload for sale creation:', payload);
+    return;
+
+    this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
       next: (response: any) => {
         this.isLoading = false;
         this.spinnerService.hide();
-  
+
         const createdId = response?.data?.id || response?.data?.sale?.id;
         this.commonService.toastr.success('Sale created successfully.');
-  
+
         if (redirectToPrint && createdId) {
           this.router.navigate([`/app/direct-sale/print/${createdId}`]);
         } else {
@@ -522,6 +541,4 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       },
     });
   }
-  
-  
 }
