@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInventoryRequest;
+use App\Http\Requests\StorePOSRequest;
 use App\Http\Requests\UpdateInventoryRequest;
 use App\Models\Contact;
 use App\Models\Inventory;
@@ -57,7 +58,7 @@ class PosController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInventoryRequest $request)
+    public function store(StorePOSRequest $request)
     {
         try {
             DB::beginTransaction();
