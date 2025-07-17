@@ -9,7 +9,8 @@
           <div class="col-12 col-md-6" style="margin-bottom: 20px;">
             <mat-form-field class="w-100">
               <mat-label>Mobile</mat-label>
-              <input matInput formControlName="mobile" [matAutocomplete]="autoMob" (blur)="onContactBlur()" placeholder="Search or enter mobile" />
+              <input matInput formControlName="mobile" [matAutocomplete]="autoMob" (blur)="onContactBlur()"
+                placeholder="Search or enter mobile" />
               <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
                 <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
                   {{ contact.mob1 }} <small>[{{ contact.name }}]</small>
@@ -24,7 +25,8 @@
             <mat-form-field class="w-100">
               <mat-label>Name</mat-label>
               <input class="d-none" formControlName="contact_id" />
-              <input matInput formControlName="name" [matAutocomplete]="autoName" (blur)="onNameBlur()" placeholder="Search or enter name" />
+              <input matInput formControlName="name" [matAutocomplete]="autoName" (blur)="onNameBlur()"
+                placeholder="Search or enter name" />
               <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="isNameSelected = true">
                 <mat-option *ngFor="let contact of filteredNames | async" [value]="contact.name">
                   {{ contact.name }}
@@ -38,7 +40,8 @@
         <!-- Sale Details -->
         <div class="row" style="border-top: 2px dashed #ccc; padding-bottom: 20px;"></div>
         <div formArrayName="saleDetails" class="col-12">
-          <div *ngFor="let detail of saleDetails.controls; let i = index" [formGroupName]="i" class="row align-items-center" style="margin-bottom: 15px;">
+          <div *ngFor="let detail of saleDetails.controls; let i = index" [formGroupName]="i"
+            class="row align-items-center" style="margin-bottom: 15px;">
             <!-- Product -->
             <div class="col-12 col-md-6">
               <mat-form-field class="w-100">
@@ -64,11 +67,16 @@
             </div>
 
             <!-- Quantity -->
-            <div class="col-12 col-md-1">
+            <div class="col-12 col-md-2 ">
               <mat-form-field class="w-100">
                 <mat-label>Quantity</mat-label>
-                <input matInput type="number" formControlName="quantity" placeholder="Enter Quantity" />
-                <mat-error>Quantity is <strong>required</strong></mat-error>
+                <input matInput type="number" [min]="1" formControlName="quantity" placeholder="Enter Quantity" />
+                <mat-error *ngIf="detail.get('quantity')?.hasError('required')">
+                  Quantity is <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="detail.get('quantity')?.hasError('negativeValue')" style="white-space: nowrap;">
+                  Quantity cannot be negative.
+                </mat-error>
               </mat-form-field>
             </div>
 
@@ -76,17 +84,23 @@
             <div class="col-12 col-md-2">
               <mat-form-field class="w-100">
                 <mat-label>Amount</mat-label>
-                <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
+                <input matInput type="number" [min]="0" formControlName="amount" placeholder="Enter Amount" />
                 <mat-error>Amount is <strong>required</strong></mat-error>
+                <mat-error *ngIf="form.get('amount')?.hasError('negativeValue')">
+                  Amount cannot be negative.
+                </mat-error>
+                
               </mat-form-field>
             </div>
 
             <!-- Add/Remove Buttons -->
-            <div class="col-12 col-md-1" style="display: flex; justify-content: flex-end; align-items: flex-end; margin-top: -15px;">
+            <div class="col-12 col-md-1"
+              style="display: flex; justify-content: flex-end; align-items: flex-end; margin-top: -15px;">
               <button mat-icon-button color="primary" (click)="addSaleDetail()" type="button">
                 <mat-icon>add_circle</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="removeSaleDetail(i)" type="button" [disabled]="saleDetails.length === 1">
+              <button mat-icon-button color="warn" (click)="removeSaleDetail(i)" type="button"
+                [disabled]="saleDetails.length === 1">
                 <mat-icon>remove_circle</mat-icon>
               </button>
             </div>
@@ -115,9 +129,10 @@
 
           <!-- Discount Amount -->
           <div style="max-width: 150px; flex: 1;">
-            <mat-form-field appearance="outline" class="w-100 mb-3">
+            <mat-form-field appearance="outline" class="w-100 mb-6">
               <mat-label>Discount</mat-label>
-              <input matInput type="text" formControlName="discount_amount" placeholder="Enter Discount" autocomplete="off" />
+              <input matInput type="number" [min]="0" formControlName="discount_amount" placeholder="Enter Discount"
+                autocomplete="off" />
               <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px;">
                 <mat-option [value]="1">INR</mat-option>
                 <mat-option [value]="2">%</mat-option>
@@ -130,6 +145,9 @@
               </mat-error>
               <mat-error *ngIf="form.get('discount_amount')?.hasError('exceedsPercent')">
                 Discount % cannot exceed 100%.
+              </mat-error>
+              <mat-error *ngIf="form.get('discount_amount')?.hasError('negativeValue')">
+                Discount Amount cannot be negative.
               </mat-error>
             </mat-form-field>
           </div>
@@ -156,59 +174,74 @@
           <div style="display: flex; justify-content: flex-end;">
             <mat-form-field appearance="outline" style="min-width: 120px; max-width: max-content;">
               <mat-label>Payment Type</mat-label>
-              <mat-select formControlName="payment_type">
-                <mat-option [value]="1">Online</mat-option>
-                <mat-option [value]="2">Cash</mat-option>
+              <mat-select formControlName="payment_method">
+                <mat-option [value]="1">Cash</mat-option>
+                <mat-option [value]="2">Online</mat-option>
                 <mat-option [value]="3">Split</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
         </div>
-        
-        <!-- 💵 Cash Input & Return Amount -->
-        <div class="row" style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 15px;">
+        <div *ngIf="showCashFields" class="row"
+          style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 15px;">
           <!-- Cash Input -->
           <div style="max-width: 150px; flex: 1;">
             <mat-form-field appearance="outline" class="w-100 mb-3">
               <mat-label>Cash</mat-label>
-              <input matInput type="number" formControlName="cash" placeholder="Cash" autocomplete="off" />
+              <input matInput type="number" [min]="0" formControlName="cash_amount" placeholder="Cash" autocomplete="off" />
+              <mat-error *ngIf="form.get('cash_amount')?.hasError('required')">
+                Cash amount is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="form.get('cash_amount')?.hasError('negativeValue')">
+                Cash Amount cannot be negative.
+              </mat-error>
             </mat-form-field>
           </div>
-        
+
           <!-- Return Amount Display -->
           <div style="
-            font-weight: 600;
-            font-size: 16px;
-            padding: 15px 15px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            white-space: nowrap;
-            min-width: 200px;
-            max-width: fit-content;
-            height: 55px;
-          ">
-            Return Amount: ₹ {{ 0 }}
+              font-weight: 600;
+              font-size: 16px;
+              padding: 15px 15px;
+              background: #f5f5f5;
+              border-radius: 4px;
+              white-space: nowrap;
+              min-width: 200px;
+              max-width: fit-content;
+              height: 55px;
+            ">
+            Return Amount: ₹ {{ returnAmount }}
           </div>
         </div>
-        
-        <!-- ✅ NEW: Online Amount & Transaction ID -->
-        <div class="row" style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 15px;">
+
+
+        <div *ngIf="showOnlineFields" class="row"
+          style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 15px;">
           <!-- Online Amount -->
           <div style="max-width: 150px; flex: 1;">
             <mat-form-field appearance="outline" class="w-100 mb-3">
               <mat-label>Online Amount</mat-label>
-              <input matInput type="number" formControlName="online_amount" placeholder="Online Amount" autocomplete="off" />
+              <input matInput type="number" [min]="0" formControlName="online_amount" placeholder="Online Amount"
+                autocomplete="off" />
+              <mat-error *ngIf="form.get('online_amount')?.hasError('required')">
+                Online amount is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="form.get('online_amount')?.hasError('negativeValue')">
+                Online Amount cannot be negative.
+              </mat-error>
             </mat-form-field>
           </div>
-        
+
           <!-- Transaction ID -->
           <div style="max-width: 250px; flex: 1;">
             <mat-form-field appearance="outline" class="w-100 mb-3">
               <mat-label>Transaction ID</mat-label>
-              <input matInput type="text" formControlName="transaction_id" placeholder="Transaction ID" autocomplete="off" />
+              <input matInput type="text" formControlName="transaction_id" placeholder="Transaction ID"
+                autocomplete="off" />
             </mat-form-field>
           </div>
         </div>
+
 
       </form>
     </div>
@@ -229,7 +262,8 @@
     </ng-container>
   </button>
 
-  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit(true)" (keyup.enter)="onSubmit(true)">
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit(true)"
+    (keyup.enter)="onSubmit(true)">
     <ng-container *ngIf="!isLoading">Save and Print</ng-container>
     <ng-container *ngIf="isLoading">
       <span class="indicator-progress" style="display: block;">
