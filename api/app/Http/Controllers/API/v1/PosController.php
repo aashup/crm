@@ -59,7 +59,6 @@ class PosController extends Controller
      */
     public function store(StoreInventoryRequest $request)
     {
-        return 123;
         try {
             DB::beginTransaction();
 

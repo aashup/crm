@@ -29,6 +29,7 @@ class StoreInventoryRequest extends FormRequest
             'cash_amount' => ['nullable', 'required_if:payment_method,1,3', 'numeric', 'min:0'],
             'online_amount' => ['nullable', 'required_if:payment_method,2,3', 'numeric', 'min:0'],
             'transaction_id' => ['nullable', 'required_if:payment_method,2,3', 'string', 'max:255'],
+            'return_amount' => ['nullable', 'numeric', 'min:0'],
 
             'saleDetails' => ['required', 'array', 'min:1'],
             'saleDetails.*.product_id' => ['required', 'exists:products,id'],
