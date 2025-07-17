@@ -106,7 +106,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       notes: [''],
       status: [1, Validators.required],
       payment_method: [1, Validators.required],
-      cash_amount: [null,[ Validators.min(0),this.nonNegativeValidator()]],
+      cash_amount: [null,[Validators.required, Validators.min(0),this.nonNegativeValidator()]],
       online_amount: [null,this.nonNegativeValidator()],
       transaction_id: [null],
       saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)])
@@ -430,13 +430,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     const method = this.form.get('payment_method')?.value;
     const returnAmt = this.returnAmount;
   
-    // ❌ Prevent negative return amount
+ 
     if (returnAmt < 0) {
       this.commonService.toastr.error('Return amount cannot be negative.');
       return;
     }
   
-    // ❌ Validate payment amounts
     if (method === 1 && cash < netTotal) {
       this.commonService.toastr.error('Cash amount must be greater than or equal to Net Total.');
       return;
@@ -452,7 +451,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       return;
     }
   
-    // ❌ Validate for negative amount fields
+    
     const invalidFields = ['amount', 'discount_amount', 'cash_amount', 'online_amount']
       .filter(field => {
         const control = this.form.get(field);
@@ -460,11 +459,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       });
   
     if (invalidFields.length > 0) {
-      this.commonService.toastr.error('Negative values are not allowed in amount fields.');
+      this.commonService.toastr.error('Negative values are not allowed in in any amount fields.');
       return;
     }
   
-    // ❌ Check for invalid nested fields (saleDetails)
+    
     const saleDetailsInvalid = this.saleDetails.controls.some(group => {
       return group.get('amount')?.hasError('negativeValue') ||
              group.get('discount_amount')?.hasError('negativeValue');
