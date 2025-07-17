@@ -99,13 +99,14 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
         if (result) {
           this.loadUnit();
           this.commonService.toastr.success('Product unit updated successfully');
-        } else {
-          this.commonService.toastr.error('Failed to update product unit');
+          this.cdr.markForCheck();
+          this.loadUnit();
+          this.cdr.detectChanges();
         }
-        this.cdr.markForCheck();
-        this.loadUnit();
-        this.cdr.detectChanges();
-      });
+      },
+      (err) => this.commonService.toastr.error(err.error.message || 'Failed to update product unit')    
+
+    );
   }
 
   delete(unit_id: number) {

@@ -15,13 +15,10 @@ import _ from 'lodash';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
-import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 'rxjs';
-import { ProductInventoryDatasource } from './product-inventory.datasource';
+import { merge, tap } from 'rxjs';
 
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { ProductInventoryModel } from './product-inventory.model';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
-import { ProductInventoryService } from './product-inventory.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { ProductService } from '../product.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
@@ -30,6 +27,9 @@ import { ConfirmationDialogComponent } from 'src/app/modules/core/confirmation-d
 import { AddProductInventoryComponent } from './add-product-inventory/add-product-inventory.component';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { InventoryDatasource } from '../../inventory/inventory.datasource';
+import { InventoryModel } from '../../inventory/inventory.model';
+import { InventoryService } from '../../inventory/inventory.service';
 
 @Component({
   selector: 'app-product-inventory',
@@ -43,8 +43,8 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   @Input() form: FormGroup;
   @Input() next!: () => void;
   @Input() prev!: () => void;
-  dataSource: ProductInventoryDatasource;
-  selection = new SelectionModel<ProductInventoryModel>(true, []);
+  dataSource: InventoryDatasource;
+  selection = new SelectionModel<InventoryModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   productCache: { [key: string]: string } = {};
   isLoading = false;
@@ -56,7 +56,6 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   search: any = { all: '' };
   filter: any = {};
   displayableCol = [
-    'select',
     'id',
     'product_id',
     'unit_id',
@@ -66,7 +65,6 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     'purchase_price',
     'sale_price',
     'notes',
-
     'status',
     'action',
   ];
@@ -75,7 +73,6 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
     { ref: 'product_id', name: 'Product', mutator: (row: any) => row.product?.name || '—' },
 
@@ -93,23 +90,23 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private service: ProductInventoryService,
+    private service: InventoryService,
     private commonService: CommonService,
     private productService: ProductService,
     private unitService: UnitService,
     private userService: UsersService,
     private spinnerService: SpinnerService,
-    private ar :ActivatedRoute
+    private ar: ActivatedRoute
   ) {
-    this.dataSource = new ProductInventoryDatasource(this.service);
+    this.dataSource = new InventoryDatasource(this.service);
   }
   ngOnInit(): void {
-    this.productId = this.form.value.productInfo.id||this.ar.snapshot.params['id'];
-    console.log("inventory page ",this.form);
+    this.productId = this.form.value.productInfo.id || this.ar.snapshot.params['id'];
+    console.log('inventory page ', this.form);
     if (this.productId) this.loadData();
     this.prefetchUserNames();
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe();
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange)
       .pipe(
         tap(() => {
           this.loadData();
@@ -117,7 +114,6 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       )
       .subscribe();
   }
- 
 
   prefetchUserNames() {
     this.userService.find({}).subscribe((users: any) => {
@@ -137,24 +133,12 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
-    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-    //   .pipe(
-    //     debounceTime(500),
-    //     distinctUntilChanged(),
-    //     tap(() => {
-    //       this.paginator.pageIndex = 0;
-    //       this.search.all = this.searchElementRef.nativeElement.value;
-    //       this.loadData();
-    //     })
-    //   )
-    //   .subscribe();
+    this.cdr.detectChanges();
   }
 
   loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify({
       ..._.pickBy(this.search),
       product_id: this.productId,
@@ -176,12 +160,12 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       'deleted_at',
       'status',
     ];
-  
+
     this.dataSource.find(_.pickBy(this.filter)).subscribe({
       next: (response: any) => {
-        this.form.value.inventoryInfo = response.data; // Store the fetched data in the variable
+        this.form.value.inventoryInfo = response.data;
       },
-      error: (err:any) => {
+      error: (err: any) => {
         console.error('Error while fetching inventory data:', err);
       },
     });
@@ -190,7 +174,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     if (this.selection.selected.length === this.dataSource.originalData.data.length) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: ProductInventoryModel) => this.selection.select(row));
+      this.dataSource.originalData.data.forEach((row: InventoryModel) => this.selection.select(row));
     }
   }
 
@@ -198,7 +182,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
 
-  delete(item: ProductInventoryModel) {
+  delete(item:InventoryModel) {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -233,21 +217,21 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     this.dialog
       .open(AddProductInventoryComponent, {
         data: {
-          model: new ProductInventoryModel().clear(),
+          model: new InventoryModel().clear(),
           isEdit: false,
           productId: this.productId,
         },
       })
       .afterClosed()
       .subscribe((result) => {
-        console.log("result of inventory page ",result);
-         this.form.value.inventoryInfo=[...this.form.value.inventoryInfo,result];
-        console.log("result is this ",result);
+        console.log('result of inventory page ', result);
+        this.form.value.inventoryInfo = [...this.form.value.inventoryInfo, result];
+        console.log('result is this ', result);
         this.loadData();
       });
   }
 
-  edit(item: ProductInventoryModel) {
+  edit(item: InventoryModel) {
     this.dialog
       .open(AddProductInventoryComponent, {
         data: {
@@ -257,10 +241,10 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       })
       .afterClosed()
       .subscribe((result) => {
-        console.log("result of inventory page ",result);
-         this.form.value.inventoryInfo=[...this.form.value.inventoryInfo,result];
-        console.log("result is this ",result);
+        console.log('result of inventory page ', result);
+        this.form.value.inventoryInfo = [...this.form.value.inventoryInfo, result];
+        console.log('result is this ', result);
         this.loadData();
-      });;
+      });
   }
 }

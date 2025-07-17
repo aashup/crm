@@ -6,10 +6,11 @@ import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { UnitConversionModel } from '../unitconversion.model';
-import { UnitConversionService } from '../unitconversion.service';
+
 import { ProductService } from 'src/app/modules/apps/product/product.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
+import { UnitConversionModel } from 'src/app/modules/settings/unit-conversion/unitconversion.model';
+import { UnitConversionService } from 'src/app/modules/settings/unit-conversion/unitconversion.service';
 
 @Component({
   selector: 'app-add-unit-conversion',

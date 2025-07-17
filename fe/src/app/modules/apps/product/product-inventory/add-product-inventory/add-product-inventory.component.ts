@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from 'src/app/modules/core/common.service';
@@ -7,9 +7,10 @@ import _ from 'lodash';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { AuthService } from 'src/app/modules/auth';
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { ProductInventoryModel } from '../product-inventory.model';
-import { ProductInventoryService } from '../product-inventory.service';
+
 import { ProductService } from '../../product.service';
+import { InventoryModel } from '../../../inventory/inventory.model';
+import { InventoryService } from '../../../inventory/inventory.service';
 
 @Component({
   selector: 'app-add-product-inventory',
@@ -19,7 +20,7 @@ import { ProductService } from '../../product.service';
 })
 export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   form: FormGroup;
-  model: ProductInventoryModel;
+  model: InventoryModel;
   products: any[];
   units: any[];
   clone: any;
@@ -29,22 +30,23 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddProductInventoryComponent>);
   readonly data = inject<{
-    model: ProductInventoryModel;
+    model: InventoryModel;
     isEdit: boolean;
     productId:string
   }>(MAT_DIALOG_DATA);
 
-  inventries: ProductInventoryModel[] = [];
+  inventries: InventoryModel[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private service: ProductInventoryService,
+    private service: InventoryService,
     private find: FindService,
     private commonService: CommonService,
     private productService: ProductService,
     private unitService: UnitService,
     private authService: AuthService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -86,7 +88,7 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
     });
   }
 
-  initForm(model: ProductInventoryModel) {
+  initForm(model: InventoryModel) {
     this.form = this.fb.group({
       id: [model.id, []],
       unit_id: [model.unit_id, Validators.required],
@@ -118,7 +120,7 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
     this.spinnerService.show();
     const payload={
       ...this.form.value,
-      product_id: this.data.productId
+      product_id: this.data.productId,
     }
     console.log("payload ",payload);
     
@@ -128,12 +130,17 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
         this.isLoading = false;
         this.spinnerService.hide();
         this.dialogRef.close({...res.data, product_id: this.data.productId});
-      }
-    )
-    , (err: any) => {
-        this.commonService.handleError(err);
+      },
+      (err: any) => {
+        console.log("error in inventory ",err);
+      
+        this.commonService.toastr.error(err.error.message || "something went wrong");
         this.isLoading = false;
         this.spinnerService.hide();
-      };
+        this.cdr.detectChanges(); 
+      }
+
+    )
+   
   }
 }

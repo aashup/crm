@@ -1,16 +1,11 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ProductModel } from '../product.model';
 import { FormGroup } from '@angular/forms';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
-import { set } from 'lodash';
-import { ProductSellerService } from '../product-seller/product-seller.service';
 import { CommonService } from 'src/app/modules/core/common.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ProductUnitService } from '../product-unit/product-unit.service';
+import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import _ from 'lodash';
-import { UnitConversionDatasource } from '../unit-conversion/unitconversion.datasource';
+import { UnitConversionDatasource } from 'src/app/modules/settings/unit-conversion/unitconversion.datasource';
 @Component({
   selector: 'app-complete',
   standalone: false,
@@ -60,11 +55,7 @@ export class CompleteComponent implements AfterViewInit, OnInit, OnDestroy {
     return this.sellers.find((seller) => seller.id === id);
   }
 
-  getAllSellers() {
-    // this.sellerService.getAll().subscribe((result:any) => {
-    //   this.sellers = result.data;
-    // });
-  }
+  
   ngOnInit(): void {
     console.log('final details', this.form.value);
    

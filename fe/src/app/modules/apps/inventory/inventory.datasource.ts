@@ -1,6 +1,7 @@
 import { tap, finalize } from 'rxjs/operators';
 import { BaseDataSource } from '../../core/base.datasource';
 import { InventoryService } from './inventory.service';
+import { Observable } from 'rxjs';
 
 
 export class InventoryDatasource extends BaseDataSource {
@@ -8,16 +9,15 @@ export class InventoryDatasource extends BaseDataSource {
         super();
     }
 
-    find(queryParams: any) {
+    find(queryParams: any): Observable<any> {
         this.loadingSubject.next(true);
-        this.subscriptions.subscribe = this.service.find(queryParams).pipe(
-            tap((res: any) => {
-                this.originalData = res;
-                this.entitySubject.next(res.data);
-                this.paginatorTotalSubject.next(res.total);
-            }),
-            // catchError(err => of(new QueryResultsModel([], err))),
-            finalize(() => this.loadingSubject.next(false))
-        ).subscribe();
-    }
+        return this.service.find(queryParams).pipe(
+          tap((res: any) => {
+            this.originalData = res;
+            this.entitySubject.next(res.data);
+            this.paginatorTotalSubject.next(res.total);
+          }),
+          finalize(() => this.loadingSubject.next(false))
+        );
+      }
 }

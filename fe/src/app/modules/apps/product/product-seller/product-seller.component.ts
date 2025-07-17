@@ -15,20 +15,20 @@ import _ from 'lodash';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
-import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 'rxjs';
+import { merge, take, tap } from 'rxjs';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { ProductSellerDatasource } from './product-seller.datasource';
-import { ProductSellerModel } from './product-seller.model';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
-import { ProductSellerService } from './product-seller.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { CityService } from 'src/app/modules/settings/city/city.service';
 import { AddressService } from 'src/app/modules/settings/address/address.service';
 import { ConfirmationDialogComponent } from 'src/app/modules/core/confirmation-dialog/confirmation-dialog.component';
 import { AddProductSellerComponent } from './add-product-seller/add-product-seller.component';
 import { FormGroup } from '@angular/forms';
+import { VendorDatasource } from '../../vendor/vendor.datasource';
+import { VendorModel } from '../../vendor/vendor.model';
+import { VendorService } from '../../vendor/vendor.service';
 @Component({
   selector: 'app-product-seller',
   templateUrl: './product-seller.component.html',
@@ -41,8 +41,8 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
   @Input() form: FormGroup;
   @Input() next: () => void;
   @Input() prev: () => void;
-  dataSource: ProductSellerDatasource;
-  selection = new SelectionModel<ProductSellerModel>(true, []);
+  dataSource: VendorDatasource;
+  selection = new SelectionModel<VendorModel>(true, []);
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
@@ -52,7 +52,6 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
   filter: any = {};
   isLoading = false;
   displayableCol = [
-    'select',
     'id',
     'name',
     'shipping_address_id',
@@ -69,7 +68,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'Select', style: { width: '70px' } },
+  
     {
       ref: 'id',
       name: 'ID',
@@ -111,26 +110,23 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private service: ProductSellerService,
+    private service: VendorService,
     private commonService: CommonService,
     private cityService: CityService,
     private addressService: AddressService,
     private spinnerService: SpinnerService
   ) {
-    this.dataSource = new ProductSellerDatasource(this.service);
+    this.dataSource = new VendorDatasource(this.service);
   }
   ngOnInit(): void {
-    this.paginator.pageSize = 20;
-    this.paginator.pageIndex = 0;
+    
     this.getAllAddresses();
     this.getAllCities();
     this.loadData();
-    console.log('Product Seller Component Initialized ',this.form);
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-    });
+    console.log('Product Seller Component Initialized ', this.form);
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe();
 
-    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange)
       .pipe(
         tap(() => {
           this.loadData();
@@ -165,25 +161,11 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
-
-    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-    //   .pipe(
-    //     debounceTime(500),
-    //     distinctUntilChanged(),
-    //     tap(() => {
-    //       this.paginator.pageIndex = 0;
-    //       this.search.all = this.searchElementRef.nativeElement.value;
-    //       this.loadData();
-    //     })
-    //   )
-    //   .subscribe();
   }
 
   loadData(): void {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
     this.filter.with = ['contact', 'BillingAddress', 'ShippingAddress'];
     this.filter.cols = [
@@ -205,7 +187,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
     if (this.selection.selected.length === this.dataSource.originalData.data.length) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: ProductSellerModel) => this.selection.select(row));
+      this.dataSource.originalData.data.forEach((row: VendorModel) => this.selection.select(row));
     }
   }
 
@@ -213,7 +195,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
     return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
 
-  delete(item: ProductSellerModel) {
+  delete(item: VendorModel) {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
@@ -250,7 +232,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
     this.dialog
       .open(AddProductSellerComponent, {
         data: {
-          model: new ProductSellerModel().clear(),
+          model: new VendorModel().clear(),
           isEdit: false,
         },
       })
@@ -264,7 +246,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
       .subscribe();
   }
 
-  edit(item: ProductSellerModel) {
+  edit(item: VendorModel) {
     this.dialog
       .open(AddProductSellerComponent, {
         data: {

@@ -43,7 +43,7 @@
           <div *ngFor="let detail of saleDetails.controls; let i = index" [formGroupName]="i"
             class="row align-items-center" style="margin-bottom: 15px;">
             <!-- Product -->
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-5">
               <mat-form-field class="w-100">
                 <mat-label>Product</mat-label>
                 <mat-select [formControlName]="'product_id'">
