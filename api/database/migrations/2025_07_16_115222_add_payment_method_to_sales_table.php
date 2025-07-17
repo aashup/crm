@@ -15,6 +15,7 @@ return new class extends Migration
             $table->integer('payment_method')->default(1)->after('status')->comment("1: Cash, 2: Online, 3: Split Payment"); // Adding payment_method column
             $table->decimal('cash_amount')->nullable('pending')->after('payment_method');
             $table->decimal('online_amount')->nullable('pending')->after('payment_method');
+            $table->decimal('return_amount')->default(0)->after('online_amount')->comment('Amount returned to customer, default is 0');
             $table->text('transaction_id')->nullable()->after('online_amount');
         });
     }
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->dropColumn('payment_method');
             $table->dropColumn('cash_amount');
             $table->dropColumn('online_amount');
+            $table->dropColumn('return_amount');
             $table->dropColumn('transaction_id');
         });
     }

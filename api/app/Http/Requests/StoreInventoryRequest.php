@@ -48,15 +48,15 @@ class StoreInventoryRequest extends FormRequest
         $validator->after(function (Validator $validator) {
             $data = $this->all();
 
-            if($data['payment_method'] == 1 && $data['cash_amount'] != $data['net_total']) {
+            if($data['payment_method'] == 1 && ($data['cash_amount'] - $data['return_amount']) != $data['net_total']) {
                 $validator->errors()->add('cash_amount', 'Cash amount must equal the net total for Cash payment method.');
             }
 
-            if($data['payment_method'] == 2 && $data['online_amount'] != $data['net_total']) {
+            if($data['payment_method'] == 2 && ($data['online_amount'] - $data['return_amount']) != $data['net_total']) {
                 $validator->errors()->add('online_amount', 'Online amount must equal the net total for Online payment method.');
             }
 
-            if($data['payment_method'] == 3 && ($data['cash_amount'] + $data['online_amount']) != $data['net_total']) {
+            if($data['payment_method'] == 3 && (($data['cash_amount'] + $data['online_amount']) - $data['return_amount']) != $data['net_total']) {
                 $validator->errors()->add('payment_method', 'Total of Cash and Online amounts must equal the net total for Split Payment.');
             }
 
