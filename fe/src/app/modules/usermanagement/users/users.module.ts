@@ -1,20 +1,20 @@
-import { CommonModule } from "@angular/common";
-import { RouterModule, Routes } from "@angular/router";
-import { SharedMaterialModuleModule } from "../../shared-material-module/shared-material-module.module";
-import { NgxPermissionsModule } from "ngx-permissions";
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
+import { SharedMaterialModuleModule } from '../../shared-material-module/shared-material-module.module';
+import { NgxPermissionsModule } from 'ngx-permissions';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 
-import { UsersComponent } from "./users.component";
-import { AddUsersComponent } from "./add-users/add-users.component";
-import { NgxSpinnerModule } from "ngx-spinner";
+import { UsersComponent } from './users.component';
+import { AddUsersComponent } from './add-users/add-users.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 const routes: Routes = [
-  { path: "", component: UsersComponent},
-  { path: "add", component: AddUsersComponent },
+  { path: '', component: UsersComponent },
+  { path: 'add', component: AddUsersComponent },
 ];
 
 @NgModule({
-  declarations: [ UsersComponent, AddUsersComponent],
+  declarations: [UsersComponent, AddUsersComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -23,6 +23,6 @@ const routes: Routes = [
     NgxSpinnerModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  exports: []
+  exports: [],
 })
-export class UsersModule { }
+export class UsersModule {}

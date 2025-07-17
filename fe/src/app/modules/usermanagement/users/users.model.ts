@@ -9,11 +9,8 @@ export class UsersModel {
   created_at: Date;
   updated_at: Date;
   deleted_at: Date;
- 
 
-	
-
-  clear(): UsersModel { 
+  clear(): UsersModel {
     this.id = null;
     this.name = '';
     this.email = '';

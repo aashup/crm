@@ -1,20 +1,14 @@
-<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} User</h2>
+<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} User</h2>
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
-      
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
           <!-- Name Input -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Enter Name</mat-label>
-              <input
-                matInput
-                placeholder="Enter Name"
-                formControlName="name"
-                maxlength="200"
-              />
+              <input matInput placeholder="Enter Name" formControlName="name" maxlength="200" />
               <mat-error>Name is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
@@ -23,12 +17,7 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Enter Email</mat-label>
-              <input
-                matInput
-                type="email"
-                placeholder="Enter Email"
-                formControlName="email"
-              />
+              <input matInput type="email" placeholder="Enter Email" formControlName="email" />
               <mat-error>Email is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
@@ -66,7 +55,7 @@
                 Cancel Change Password
               </button>
             </div>
-          
+
             <!-- Password Fields for Add or Edit -->
             <div *ngIf="!isEdit || showPasswordFields" class="mt-3">
               <div class="col-12 kt-margin-bottom-20-mobile">
@@ -85,14 +74,12 @@
                     [attr.aria-label]="'Hide password'"
                     [attr.aria-pressed]="hidePassword"
                   >
-                    <mat-icon>{{
-                      hidePassword ? "visibility_off" : "visibility"
-                    }}</mat-icon>
+                    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                   </button>
                   <mat-error>Password is <strong>required</strong></mat-error>
                 </mat-form-field>
               </div>
-          
+
               <div class="col-12 kt-margin-bottom-20-mobile">
                 <mat-form-field class="w-100" appearance="outline">
                   <mat-label>Confirm Password</mat-label>
@@ -109,13 +96,9 @@
                     [attr.aria-label]="'Hide confirm password'"
                     [attr.aria-pressed]="hideConfirmPassword"
                   >
-                    <mat-icon>{{
-                      hideConfirmPassword ? "visibility_off" : "visibility"
-                    }}</mat-icon>
+                    <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                   </button>
-                  <mat-error
-                    >Confirm Password is <strong>required</strong></mat-error
-                  >
+                  <mat-error>Confirm Password is <strong>required</strong></mat-error>
                 </mat-form-field>
               </div>
             </div>
@@ -137,21 +120,12 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Select Roles</mat-label>
-              <mat-select
-                placeholder="Select Roles"
-                formControlName="roles"
-                multiple
-              >
-                <mat-option
-                  *ngFor="let role of fechedRoles"
-                  [value]="role.id"
-                >
+              <mat-select placeholder="Select Roles" formControlName="roles" multiple>
+                <mat-option *ngFor="let role of fechedRoles" [value]="role.id">
                   {{ role.name }}
                 </mat-option>
               </mat-select>
-              <mat-error
-                >At least one role is <strong>required</strong></mat-error
-              >
+              <mat-error>At least one role is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
         </div>
@@ -160,7 +134,13 @@
   </div>
 </div>
 <div mat-dialog-actions>
-  <button  [mat-dialog-close]="false" type="button" class="btn btn-primary" [disabled]="isLoading"  style="margin-right: 5px;">
+  <button
+    [mat-dialog-close]="false"
+    type="button"
+    class="btn btn-primary"
+    [disabled]="isLoading"
+    style="margin-right: 5px"
+  >
     Cancel
   </button>
   <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="submit()" (keyup.enter)="submit()">

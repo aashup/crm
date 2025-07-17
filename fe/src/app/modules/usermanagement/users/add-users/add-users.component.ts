@@ -24,7 +24,7 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
   isLoading: boolean = false;
   isEdit: boolean = false;
   isPasswordChanged: boolean = false;
-  showPasswordFields: boolean = false; 
+  showPasswordFields: boolean = false;
 
   togglePasswordFields(): void {
     this.showPasswordFields = !this.showPasswordFields;
@@ -50,91 +50,73 @@ export class AddUsersComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-    
     this.find.getRoles().subscribe(
       (data) => {
         this.fechedRoles = data.data;
-        
       },
       (error) => {
         console.error('Error fetching roles:', error);
       }
-
-    )
+    );
   }
   changePassword() {
     this.isPasswordChanged = !this.isPasswordChanged;
   }
 
- ngAfterViewInit(): void {
-  this.isLoading= false;
-  this.spinnerService.hide();
-  this.dialogRef.afterClosed().subscribe(() => {
+  ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
-  });
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.isLoading = false;
+      this.spinnerService.hide();
+    });
 
-  this.model = this.data.model;
-  this.isEdit = this.data.isEdit;
-  this.isPasswordChanged = this.data.isPasswordChanged;
-  this.initForm(this.model);
-}
+    this.model = this.data.model;
+    this.isEdit = this.data.isEdit;
+    this.isPasswordChanged = this.data.isPasswordChanged;
+    this.initForm(this.model);
+  }
 
-  
-initForm(model: UsersModel) {
-  this.form = this.fb.group({
-    id: [model.id || null, []], 
-    name: [
-      model.name || '', 
-      [
-        Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(200),
-      ],
-    ],
-    status: [model.status || 1, [Validators.required]], 
-    email: [model.email || '', [Validators.required, Validators.email]], 
-    password: [model.password || null], 
-    cpassword: [model.cpassword || null], 
-    roles: [
-      model.roles ? model.roles.map((role: any) => role.id) : [], 
-      [Validators.required],
-    ],
-  });
-  this.clone = this.form.value;
-}
-
-
+  initForm(model: UsersModel) {
+    this.form = this.fb.group({
+      id: [model.id || null, []],
+      name: [model.name || '', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
+      status: [model.status || 1, [Validators.required]],
+      email: [model.email || '', [Validators.required, Validators.email]],
+      password: [model.password || null],
+      cpassword: [model.cpassword || null],
+      roles: [model.roles ? model.roles.map((role: any) => role.id) : [], [Validators.required]],
+    });
+    this.clone = this.form.value;
+  }
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);
-  
+
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-  
+
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
-  
-    this.isLoading = true; 
+
+    this.isLoading = true;
     this.spinnerService.show();
-  
+
     this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
       complete: () => {
-        this.commonService.toastr.success(
-          this.isEdit ? 'User has been updated.' : 'User has been created.'
-        );
-        this.dialogRef.close(true); 
-        this.isLoading = false; 
+        this.commonService.toastr.success(this.isEdit ? 'User has been updated.' : 'User has been created.');
+        this.dialogRef.close(true);
+        this.isLoading = false;
         this.spinnerService.hide();
       },
       error: (err) => {
         this.commonService.handleError(err);
         this.isLoading = false;
-        this.spinnerService.hide(); 
+        this.spinnerService.hide();
       },
     });
   }

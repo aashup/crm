@@ -26,9 +26,9 @@ class StoreInventoryRequest extends FormRequest
             'status' => ['required', 'in:1,2'], // 1 = active, 2 = inactive
 
             'payment_method' => ['required', 'integer', 'in:1,2,3'], // 1 = Cash, 2 = Online, 3 = Split Payment
-            'cash_amount' => ['nullable', 'required_with:payment_method,1,3', 'numeric', 'min:0'],
-            'online_amount' => ['nullable', 'required_with:payment_method,2,3', 'numeric', 'min:0'],
-            'transaction_id' => ['nullable', 'required_with:payment_method,2,3', 'string', 'max:255'],
+            'cash_amount' => ['nullable', 'required_if:payment_method,1,3', 'numeric', 'min:0'],
+            'online_amount' => ['nullable', 'required_if:payment_method,2,3', 'numeric', 'min:0'],
+            'transaction_id' => ['nullable', 'required_if:payment_method,2,3', 'string', 'max:255'],
 
             'saleDetails' => ['required', 'array', 'min:1'],
             'saleDetails.*.product_id' => ['required', 'exists:products,id'],
