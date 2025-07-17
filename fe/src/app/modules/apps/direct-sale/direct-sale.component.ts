@@ -109,14 +109,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       },
     });
   }
-  onInputNameChange(event: any): void {
-    const inputValue = event.target.value;  
-    console.log('Input value changed:', inputValue);  
-    const mobileValue = this.form.get('mobile')?.value;
-    const nameValue = this.form.get('name')?.value;
-    console.log('Mobile value:', mobileValue);
-    console.log('Name value:', nameValue);
-  }
 
   get saleDetails(): FormArray {
     return this.form.get('saleDetails') as FormArray;
@@ -129,8 +121,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       name: [null, Validators.required],
       unit_id: [null],
       amount: [0, [Validators.required]],
-      discount_amount: [null, [Validators.required, Validators.min(0)]],
-      discount_type: [1, Validators.required],
+      discount_amount: [0],
+      discount_type: [1],
       net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       notes: [''],
       status: [1, Validators.required],
@@ -210,8 +202,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       unit_id: [null, Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
       amount: [0, [Validators.required, Validators.min(1)]],
-      discount_amount: [0, [Validators.required, Validators.min(0)]],
-      discount_type: [1, Validators.required],
+      discount_amount: [0],
+      discount_type: [1],
       net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
     });
   
@@ -239,13 +231,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
         group.get('unit_id')?.reset();
       }
   
-      // ✅ Reset quantity & amount when product changes
       group.patchValue({
-        quantity: null,
+        quantity: 1,
         amount: null,
       }, { emitEvent: true });
-  
-      // Update product dropdown filters to avoid duplicates
+      
+
       this.updateFilteredProducts();
     });
   
@@ -383,9 +374,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
     this.calculateNetTotal();
     this.updateFilteredProducts();
   }
-  onSaveAndPrint(): void {
 
-  }
 
  onSubmit(redirectToPrint: boolean = false): void {
   this.commonService.markFormGroupTouched(this.form);
@@ -399,7 +388,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
   this.spinnerService.show();
 
   const rawForm = this.form.getRawValue();
-
+  if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
+    rawForm.mobile = '+91' + rawForm.mobile.trim();
+  }
   const payload = {
     ...rawForm,
   };
@@ -412,7 +403,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit {
       const createdId = response?.data?.id || response?.data?.sale?.id;
 
       this.commonService.toastr.success('Sale created successfully.');
-      debugger
       if (redirectToPrint && createdId) {
         this.router.navigate([`/app/direct-sale/print/${createdId}`]);
       } else {
