@@ -50,7 +50,7 @@ class StoreInventoryRequest extends FormRequest
             $data = $this->all();
 
             if($data['payment_method'] == 1 && ($data['cash_amount'] - $data['return_amount']) != $data['net_total']) {
-                $validator->errors()->add('cash_amount', 'Cash amount must equal the net total for Cash payment method.');
+                $validator->errors()->add('cash_amount', 'For Cash payment, Cash Amount minus Return Amount must equal Net Total.');
             }
 
             if($data['payment_method'] == 2 && ($data['online_amount'] - $data['return_amount']) != $data['net_total']) {

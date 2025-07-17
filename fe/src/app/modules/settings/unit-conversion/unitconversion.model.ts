@@ -8,13 +8,13 @@ export class UnitConversionModel {
   status: number;
 
   clear() {
-      this.id = null;
-      this.product_id = null;
-      this.from_unit_id = null;
-      this.to_unit_id = null;
-      this.conversion_factor = null;
-      this.description = null;
-      this.status = 1;
-      return this;
+    this.id = null;
+    this.product_id = null;
+    this.from_unit_id = null;
+    this.to_unit_id = null;
+    this.conversion_factor = null;
+    this.description = null;
+    this.status = 1;
+    return this;
   }
 }

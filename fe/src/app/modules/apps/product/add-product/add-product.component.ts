@@ -16,6 +16,7 @@ import _ from 'lodash';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 
 @Component({
   selector: 'app-add-product',
@@ -24,6 +25,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
+  subscriptionHandler = new SubscriptionHandler();
   @Input() form: FormGroup;
   @Input() next: () => void = () => {};
   productInfoForm!: FormGroup;
@@ -40,15 +42,13 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.ar.params.subscribe((params) => {
+    this.subscriptionHandler.subscribe = this.ar.params.subscribe((params) => {
       this.productId = params['id'];
-      console.log('Product ID from URL:', this.productId);
     });
-    console.log(this.form.value.productInfo);
     if (this.productId) {
       this.loadProductDetails(this.productId);
     }
-    this.initForm()
+    this.initForm();
   }
   ngAfterViewInit(): void {}
 
@@ -61,8 +61,8 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
   loadProductDetails(productId: string) {
-    this.service.get({id:productId,with:""}).subscribe({
-      next: (product:any) => {
+    this.subscriptionHandler.subscribe = this.service.get({ id: productId, with: '' }).subscribe({
+      next: (product: any) => {
         console.log('Product details:', product);
 
         this.productInfoForm.patchValue({
@@ -71,12 +71,12 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
           status: product.data.status,
           slug: product.data.slug,
         });
-        this.form.value.productInfo={
+        this.form.value.productInfo = {
           id: product.data.id,
           name: product.data.name,
           status: product.data.status,
           slug: product.data.slug,
-        }
+        };
       },
       error: (err) => {
         this.commonService.toastr.error('Failed to load product details');
@@ -86,12 +86,16 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   submit() {
-    this.service[this.productId ? 'update' : 'create'](this.productInfoForm.value).subscribe({
+    this.subscriptionHandler.subscribe = this.service[this.productId ? 'update' : 'create'](
+      this.productInfoForm.value
+    ).subscribe({
       next: (res: any) => {
-        this.commonService.toastr.success(this.productId?'Prouduct updated successfully':'Product created successfully');
+        this.commonService.toastr.success(
+          this.productId ? 'Prouduct updated successfully' : 'Product created successfully'
+        );
         console.log(res);
         this.productId = res.data.id;
-        this.form.value.productInfo=res.data
+        this.form.value.productInfo = res.data;
         this.isProductCreated = true;
         this.cdr.detectChanges();
       },
@@ -110,5 +114,7 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       },
     });
   }
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.subscriptionHandler.unsubscribe();
+  }
 }
