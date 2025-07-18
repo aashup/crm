@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { FindService } from 'src/app/modules/core/find.service';
@@ -11,6 +11,8 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { ProductService } from '../../product.service';
 import { InventoryModel } from '../../../inventory/inventory.model';
 import { InventoryService } from '../../../inventory/inventory.service';
+import { map, Observable, startWith, take } from 'rxjs';
+import { UnitModel } from 'src/app/modules/settings/unit/unit.model';
 
 @Component({
   selector: 'app-add-product-inventory',
@@ -23,6 +25,7 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   model: InventoryModel;
   products: any[];
   units: any[];
+  filteredUnits: Observable<UnitModel[]>;
   clone: any;
   isEdit: boolean = false;
   isLoading = false;
@@ -32,7 +35,7 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   readonly data = inject<{
     model: InventoryModel;
     isEdit: boolean;
-    productId:string
+    productId: string;
   }>(MAT_DIALOG_DATA);
 
   inventries: InventoryModel[] = [];
@@ -50,9 +53,9 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("data ",this.data);
+    console.log('data ', this.data);
     this.getProducts();
-    this.getUnits();
+    this.loadUnits();
     this.getUserId();
   }
   getUserId() {
@@ -68,22 +71,59 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
       }
     });
   }
-  getUnits() {
-    this.unitService.find({}).subscribe((res: any) => {
-      console.log(res);
-      if (res) {
-        this.units = res.data;
-      }
-    });
-  }
+  loadUnits() {
+    this.unitService
+      .find({ pageSize: 100 })
+      .pipe(take(1))
+      .subscribe({
+        next: (resp: any) => {
+          this.units = resp.data;
 
+          const unitControl = this.unitIdControl;
+
+         if(this.isEdit){
+          this.filteredUnits = unitControl.valueChanges.pipe(
+            map((value: any) => {
+              const search =
+                typeof value === 'string' ? value.toLowerCase() : this.displayUnitName(value).toLowerCase();
+
+              return this.units.filter((unit: any) => unit.name.toLowerCase().includes(search));
+            })
+          );
+         }else{
+          this.filteredUnits = unitControl.valueChanges.pipe(
+            startWith(''),
+            map((value: any) => {
+              const search =
+                typeof value === 'string' ? value.toLowerCase() : this.displayUnitName(value).toLowerCase();
+
+              return this.units.filter((unit: any) => unit.name.toLowerCase().includes(search));
+            })
+          );
+         }
+
+          if (this.isEdit && this.model.unit_id) {
+            unitControl.setValue(this.model.unit_id);
+          }
+        },
+        error: (err) => this.commonService.handleError(err),
+      });
+  }
+  get unitIdControl(): FormControl {
+    return this.form.get('unit_id') as FormControl;
+  }
+  displayUnitName = (id: number | string): string => {
+    if (!id || !this.units) return '';
+    const unit: any = this.units.find((u) => u.id === +id);
+    return unit ? unit.name : '';
+  };
   ngAfterViewInit(): void {
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
-    this.isLoading = false; 
+    this.isLoading = false;
     this.dialogRef.afterClosed().subscribe(() => {
-      this.isLoading = false; 
+      this.isLoading = false;
       this.spinnerService.hide();
     });
   }
@@ -103,7 +143,7 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   }
   submit() {
     console.log(this.data);
-    
+
     this.commonService.markFormGroupTouched(this.form);
     this.form.value.qty = Number(this.form.value.qty);
     this.form.value.rem_qty = Number(this.form.value.rem_qty);
@@ -118,29 +158,27 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
 
     this.isLoading = true;
     this.spinnerService.show();
-    const payload={
+    const payload = {
       ...this.form.value,
       product_id: this.data.productId,
-    }
-    console.log("payload ",payload);
-    
-    this.service[this.isEdit ? 'update' : 'create'](payload).subscribe((res: any) => {
-      
+    };
+    console.log('payload ', payload);
+
+    this.service[this.isEdit ? 'update' : 'create'](payload).subscribe(
+      (res: any) => {
         this.commonService.toastr.success(this.isEdit ? 'Inventory has been updated.' : 'Inventory has been created.');
         this.isLoading = false;
         this.spinnerService.hide();
-        this.dialogRef.close({...res.data, product_id: this.data.productId});
+        this.dialogRef.close({ ...res.data, product_id: this.data.productId });
       },
       (err: any) => {
-        console.log("error in inventory ",err);
-      
-        this.commonService.toastr.error(err.error.message || "something went wrong");
+        console.log('error in inventory ', err);
+
+        this.commonService.toastr.error(err.error.message || 'something went wrong');
         this.isLoading = false;
         this.spinnerService.hide();
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       }
-
-    )
-   
+    );
   }
 }
