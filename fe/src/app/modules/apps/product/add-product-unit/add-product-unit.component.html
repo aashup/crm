@@ -5,45 +5,37 @@
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100" >
-              <mat-label>Please enter Unit Name </mat-label>
-              <mat-label>Unit </mat-label>
-              <mat-select placeholder="Unit" formControlName="unit_id"  [disabled]="true">
-                <mat-option *ngFor="let item of units" [value]="item.id">
+            <mat-form-field class="w-100">
+              <mat-label>Unit</mat-label>
+              <input
+              matInput
+              placeholder="Search Unit"
+              [formControl]="unitIdControl"
+              [matAutocomplete]="autoUnits"
+            />
+              <mat-autocomplete #autoUnits="matAutocomplete" [displayWith]="displayUnitName">
+                <mat-option *ngFor="let item of filteredUnits | async" [value]="item.id">
                   {{ item.name }}
                 </mat-option>
-              </mat-select>
-              <mat-error>Unit is <strong>required</strong> </mat-error>
+              </mat-autocomplete>
+              <mat-error *ngIf="unitIdControl.hasError('required')">Unit is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
-              <mat-label>Please enter Sale Price </mat-label>
-              <input
-                matInput
-                placeholder="Enter Price"
-                formControlName="sale_price"
-                maxlength="200"
-                type="number"
-              />
-              <mat-error
-                >Sale price is <strong>required</strong> and must be
+              <mat-label>Please enter Purchase Price </mat-label>
+              <input matInput placeholder="Enter Purchsae price" formControlName="purchase_price" maxlength="200"
+                type="number" />
+              <mat-error>Purchase price is <strong>required</strong> and must be
                 <strong>Number only</strong>
               </mat-error>
             </mat-form-field>
           </div>
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
-              <mat-label>Please enter Purchase Price </mat-label>
-              <input
-                matInput
-                placeholder="Enter Purchsae price"
-                formControlName="purchase_price"
-                maxlength="200"
-                type="number"
-              />
-              <mat-error
-                >Purchase price is <strong>required</strong> and must be
+              <mat-label>Please enter Sale Price </mat-label>
+              <input matInput placeholder="Enter Price" formControlName="sale_price" maxlength="200" type="number" />
+              <mat-error>Sale price is <strong>required</strong> and must be
                 <strong>Number only</strong>
               </mat-error>
             </mat-form-field>
@@ -61,11 +53,7 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Notes </mat-label>
-              <textarea
-                matInput
-                placeholder="Notes"
-                formControlName="notes"
-              ></textarea>
+              <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
               <mat-error>Notes is <strong>required</strong> </mat-error>
             </mat-form-field>
           </div>
