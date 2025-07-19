@@ -28,7 +28,7 @@ class StorePOSRequest extends FormRequest
             'payment_method' => ['required', 'integer', 'in:1,2,3'], // 1 = Cash, 2 = Online, 3 = Split Payment
             'cash_amount' => ['nullable', 'required_if:payment_method,1,3', 'numeric', 'min:0'],
             'online_amount' => ['nullable', 'required_if:payment_method,2,3', 'numeric', 'min:0'],
-            'transaction_id' => ['nullable', 'required_if:payment_method,2,3', 'string', 'max:255'],
+            'transaction_id' => ['nullable', 'string', 'max:255'],
             'return_amount' => ['nullable', 'numeric', 'min:0'],
 
             'saleDetails' => ['required', 'array', 'min:1'],
@@ -49,15 +49,15 @@ class StorePOSRequest extends FormRequest
         $validator->after(function (Validator $validator) {
             $data = $this->all();
 
-            if($data['payment_method'] == 1 && ($data['cash_amount'] - $data['return_amount']) != $data['net_total']) {
+            if ($data['payment_method'] == 1 && ($data['cash_amount'] - $data['return_amount']) != $data['net_total']) {
                 $validator->errors()->add('cash_amount', 'For Cash payment, Cash Amount minus Return Amount must equal Net Total.');
             }
 
-            if($data['payment_method'] == 2 && ($data['online_amount'] - $data['return_amount']) != $data['net_total']) {
+            if ($data['payment_method'] == 2 && ($data['online_amount'] - $data['return_amount']) != $data['net_total']) {
                 $validator->errors()->add('online_amount', 'Online amount must equal the net total for Online payment method.');
             }
 
-            if($data['payment_method'] == 3 && (($data['cash_amount'] + $data['online_amount']) - $data['return_amount']) != $data['net_total']) {
+            if ($data['payment_method'] == 3 && (($data['cash_amount'] + $data['online_amount']) - $data['return_amount']) != $data['net_total']) {
                 $validator->errors()->add('payment_method', 'Total of Cash and Online amounts must equal the net total for Split Payment.');
             }
 
