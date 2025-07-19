@@ -158,7 +158,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.showCashFields = true;
         this.showOnlineFields = false;
         online?.setValue(0);
-        txn?.setValue("");
+        txn?.setValue('');
+        cash?.setValue(this.form.get('net_total')?.value || 0);
         cash?.setValidators([Validators.required, Validators.min(0)]);
       } else if (type == 2) {
         // Cash
@@ -172,9 +173,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         // Split
         this.showCashFields = true;
         this.showOnlineFields = true;
+        cash?.setValue(0);
+        online?.setValue(0);
         cash?.setValidators([Validators.required, Validators.min(0)]);
-        online?.setValidators([Validators.required, Validators.min(0.01)]);
-        txn?.setValidators([Validators.required]);
+        online?.setValidators([Validators.required, Validators.min(0)]);
+        // txn?.setValidators([Validators.required]);
       }
 
       // Apply validation updates
@@ -396,6 +399,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
+    if(this.form.get('payment_method')?.value === 1) {
+      this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
+      this.form.get('online_amount')?.setValue(0, { emitEvent: false });
+    }
     this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
   }
 
@@ -512,8 +519,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return_amount: this.returnAmount,
     };
 
-    console.log('Payload for sale creation:', payload);
-    return;
+    // console.log('Payload for sale creation:', payload);
+    // this.isLoading = false;
+    // this.spinnerService.hide();
+    // this.cdr.detectChanges();
+    // return;
 
     this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
       next: (response: any) => {
@@ -540,5 +550,30 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.commonService.toastr.error(error.error?.message || 'Failed to create sale. Please try again.');
       },
     });
+  }
+
+  handleSplitPaymentAutoCalculation(payment_type: string): void {
+    if(!this.form.get('payment_method')?.value || this.form.get('payment_method')?.value !== 3) {
+      return;
+    }
+    const cashControl = this.form.get('cash_amount');
+    const onlineControl = this.form.get('online_amount');
+    const netTotalControl = this.form.get('net_total');
+
+    if (payment_type === 'cash') {
+      if (cashControl?.value > netTotalControl?.value) {
+        onlineControl?.setValue(0);
+      } else {
+        onlineControl?.setValue(netTotalControl?.value - cashControl?.value);
+      }
+    }
+
+    if (payment_type === 'online') {
+      if (onlineControl?.value > netTotalControl?.value) {
+        cashControl?.setValue(0);
+      } else {
+        cashControl?.setValue(netTotalControl?.value - onlineControl?.value);
+      }
+    }
   }
 }

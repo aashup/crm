@@ -211,6 +211,7 @@
                 formControlName="cash_amount"
                 placeholder="Cash"
                 autocomplete="off"
+                (input)="handleSplitPaymentAutoCalculation('cash')"
               />
               <mat-error *ngIf="form.get('cash_amount')?.hasError('required')">
                 Cash amount is <strong>required</strong>
@@ -231,6 +232,7 @@
                   formControlName="online_amount"
                   placeholder="Online Amount"
                   autocomplete="off"
+                  (input)="handleSplitPaymentAutoCalculation('online')"
                 />
                 <mat-error *ngIf="form.get('online_amount')?.hasError('required')">
                   Online amount is <strong>required</strong>
