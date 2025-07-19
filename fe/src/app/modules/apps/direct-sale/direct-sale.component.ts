@@ -158,7 +158,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.showCashFields = true;
         this.showOnlineFields = false;
         online?.setValue(0);
-        txn?.setValue("");
+        txn?.setValue('');
         cash?.setValidators([Validators.required, Validators.min(0)]);
       } else if (type == 2) {
         // Cash
@@ -444,7 +444,53 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   onSubmit(redirectToPrint: boolean = false): void {
     this.commonService.markFormGroupTouched(this.form);
+    if(!this.validateData()) {
+      return;
+    }
+    this.isLoading = true;
+    this.spinnerService.show();
+    const rawForm = this.form.getRawValue();
+    if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
+      rawForm.mobile = '+91' + rawForm.mobile.trim();
+    }
 
+    const payload = {
+      ...rawForm,
+      payment_method: rawForm.payment_method,
+      cash_amount: rawForm.cash_amount || 0,
+      online_amount: rawForm.online_amount || 0,
+      transaction_id: rawForm.transaction_id || '',
+      return_amount: this.returnAmount,
+    };
+
+    this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        this.spinnerService.hide();
+
+        const createdId = response?.data?.id || response?.data?.sale?.id;
+        this.commonService.toastr.success('Sale created successfully.');
+
+        if (redirectToPrint && createdId) {
+          this.router.navigate([`/app/direct-sale/print/${createdId}`]);
+        } else {
+          this.form.reset();
+          this.saleDetails.clear();
+          this.filteredUnitsList = [];
+          this.filteredProductsList = [];
+          this.router.navigate(['/app/sale']);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.spinnerService.hide();
+        this.cdr.detectChanges();
+        this.commonService.toastr.error(error.error?.message || 'Failed to create sale. Please try again.');
+      },
+    });
+  }
+
+  validateData() {
     const netTotal = this.form.get('net_total')?.value || 0;
     const cash = parseFloat(this.form.get('cash_amount')?.value) || 0;
     const online = parseFloat(this.form.get('online_amount')?.value) || 0;
@@ -494,51 +540,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-
-    this.isLoading = true;
-    this.spinnerService.show();
-
-    const rawForm = this.form.getRawValue();
-    if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
-      rawForm.mobile = '+91' + rawForm.mobile.trim();
-    }
-
-    const payload = {
-      ...rawForm,
-      payment_method: rawForm.payment_method,
-      cash_amount: rawForm.cash_amount || 0,
-      online_amount: rawForm.online_amount || 0,
-      transaction_id: rawForm.transaction_id || '',
-      return_amount: this.returnAmount,
-    };
-
-    console.log('Payload for sale creation:', payload);
-    return;
-
-    this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
-      next: (response: any) => {
-        this.isLoading = false;
-        this.spinnerService.hide();
-
-        const createdId = response?.data?.id || response?.data?.sale?.id;
-        this.commonService.toastr.success('Sale created successfully.');
-
-        if (redirectToPrint && createdId) {
-          this.router.navigate([`/app/direct-sale/print/${createdId}`]);
-        } else {
-          this.form.reset();
-          this.saleDetails.clear();
-          this.filteredUnitsList = [];
-          this.filteredProductsList = [];
-          this.router.navigate(['/app/sale']);
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.spinnerService.hide();
-        this.cdr.detectChanges();
-        this.commonService.toastr.error(error.error?.message || 'Failed to create sale. Please try again.');
-      },
-    });
+    return true;
   }
 }
