@@ -1,4 +1,4 @@
-import { UnitModel } from "../../settings/unit/unit.model";
+import { UnitModel } from '../../settings/unit/unit.model';
 
 export class ProductDetailsModel {
   id: number | null;
@@ -27,6 +27,7 @@ export class ContactModel {
   created_at: Date;
   updated_at: Date;
   deleted_at: Date;
+  html: string;
   clear() {
     this.name = null;
     this.mob1 = null;
@@ -45,7 +46,7 @@ export class ProductModel {
   updated_at: Date;
   deleted_at: Date;
 
-  units: UnitModel[]
+  units: UnitModel[];
   clear() {
     this.name = '';
     this.slug = '';

@@ -21,7 +21,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": {
-              "base": "dist/demo1"
+              "base": "dist"
             },
             "allowedCommonJsDependencies": [
               "object-path",
@@ -52,7 +52,7 @@
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/datatables.net/js/dataTables.js",
               "node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js"
-              
+
             ],
             "browser": "src/main.ts"
           },

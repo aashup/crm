@@ -4,18 +4,18 @@
 
 export const environment = {
   production: true,
-  API_ENDPOINT: 'https://api.xtrox.com/api/v1',
+  API_ENDPOINT: 'http://api.xtrox.com/api/v1',
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
   apiUrl: 'api',
   appThemeName: 'Metronic',
-  appPurchaseUrl: 'https://1.envato.market/EA4JP',
-  appHTMLIntegration: 'https://preview.keenthemes.com/metronic8/demo1/documentation/base/helpers/flex-layouts.html',
-  appPreviewUrl: 'https://preview.keenthemes.com/metronic8/angular/demo1/',
-  appPreviewAngularUrl: 'https://preview.keenthemes.com/metronic8/angular/demo1',
-  appPreviewDocsUrl: 'https://preview.keenthemes.com/metronic8/angular/docs',
-  appPreviewChangelogUrl: 'https://preview.keenthemes.com/metronic8/angular/docs/changelog',
+  appPurchaseUrl: 'http://1.envato.market/EA4JP',
+  appHTMLIntegration: 'http://preview.keenthemes.com/metronic8/demo1/documentation/base/helpers/flex-layouts.html',
+  appPreviewUrl: 'http://preview.keenthemes.com/metronic8/angular/demo1/',
+  appPreviewAngularUrl: 'http://preview.keenthemes.com/metronic8/angular/demo1',
+  appPreviewDocsUrl: 'http://preview.keenthemes.com/metronic8/angular/docs',
+  appPreviewChangelogUrl: 'http://preview.keenthemes.com/metronic8/angular/docs/changelog',
   appDemos: {
     'demo1': {
       'title': 'Demo 1',

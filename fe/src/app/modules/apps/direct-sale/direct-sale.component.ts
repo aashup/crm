@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { SubscriptionHandler } from '../../core/subscription.handler';
   selector: 'app-direct-sale',
   templateUrl: './direct-sale.component.html',
   styleUrl: './direct-sale.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   subscriptionHandler = new SubscriptionHandler();
@@ -51,7 +52,15 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       startWith(''),
       map((value: string) => {
         const val = value?.toLowerCase().trim();
-        return this.contacts.filter((contact) => contact.name.toLowerCase().includes(val));
+        const escaped = val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, 'gi');
+        return this.contacts
+          .filter((contact) => contact.name.toLowerCase().includes(val))
+          .map<ContactModel>((value: ContactModel) => {
+            value.html =
+              value.name?.replace(regex, (match: any) => `<strong>${match}</strong>`) + `&nbsp;[${value.mob1}]`;
+            return value;
+          });
       })
     );
 
@@ -59,7 +68,15 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       startWith(''),
       map((value: string) => {
         const val = value?.toLowerCase().trim();
-        return this.contacts.filter((contact) => contact.mob1.toLowerCase().includes(val));
+        const escaped = val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, 'gi');
+        return this.contacts
+          .filter((contact) => contact.mob1.toLowerCase().includes(val))
+          .map((value) => {
+            value.html =
+              value.name + '&nbsp; [' + value.mob1.replace(regex, (match: any) => `<strong>${match}</strong>`) + ']';
+            return value;
+          });
       })
     );
 
@@ -241,7 +258,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   onContactBlur(): void {
     const mobileValue = this.form.get('mobile')?.value;
     const match = this.contacts.find((c) => c.mob1 === mobileValue);
-    if (!match && this.isNameSelected) {
+    if (!match) {
       this.form.patchValue({ name: '', contact_id: null });
       this.isNameSelected = false;
     }
@@ -451,7 +468,53 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   onSubmit(redirectToPrint: boolean = false): void {
     this.commonService.markFormGroupTouched(this.form);
+    if (!this.validateData()) {
+      return;
+    }
+    this.isLoading = true;
+    this.spinnerService.show();
+    const rawForm = this.form.getRawValue();
+    if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
+      rawForm.mobile = '+91' + rawForm.mobile.trim();
+    }
 
+    const payload = {
+      ...rawForm,
+      payment_method: rawForm.payment_method,
+      cash_amount: rawForm.cash_amount || 0,
+      online_amount: rawForm.online_amount || 0,
+      transaction_id: rawForm.transaction_id || '',
+      return_amount: this.returnAmount,
+    };
+
+    this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        this.spinnerService.hide();
+
+        const createdId = response?.data?.id || response?.data?.sale?.id;
+        this.commonService.toastr.success('Sale created successfully.');
+
+        if (redirectToPrint && createdId) {
+          this.router.navigate([`/app/direct-sale/print/${createdId}`]);
+        } else {
+          this.form.reset();
+          this.saleDetails.clear();
+          this.filteredUnitsList = [];
+          this.filteredProductsList = [];
+          this.router.navigate(['/app/sale']);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.spinnerService.hide();
+        this.cdr.detectChanges();
+        this.commonService.toastr.error(error.error?.message || 'Failed to create sale. Please try again.');
+      },
+    });
+  }
+
+  validateData() {
     const netTotal = this.form.get('net_total')?.value || 0;
     const cash = parseFloat(this.form.get('cash_amount')?.value) || 0;
     const online = parseFloat(this.form.get('online_amount')?.value) || 0;
@@ -501,55 +564,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-
-    this.isLoading = true;
-    this.spinnerService.show();
-
-    const rawForm = this.form.getRawValue();
-    if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
-      rawForm.mobile = '+91' + rawForm.mobile.trim();
-    }
-
-    const payload = {
-      ...rawForm,
-      payment_method: rawForm.payment_method,
-      cash_amount: rawForm.cash_amount || 0,
-      online_amount: rawForm.online_amount || 0,
-      transaction_id: rawForm.transaction_id || '',
-      return_amount: this.returnAmount,
-    };
-
-    // console.log('Payload for sale creation:', payload);
-    // this.isLoading = false;
-    // this.spinnerService.hide();
-    // this.cdr.detectChanges();
-    // return;
-
-    this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
-      next: (response: any) => {
-        this.isLoading = false;
-        this.spinnerService.hide();
-
-        const createdId = response?.data?.id || response?.data?.sale?.id;
-        this.commonService.toastr.success('Sale created successfully.');
-
-        if (redirectToPrint && createdId) {
-          this.router.navigate([`/app/direct-sale/print/${createdId}`]);
-        } else {
-          this.form.reset();
-          this.saleDetails.clear();
-          this.filteredUnitsList = [];
-          this.filteredProductsList = [];
-          this.router.navigate(['/app/sale']);
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.spinnerService.hide();
-        this.cdr.detectChanges();
-        this.commonService.toastr.error(error.error?.message || 'Failed to create sale. Please try again.');
-      },
-    });
+    return true;
   }
 
   handleSplitPaymentAutoCalculation(payment_type: string): void {
