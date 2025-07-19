@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { SubscriptionHandler } from '../../core/subscription.handler';
   selector: 'app-direct-sale',
   templateUrl: './direct-sale.component.html',
   styleUrl: './direct-sale.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   subscriptionHandler = new SubscriptionHandler();
@@ -51,7 +52,15 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       startWith(''),
       map((value: string) => {
         const val = value?.toLowerCase().trim();
-        return this.contacts.filter((contact) => contact.name.toLowerCase().includes(val));
+        const escaped = val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, 'gi');
+        return this.contacts
+          .filter((contact) => contact.name.toLowerCase().includes(val))
+          .map<ContactModel>((value: ContactModel) => {
+            value.html =
+              value.name?.replace(regex, (match: any) => `<strong>${match}</strong>`) + `&nbsp;[${value.mob1}]`;
+            return value;
+          });
       })
     );
 
@@ -59,7 +68,15 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       startWith(''),
       map((value: string) => {
         const val = value?.toLowerCase().trim();
-        return this.contacts.filter((contact) => contact.mob1.toLowerCase().includes(val));
+        const escaped = val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, 'gi');
+        return this.contacts
+          .filter((contact) => contact.mob1.toLowerCase().includes(val))
+          .map((value) => {
+            value.html =
+              value.name + '&nbsp; [' + value.mob1.replace(regex, (match: any) => `<strong>${match}</strong>`) + ']';
+            return value;
+          });
       })
     );
 
@@ -238,7 +255,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   onContactBlur(): void {
     const mobileValue = this.form.get('mobile')?.value;
     const match = this.contacts.find((c) => c.mob1 === mobileValue);
-    if (!match && this.isNameSelected) {
+    if (!match) {
       this.form.patchValue({ name: '', contact_id: null });
       this.isNameSelected = false;
     }
@@ -444,7 +461,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   onSubmit(redirectToPrint: boolean = false): void {
     this.commonService.markFormGroupTouched(this.form);
-    if(!this.validateData()) {
+    if (!this.validateData()) {
       return;
     }
     this.isLoading = true;
