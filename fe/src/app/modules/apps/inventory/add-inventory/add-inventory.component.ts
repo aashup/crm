@@ -65,7 +65,7 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     });
   }
   getUnits() {
-    this.unitService.find({}).subscribe((res: any) => {
+    this.unitService.find({pageSize:100}).subscribe((res: any) => {
       console.log(res);
       if (res) {
         this.units = res.data;

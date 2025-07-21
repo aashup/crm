@@ -130,7 +130,7 @@ export class AddUnitConversionComponent implements AfterViewInit, OnInit {
   }
 
   getAllUnit(callback?: () => void) {
-    this.unitService.find().subscribe((res: any) => {
+    this.unitService.find({ pageSize: 100}).subscribe((res: any) => {
       this.units = res.data;
       if (callback) callback();
     });

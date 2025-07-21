@@ -60,7 +60,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     'purchase_price',
     'sale_price',
     'notes',
-    
     'status',
     'action',
   ];
@@ -137,7 +136,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       this.spinnerService.hide();
       this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
         .pipe(
-          debounceTime(500),
+          debounceTime(300),
           distinctUntilChanged(),
           tap(() => {
             this.paginator.pageIndex = 0;
@@ -169,9 +168,16 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
         'updated_at',
         'deleted_at',
         'status',
-      ]; // Specify all required columns
-      this.dataSource.find(_.pickBy(this.filter));
+      ]; 
+      this.dataSource.find(_.pickBy(this.filter)).subscribe({
+        next: () => {
+        },
+        error: (err) => {
+          console.error('Error loading inventory:', err);
+        }
+      });
     }
+    
   masterToggle() {
     if (
       this.selection.selected.length ===
