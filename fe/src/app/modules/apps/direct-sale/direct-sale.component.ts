@@ -282,7 +282,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   createSaleDetailWithCalculation(index: number): FormGroup {
     const group = this.fb.group({
-      product_id: [null, Validators.required],
+      product_id: [null],
       product_name: [null, Validators.required],
       unit_id: [null, Validators.required],
       quantity: [1, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
@@ -494,6 +494,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onSubmit(redirectToPrint: boolean = false): void {
+    console.log(this.form.getRawValue());
+    
     this.commonService.markFormGroupTouched(this.form);
     if (!this.validateData()) {
       return;
