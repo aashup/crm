@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
+import { filter, map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { ContactModel, ProductModel } from '../product/product.model';
 import { DirectSaleService } from './direct-sale.service';
@@ -24,6 +24,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   filteredNames: Observable<ContactModel[]>;
   products: ProductModel[] = [];
   filteredProductsList: ProductModel[][] = [];
+  filteredProductsOptions: Observable<ProductModel[]>[] = [];
+
   units: UnitModel[] = [];
   filteredUnitsList: any[][] = [];
   isNameSelected = false;
@@ -112,6 +114,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isMobileSelected = false;
       }
     });
+   
   }
 
   ngAfterViewInit(): void {
@@ -164,15 +167,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       const cash = this.form.get('cash_amount');
       const online = this.form.get('online_amount');
       const txn = this.form.get('transaction_id');
-
-      // Clear all validators initially
       cash?.clearValidators();
       online?.clearValidators();
       txn?.clearValidators();
 
-      // Update visibility and validators based on selection
       if (type == 1) {
-        // Online
         this.showCashFields = true;
         this.showOnlineFields = false;
         online?.setValue(0);
@@ -180,7 +179,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         cash?.setValue(this.form.get('net_total')?.value || 0);
         cash?.setValidators([Validators.required, Validators.min(0)]);
       } else if (type == 2) {
-        // Cash
         this.showOnlineFields = false;
         this.showCashFields = false;
         cash?.setValue(0);
@@ -188,7 +186,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         // online?.setValidators([Validators.required, Validators.min(0.01)]);
         // txn?.setValidators([Validators.required]);
       } else if (type == 3) {
-        // Split
         this.showCashFields = true;
         this.showOnlineFields = true;
         cash?.setValue(0);
@@ -198,7 +195,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         // txn?.setValidators([Validators.required]);
       }
 
-      // Apply validation updates
       cash?.updateValueAndValidity();
       online?.updateValueAndValidity();
       txn?.updateValueAndValidity();
@@ -273,10 +269,14 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   updateFilteredProducts(): void {
     const selectedIds = this.getSelectedProductIds();
-
-    this.filteredProductsList = this.saleDetails.controls.map((_, index) => {
-      const currentSelected = this.saleDetails.at(index).get('product_id')?.value;
-      return this.products.filter((product) => !selectedIds.includes(product.id) || product.id === currentSelected);
+    this.filteredProductsList = [];
+  
+    this.saleDetails.controls.forEach((group, index) => {
+      const currentSelected = group.get('product_id')?.value;
+      const availableProducts = this.products.filter(
+        (product) => !selectedIds.includes(product.id) || product.id === currentSelected
+      );
+      this.filteredProductsList[index] = availableProducts;
     });
   }
 
@@ -291,44 +291,67 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       discount_type: [1],
       net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
     });
-
+  
+    // Setup filteredProductsOptions observable for this product_name control
+    this.filteredProductsOptions[index] = group.get('product_name')!.valueChanges.pipe(
+      startWith(''),
+      map((input) => {
+        const val = (input || '').toLowerCase().trim();
+  
+        const selectedIds:any = this.getSelectedProductIds().filter((id:any) => id !== group.get('product_id')?.value);
+  
+        return this.products.filter((product:any) => {
+          const matchesName = product.name.toLowerCase().includes(val);
+          const notSelected = !selectedIds.includes(product.id);
+          const isCurrent = product.id === group.get('product_id')?.value;
+          return matchesName && (notSelected || isCurrent);
+        });
+      })
+    );
+  
+    
     group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
-
-    group.get('product_name')?.valueChanges.subscribe((productId) => {
-      const selectedProduct: any = this.products.find((p) => p.name === productId);
-
-      if (selectedProduct && Array.isArray(selectedProduct.product_unit)) {
-        this.filteredUnitsList[index] = selectedProduct.product_unit.map((pu: any) => pu.unit);
-        group.get('unit_id')?.setValue(this.filteredUnitsList[index][0].id);
-        group.patchValue(
-          {
-            quantity: 1,
-            amount: selectedProduct?.product_unit?.find((p: any) => p.unit_id == this.filteredUnitsList[index][0].id)
-              ?.sale_price,
-            product_id: selectedProduct.id,
-          },
-          { emitEvent: true }
-        );
-        this.subscriptionHandler.subscribe = group.get('unit_id')?.valueChanges.subscribe((unitId) => {
-          group
-            .get('amount')
-            ?.patchValue(selectedProduct.product_unit.find((p: any) => p.unit_id == unitId)?.sale_price);
-        });
-      } else {
-        console.log('I');
-        this.filteredUnitsList[index] = this.units;
-        group.get('unit_id')?.reset();
-        group.get('product_id')?.reset();
-      }
-      this.updateFilteredProducts();
-    });
-
+  
+    // Product name changes to update units, product_id, amount etc.
+    group.get('product_name')?.valueChanges
+      .pipe(filter((inputName: any): inputName is string => typeof inputName === 'string'))
+      .subscribe((inputName: string) => {
+        const selectedProduct: any = this.products.find((p) => p.name === inputName);
+  
+        if (selectedProduct && Array.isArray(selectedProduct.product_unit)) {
+          this.filteredUnitsList[index] = selectedProduct.product_unit.map((pu: any) => pu.unit);
+          const defaultUnit = this.filteredUnitsList[index][0];
+          group.get('unit_id')?.setValue(defaultUnit.id);
+  
+          group.patchValue(
+            {
+              quantity: 1,
+              amount: selectedProduct.product_unit.find((p: any) => p.unit_id == defaultUnit.id)?.sale_price,
+              product_id: selectedProduct.id,
+            },
+            { emitEvent: true }
+          );
+  
+          this.subscriptionHandler.subscribe = group.get('unit_id')?.valueChanges.subscribe((unitId) => {
+            const unitPrice = selectedProduct.product_unit.find((p: any) => p.unit_id == unitId)?.sale_price;
+            group.get('amount')?.patchValue(unitPrice);
+          });
+        } else {
+          this.filteredUnitsList[index] = this.units;
+          group.get('unit_id')?.reset();
+          group.get('product_id')?.reset();
+        }
+  
+        this.updateFilteredProducts();
+      });
+  
     return group;
   }
-
+  
+  
   addSaleDetail(): void {
     const index = this.saleDetails.length;
     this.filteredUnitsList[index] = [];
