@@ -81,12 +81,33 @@ class PosController extends Controller
 
             $validated['created_by'] = Auth::id();
 
+            $salesDetails = $validated['saleDetails'];
+            foreach ($salesDetails as &$item) {
+                if (empty($item['product_id']) && !empty($item['product_name'])) {
+                    $product = Product::create([
+                        'name' => $item['product_name'],
+                        'unit_id' => $item['unit_id'],
+                        'status' => 1,
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    $product->units()->create([
+                        'unit_id' => $item['unit_id'],
+                        'sale_price' => $item['amount'],
+                        'status' => 1,
+                    ]);
+
+                    $item['product_id'] = $product->id;
+                }
+            }
+            $validated['saleDetails'] = $salesDetails;
+
             $sale = new Sale();
             $sale->fill($validated);
             $sale->save();
 
             $sale->saleDetails()->createMany($validated['saleDetails']);
-            
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

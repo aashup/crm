@@ -32,8 +32,9 @@ class StorePOSRequest extends FormRequest
             'return_amount' => ['nullable', 'numeric', 'min:0'],
 
             'saleDetails' => ['required', 'array', 'min:1'],
-            'saleDetails.*.product_id' => ['exists:products,id'],
-            'saleDetails.*.unit_id' => ['required', 'exists:units,id'],
+            'saleDetails.*.product_id' => ['nullable', 'exists:products,id'],
+            'saleDetails.*.product_name' => ['required_without:saleDetails.*.product_id', 'string', 'max:255'],
+            'saleDetails.*.unit_id' => ['required_with:saleDetails.*.product_id', 'exists:units,id'],
             'saleDetails.*.quantity' => ['required', 'numeric', 'min:1'],
             'saleDetails.*.amount' => ['required', 'numeric', 'min:0'],
             'saleDetails.*.discount_type' => ['nullable', 'in:1,2'],
