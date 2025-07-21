@@ -62,17 +62,19 @@
                 <mat-label>Product</mat-label>
                 <input formControlName="product_id" class="d-none" />
                 <input
-                  matInput
-                  formControlName="product_name"
-                  [matAutocomplete]="productId"
-                  (blur)="onContactBlur()"
-                  placeholder="Search or enter mobile"
-                />
-                <mat-autocomplete #productId="matAutocomplete">
-                  <mat-option *ngFor="let product of filteredProductsList[i]" [value]="product.name">
-                    {{ product.name }}
-                  </mat-option>
-                </mat-autocomplete>
+                matInput
+                formControlName="product_name"
+                [matAutocomplete]="productId"
+                placeholder="Search or enter product"
+              />
+              <mat-autocomplete #productId="matAutocomplete">
+                <mat-option
+                  *ngFor="let product of filteredProductsOptions[i] | async"
+                  [value]="product.name"
+                >
+                  {{ product.name }}
+                </mat-option>
+              </mat-autocomplete>
               </mat-form-field>
             </div>
 
@@ -161,7 +163,7 @@
                 autocomplete="off"
               />
               <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px">
-                <mat-option [value]="1">INR</mat-option>
+                <mat-option [value]="1">₹&nbsp;&nbsp;</mat-option>
                 <mat-option [value]="2">%</mat-option>
               </mat-select>
               <mat-error *ngIf="form.get('discount_amount')?.hasError('required')">
