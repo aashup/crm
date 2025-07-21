@@ -32,7 +32,7 @@ class StorePOSRequest extends FormRequest
             'return_amount' => ['nullable', 'numeric', 'min:0'],
 
             'saleDetails' => ['required', 'array', 'min:1'],
-            'saleDetails.*.product_id' => ['required', 'exists:products,id'],
+            'saleDetails.*.product_id' => ['exists:products,id'],
             'saleDetails.*.unit_id' => ['required', 'exists:units,id'],
             'saleDetails.*.quantity' => ['required', 'numeric', 'min:1'],
             'saleDetails.*.amount' => ['required', 'numeric', 'min:0'],

@@ -60,11 +60,19 @@
             <div class="col-12 col-md-5">
               <mat-form-field class="w-100">
                 <mat-label>Product</mat-label>
-                <mat-select [formControlName]="'product_id'">
-                  <mat-option *ngFor="let product of filteredProductsList[i]" [value]="product.id">
+                <input formControlName="product_id" class="d-none" />
+                <input
+                  matInput
+                  formControlName="product_name"
+                  [matAutocomplete]="productId"
+                  (blur)="onContactBlur()"
+                  placeholder="Search or enter mobile"
+                />
+                <mat-autocomplete #productId="matAutocomplete">
+                  <mat-option *ngFor="let product of filteredProductsList[i]" [value]="product.name">
                     {{ product.name }}
                   </mat-option>
-                </mat-select>
+                </mat-autocomplete>
               </mat-form-field>
             </div>
 
