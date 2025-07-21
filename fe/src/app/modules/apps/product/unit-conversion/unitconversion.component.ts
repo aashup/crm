@@ -15,18 +15,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import _ from 'lodash';
-import { merge, tap, take, debounceTime, distinctUntilChanged, fromEvent } from 'rxjs';
+import { merge, tap, take } from 'rxjs';
 
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { UnitConversionDatasource } from './unitconversion.datasource';
-import { UnitConversionModel } from './unitconversion.model';
-import { UnitConversionService } from './unitconversion.service';
+
 import { AddUnitConversionComponent } from './add-unit-conversion/add-unit-conversion.component';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { ConfirmationDialogComponent } from 'src/app/modules/core/confirmation-dialog/confirmation-dialog.component';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { UnitConversionDatasource } from 'src/app/modules/settings/unit-conversion/unitconversion.datasource';
+import { UnitConversionModel } from 'src/app/modules/settings/unit-conversion/unitconversion.model';
+import { UnitConversionService } from 'src/app/modules/settings/unit-conversion/unitconversion.service';
 
 @Component({
   selector: 'app-unit-conversion',
@@ -49,7 +50,6 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   search: any = { all: '' };
   filter: any = {};
   displayableCol = [
-    'select',
     'id',
     'product',
     'from_unit',
@@ -64,7 +64,6 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
     { ref: 'product', name: 'Product', mutator: (item: any) => item.product?.name || 'N/A' },
     { ref: 'from_unit', name: 'From Unit', mutator: (item: any) => item.from_unit?.name || 'N/A' },
@@ -92,8 +91,8 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
     this.loadData();
     console.log(this.form);
     this.cdr.detectChanges();
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe();
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange,)
       .pipe(
         tap(() => {
           this.loadData();
@@ -107,25 +106,11 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
-
-    // this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-    //   .pipe(
-    //     debounceTime(500),
-    //     distinctUntilChanged(),
-    //     tap(() => {
-    //       this.paginator.pageIndex = 0;
-    //       this.search.all = this.searchElementRef.nativeElement.value.trim();
-    //       this.loadData();
-    //     })
-    //   )
-    //   .subscribe();
   }
 
   loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
-    this.filter.page = this.paginator.pageIndex + 1;
-    this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify({
       ..._.pickBy(this.search),
       product_id: this.productId,

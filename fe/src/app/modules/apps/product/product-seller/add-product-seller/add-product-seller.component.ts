@@ -9,8 +9,9 @@ import { ContactService } from 'src/app/modules/settings/contact/contact.service
 import { AddressService } from 'src/app/modules/settings/address/address.service';
 
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { ProductSellerModel } from '../product-seller.model';
-import { ProductSellerService } from '../product-seller.service';
+import { VendorModel } from '../../../vendor/vendor.model';
+import { VendorService } from '../../../vendor/vendor.service';
+
 @Component({
     selector: 'app-add-prooduct-seller',
     templateUrl: './add-product-seller.component.html',
@@ -19,7 +20,7 @@ import { ProductSellerService } from '../product-seller.service';
 })
 export class AddProductSellerComponent implements AfterViewInit, OnInit {
   form: FormGroup;
-  model: ProductSellerModel;
+  model: VendorModel;
   clone: any;
   isEdit: boolean = false;
   contacts: any = [];
@@ -30,15 +31,15 @@ export class AddProductSellerComponent implements AfterViewInit, OnInit {
   readonly _ = _;
   readonly dialogRef = inject(MatDialogRef<AddProductSellerComponent>);
   readonly data = inject<{
-    model: ProductSellerModel;
+    model: VendorModel;
     isEdit: boolean;
   }>(MAT_DIALOG_DATA);
 
-  vendors: ProductSellerModel[] = [];
+  vendors: VendorModel[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private service: ProductSellerService,
+    private service: VendorService,
     private find: FindService,
     private commonService: CommonService,
     private contactService: ContactService,
@@ -79,7 +80,7 @@ export class AddProductSellerComponent implements AfterViewInit, OnInit {
     this.spinnerService.hide();
   }
 
-  initForm(model: ProductSellerModel) {
+  initForm(model: VendorModel) {
     this.form = this.fb.group({
       id: [model.id, []],
       name: [

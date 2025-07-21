@@ -2,11 +2,7 @@
   <div class="card-header border-0 pt-6">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
-        <!-- <mat-form-field appearance="outline">
-          <mat-label>Search in all fields</mat-label>
-          <input #searchElementRef matInput placeholder="Search" />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field> -->
+       
       </div>
     </div>
     <div class="card-toolbar">
@@ -44,25 +40,8 @@
       >
         <ng-container *ngFor="let cols of tableColumns">
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref === 'select'">
-            <th
-              cdk-header-cell
-              *matHeaderCellDef
-              class="text-center"
-              [attr.aria-label]="'Select all'"
-            >
-              <mat-checkbox
-                (change)="masterToggle()"
-                [checked]="selection.hasValue() && isAllSelected()"
-                [indeterminate]="selection.hasValue() && !isAllSelected()"
-              ></mat-checkbox>
-            </th>
-            <td cdk-cell *matCellDef="let row" class="text-center">
-              <mat-checkbox
-                (click)="$event.stopPropagation()"
-                (change)="selection.toggle(row)"
-                [checked]="selection.isSelected(row)"
-              ></mat-checkbox>
-            </td>
+           
+           
           </ng-container>
 
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref !== 'select' && cols.ref !== 'action'">
@@ -149,11 +128,6 @@
 
     <div class="pt-5">
       <mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-      <mat-paginator
-        [pageSizeOptions]="[5, 10, 20, 50, 100]"
-        [length]="dataSource.paginatorTotal$ | async"
-      ></mat-paginator>
-
       <div class="mat-table__floating-modal" *ngIf="selection.selected.length">
         <div class="floating-modal">
           <p class="font-weight-bold m-0" style="font-size: 16px">
