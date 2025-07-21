@@ -82,6 +82,8 @@ export class ProductComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.orderBy = this.sort.direction;
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize;
+    this.filter.orderField = 'name';
+    this.filter.orderBy = 'asc';
     // this.filter.filter = JSON.stringify(this.search);
     this.filter.with = ['unit', 'productDetails'];
     this.dataSource.find(this.filter);

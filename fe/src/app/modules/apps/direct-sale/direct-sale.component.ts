@@ -8,6 +8,7 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { Router } from '@angular/router';
 import { SubscriptionHandler } from '../../core/subscription.handler';
+import { UnitModel } from '../../settings/unit/unit.model';
 
 @Component({
   selector: 'app-direct-sale',
@@ -23,7 +24,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   filteredNames: Observable<ContactModel[]>;
   products: ProductModel[] = [];
   filteredProductsList: ProductModel[][] = [];
-  units: any[] = [];
+  units: UnitModel[] = [];
   filteredUnitsList: any[][] = [];
   isNameSelected = false;
   isMobileSelected = false;
@@ -235,6 +236,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       next: (data: any) => {
         this.products = data.data.products;
         this.contacts = data.data.contacts;
+        this.units = data.data.units;
         this.updateFilteredProducts();
       },
       error: (err) => {
@@ -245,14 +247,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   get saleDetails(): FormArray {
     return this.form.get('saleDetails') as FormArray;
-  }
-
-  private _filter<T extends ContactModel>(value: string): T[] {
-    const filterValue = value.toLowerCase().replace(/\s/g, '');
-    return this.contacts.filter(
-      (contact) =>
-        contact.mob1?.toLowerCase().includes(filterValue) || contact.name?.toLowerCase().includes(filterValue)
-    );
   }
 
   onContactBlur(): void {
@@ -289,6 +283,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   createSaleDetailWithCalculation(index: number): FormGroup {
     const group = this.fb.group({
       product_id: [null, Validators.required],
+      product_name: [null, Validators.required],
       unit_id: [null, Validators.required],
       quantity: [1, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
       amount: [0, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
@@ -302,23 +297,32 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
 
-    group.get('product_id')?.valueChanges.subscribe((productId) => {
-      const selectedProduct: any = this.products.find((p) => p.id === productId);
+    group.get('product_name')?.valueChanges.subscribe((productId) => {
+      const selectedProduct: any = this.products.find((p) => p.name === productId);
 
       if (selectedProduct && Array.isArray(selectedProduct.product_unit)) {
         this.filteredUnitsList[index] = selectedProduct.product_unit.map((pu: any) => pu.unit);
-
-        if (this.filteredUnitsList[index].length === 1) {
-          group.get('unit_id')?.setValue(this.filteredUnitsList[index][0].id);
-        } else {
-          group.get('unit_id')?.reset();
-        }
+        group.get('unit_id')?.setValue(this.filteredUnitsList[index][0].id);
+        group.patchValue(
+          {
+            quantity: 1,
+            amount: selectedProduct?.product_unit?.find((p: any) => p.unit_id == this.filteredUnitsList[index][0].id)
+              ?.sale_price,
+            product_id: selectedProduct.id,
+          },
+          { emitEvent: true }
+        );
+        this.subscriptionHandler.subscribe = group.get('unit_id')?.valueChanges.subscribe((unitId) => {
+          group
+            .get('amount')
+            ?.patchValue(selectedProduct.product_unit.find((p: any) => p.unit_id == unitId)?.sale_price);
+        });
       } else {
-        this.filteredUnitsList[index] = [];
+        console.log('I');
+        this.filteredUnitsList[index] = this.units;
         group.get('unit_id')?.reset();
+        group.get('product_id')?.reset();
       }
-
-      group.patchValue({ quantity: 1, amount: null }, { emitEvent: true });
       this.updateFilteredProducts();
     });
 
