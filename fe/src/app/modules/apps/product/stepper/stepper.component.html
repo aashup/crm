@@ -95,43 +95,41 @@
           <div class="stepper-line h-40px"></div>
           <!--end::Line-->
         </div>
-
+<!-- 
         <div
           class="stepper-item"
           [ngClass]="{
             current: currentStep$.value === 4,
           }"
         >
+         
+          <div class="stepper-wrapper">
+            
+            <div class="stepper-icon w-40px h-40px">
+              <i class="stepper-check fas fa-check"></i>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(4)">4</button>
+            </div>
+           
+            <div class="stepper-label">
+              <h3 class="stepper-title">Inventory Setup</h3>
+              <div class="stepper-desc fw-semibold">Setup Inventory</div>
+            </div>
+          
+          </div>
+        
+
+        
+          <div class="stepper-line h-40px"></div>
+         
+        </div> -->
+
+        <div class="stepper-item" [ngClass]="{ current: currentStep$.value === 4 }">
           <!--begin::Wrapper-->
           <div class="stepper-wrapper">
             <!--begin::Icon-->
             <div class="stepper-icon w-40px h-40px">
               <i class="stepper-check fas fa-check"></i>
               <button class="stepper-number" mat-icon-button (click)="gotoStep(4)">4</button>
-            </div>
-            <!--end::Icon-->
-
-            <!--begin::Label-->
-            <div class="stepper-label">
-              <h3 class="stepper-title">Inventory Setup</h3>
-              <div class="stepper-desc fw-semibold">Setup Inventory</div>
-            </div>
-            <!--end::Label-->
-          </div>
-          <!--end::Wrapper-->
-
-          <!--begin::Line-->
-          <div class="stepper-line h-40px"></div>
-          <!--end::Line-->
-        </div>
-
-        <div class="stepper-item" [ngClass]="{ current: currentStep$.value === 5 }">
-          <!--begin::Wrapper-->
-          <div class="stepper-wrapper">
-            <!--begin::Icon-->
-            <div class="stepper-icon w-40px h-40px">
-              <i class="stepper-check fas fa-check"></i>
-              <button class="stepper-number" mat-icon-button (click)="gotoStep(5)">5</button>
             </div>
             <!--end::Icon-->
 
@@ -148,7 +146,7 @@
         <div
           class="stepper-item"
           [ngClass]="{
-            current: currentStep$.value === 6,
+            current: currentStep$.value === 5,
           }"
         >
           <!--begin::Wrapper-->
@@ -156,7 +154,7 @@
             <!--begin::Icon-->
             <div class="stepper-icon w-40px h-40px">
               <i class="stepper-check fas fa-check"></i>
-              <button class="stepper-number" mat-icon-button (click)="gotoStep(6)">6</button>
+              <button class="stepper-number" mat-icon-button (click)="gotoStep(5)">5</button>
             </div>
             <!--end::Icon-->
 
@@ -199,21 +197,21 @@
             ></app-unit-conversion>
           </ng-container>
         </ng-container>
-        <ng-container *ngIf="currentStep$.value === 4">
+        <!-- <ng-container *ngIf="currentStep$.value === 4">
           <app-product-inventory
             [form]="form"
             [next]="nextStep.bind(this)"
             [prev]="prevStep.bind(this)"
           ></app-product-inventory>
-        </ng-container>
-        <ng-container *ngIf="currentStep$.value === 5">
+        </ng-container> -->
+        <ng-container *ngIf="currentStep$.value === 4">
           <app-product-seller
             [form]="form"
             [next]="nextStep.bind(this)"
             [prev]="prevStep.bind(this)"
           ></app-product-seller>
         </ng-container>
-        <ng-container *ngIf="currentStep$.value === 6">
+        <ng-container *ngIf="currentStep$.value === 5">
           <app-complete [form]="form"> </app-complete>
         </ng-container>
       </div>
