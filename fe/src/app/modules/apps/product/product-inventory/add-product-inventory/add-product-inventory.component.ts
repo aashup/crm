@@ -73,7 +73,7 @@ export class AddProductInventoryComponent implements AfterViewInit, OnInit {
   }
   loadUnits() {
     this.unitService
-      .find({ pageSize: 100 })
+      .find({ pageSize: 1000})
       .pipe(take(1))
       .subscribe({
         next: (resp: any) => {

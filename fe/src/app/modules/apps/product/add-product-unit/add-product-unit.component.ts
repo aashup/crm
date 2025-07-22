@@ -62,7 +62,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   }
 
   loadUnits() {
-    this.us.find({ pageSize: 100 }).pipe(take(1)).subscribe({
+    this.us.find({ pageSize: 1000}).pipe(take(1)).subscribe({
       next: (resp: any) => {
         this.units = resp.data;
 
