@@ -74,7 +74,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   getAllUnits() {
-    this.unitService.find().subscribe({
+    this.unitService.find({pageSize:100}).subscribe({
       next: (data: any) => {
         this.units = data.data;
       },
@@ -150,10 +150,10 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   calculateNet(index: number): void {
     const item = this.saleDetails.at(index);
-    const quantity = item.get('quantity')?.value || 1; // Use quantity in calculation
-    const amount = item.get('amount')?.value || 0;
-    const discountAmount = item.get('discount_amount')?.value || 0;
-    const discountType = item.get('discount_type')?.value;
+    const quantity = item?.get('quantity')?.value || 1; // Use quantity in calculation
+    const amount = item?.get('amount')?.value || 0;
+    const discountAmount = item?.get('discount_amount')?.value || 0;
+    const discountType = item?.get('discount_type')?.value;
   
     let net = amount * quantity; // Multiply amount by quantity
   
@@ -164,7 +164,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     }
   
     net = Math.max(0, parseFloat(net.toFixed(2)));
-    item.get('net')?.setValue(net, { emitEvent: false });
+    item?.get('net')?.setValue(net, { emitEvent: false });
   
     this.calculateNetTotal();
   }
