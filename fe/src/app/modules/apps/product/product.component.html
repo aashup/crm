@@ -1,12 +1,23 @@
 <div class="card text-center">
-  <div class="card-header">
-    <div class="w-100 my-auto d-flex flex-row flex-end">
-      <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['products.create']">
-        Add New
-      </button>
-      <button mat-icon-button (click)="loadData()">
-        <mat-icon>sync</mat-icon>
-      </button>
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <div class="d-flex align-items-center position-relative my-1">
+        <mat-form-field appearance="outline">
+          <mat-label>Search by name</mat-label>
+          <input #searchElementRef matInput placeholder="Search" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="card-toolbar">
+      <div class="d-flex justify-content-end">
+        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['products.create']">
+          Add New
+        </button>
+        <button mat-icon-button (click)="loadData()">
+          <mat-icon>sync</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
   <div class="card-body">

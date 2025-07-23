@@ -90,8 +90,6 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private service: InventoryService,
     private commonService: CommonService,
-    private productService: ProductService,
-    private unitService: UnitService,
     private userService: UsersService,
     private spinnerService: SpinnerService
   ) {
