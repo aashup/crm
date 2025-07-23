@@ -19,7 +19,13 @@ class Sale extends Model
         'created_at',
         'updated_at',
         'deleted_at',
-        'status'
+        'status',
+        'due_amount',
+        'payment_method',
+        'cash_amount',
+        'online_amount',
+        'transaction_id',
+        'return_amount',
     ];
 
     protected $relations = [
@@ -44,7 +50,13 @@ class Sale extends Model
             'created_at',
             'updated_at',
             'deleted_at',
-            'status'
+            'status',
+            'due_amount',
+            'payment_method',
+            'cash_amount',
+            'online_amount',
+            'transaction_id',
+            'return_amount',
         ];
     }
 
@@ -63,6 +75,13 @@ class Sale extends Model
             'status' => 'int',
             'created_at' => 'text',
             'updated_at' => 'text',
+            'deleted_at' => 'text',
+            'due_amount' => 'int',
+            'payment_method' => 'int',
+            'cash_amount' => 'int',
+            'online_amount' => 'int',
+            'transaction_id' => 'text',
+            'return_amount' => 'int',
         ];
     }
 
@@ -79,6 +98,12 @@ class Sale extends Model
             'net_total',
             'notes',
             'status',
+            'due_amount',
+            'payment_method',
+            'cash_amount',
+            'online_amount',
+            'transaction_id',
+            'return_amount',
             'created_at',
             'updated_at',
             'deleted_at',
