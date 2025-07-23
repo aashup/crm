@@ -82,15 +82,24 @@
             <div class="col-12 col-md-2">
               <mat-form-field class="w-100">
                 <mat-label>Unit</mat-label>
-                <mat-select formControlName="unit_id">
-                  <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.id">
+                <input formControlName="unit_id" class="d-none" />
+                
+                <input
+                  matInput
+                  formControlName="unit_name"
+                  [matAutocomplete]="autoUnit"
+                  placeholder="Search or enter unit" 
+                  (input)="searchUnit($event)"
+                />
+            
+                <mat-autocomplete #autoUnit="matAutocomplete" (optionSelected)="onUnitSelected($event.option.value, i)">
+                  <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.name">
                     {{ unit.name }}
                   </mat-option>
-                </mat-select>
+                </mat-autocomplete>
               </mat-form-field>
             </div>
 
-            <!-- Quantity -->
             <div class="col-12 col-md-2">
               <mat-form-field class="w-100">
                 <mat-label>Quantity</mat-label>

@@ -1,5 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  ChangeDetectorRef,
+  AfterViewInit
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { DirectSaleService } from '../direct-sale/direct-sale.service';
@@ -10,13 +17,12 @@ import { SaleDetailsService } from '../sale/sale-details/sale-details-service';
   templateUrl: './print.component.html',
   styleUrls: ['./print.component.scss']
 })
-export class PrintComponent implements OnInit {
+export class PrintComponent implements OnInit, AfterViewInit {
   @ViewChild('receiptContent') receiptContent!: ElementRef;
 
   saleId: number;
   saleData: any = null;
   isLoading: boolean = false;
-  displayedColumns: string[] = ['productName', 'unitName', 'quantity', 'amount', 'total'];
 
   constructor(
     private route: ActivatedRoute,
@@ -24,7 +30,8 @@ export class PrintComponent implements OnInit {
     private spinner: SpinnerService,
     private commonService: CommonService,
     private saleService: SaleDetailsService,
-    private cdr:ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,20 +43,26 @@ export class PrintComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit(): void {  
+    setTimeout(() => {
+      if (this.saleData) {
+        this.printInvoice();
+      }
+    }, 200); 
+  }
+
   fetchSaleDetails(): void {
     this.isLoading = true;
     this.spinner.show();
 
-    this.saleService.findById(this.saleId + "", {
-      with: ['saleDetails.product', 'contact', 'saleDetails.unit', 'createdby'],
+    this.saleService.findById(this.saleId + '', {
+      with: ['saleDetails.product', 'contact', 'saleDetails.unit', 'createdby']
     }).subscribe({
       next: (res: any) => {
         this.saleData = res.data;
-        console.log(this.saleData);
-
         this.isLoading = false;
         this.spinner.hide();
-        this.cdr.detectChanges()
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoading = false;
@@ -60,32 +73,10 @@ export class PrintComponent implements OnInit {
     });
   }
 
-  print() {
-    if (!this.receiptContent?.nativeElement) return;
-
-    const printContents = this.receiptContent.nativeElement.innerHTML;
-    const popupWin = window.open('', '_blank', 'width=800,height=600');
-    if (popupWin) {
-      popupWin.document.open();
-      popupWin.document.write(`
-        <html>
-          <head>
-            <title>Receipt</title>
-            <style>
-              body { font-family: Arial, sans-serif; padding: 20px; }
-              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-              th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-              .header { display: flex; justify-content: space-between; align-items: center; }
-              .logo { height: 60px; }
-              h2, h3 { margin: 0; }
-            </style>
-          </head>
-          <body onload="window.print(); window.close()">
-            ${printContents}
-          </body>
-        </html>
-      `);
-      popupWin.document.close();
+  printInvoice(): void {
+    const printContents = document.getElementById('receiptContent')?.innerHTML;  
+    if (printContents) {
+     this.commonService.printHtmlContent(printContents,"/app/sale")
     }
   }
 }

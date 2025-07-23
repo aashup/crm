@@ -69,7 +69,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     }
   }
   getAllUnits(){
-    this.unitService.find({pageSize:100}).subscribe((res:any)=>{
+    this.unitService.find({pageSize:1000}).subscribe((res:any)=>{
       if(res.data){
         this.units=res.data
       }

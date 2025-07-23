@@ -115,10 +115,12 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
     this.filter.with = ['product', 'fromUnit', 'toUnit'];
+  
     console.log('Filter:', this.filter);
-
-    this.dataSource.find(_.pickBy(this.filter));
+  
+    this.subscriptionHandler.subscribe = this.dataSource.find(_.pickBy(this.filter)).subscribe();
   }
+  
 
   masterToggle() {
     if (this.selection.selected.length === this.dataSource.originalData.data.length) {

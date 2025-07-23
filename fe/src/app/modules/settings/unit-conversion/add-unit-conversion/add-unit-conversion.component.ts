@@ -68,12 +68,12 @@ export class AddUnitConversionComponent implements AfterViewInit, OnInit {
 }
 
   getAllProducts(){
-    this.productService.find().subscribe((res:any)=>{
+    this.productService.find({pageSize:1000}).subscribe((res:any)=>{
       this.products=res.data
     })
   }
   getAllUnit(){
-    this.unitService.find().subscribe((res:any)=>{
+    this.unitService.find({pageSize:1000}).subscribe((res:any)=>{
       this.units=res.data
     })
   }

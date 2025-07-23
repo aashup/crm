@@ -74,7 +74,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   getAllUnits() {
-    this.unitService.find({pageSize:100}).subscribe({
+    this.unitService.find({pageSize:1000}).subscribe({
       next: (data: any) => {
         this.units = data.data;
       },

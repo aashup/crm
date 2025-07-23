@@ -149,7 +149,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact','unit','createdBy','saleDetails']; // Removed 'address'
+      this.filter.with= ["saleDetails","contact","unit","createdby"],
       this.filter.cols = [
         'id',
         'contact_id',
