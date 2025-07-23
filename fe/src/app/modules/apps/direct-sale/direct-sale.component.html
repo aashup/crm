@@ -69,7 +69,7 @@
               />
               <mat-autocomplete #productId="matAutocomplete">
                 <mat-option
-                  *ngFor="let product of filteredProductsOptions[i] | async"
+                  *ngFor="let product of filteredProductList[i] "
                   [value]="product.name"
                 >
                   {{ product.name }}
@@ -83,21 +83,21 @@
               <mat-form-field class="w-100">
                 <mat-label>Unit</mat-label>
                 <input formControlName="unit_id" class="d-none" />
-                
-                <input
-                  matInput
-                  formControlName="unit_name"
-                  [matAutocomplete]="autoUnit"
-                  placeholder="Search or enter unit" 
-                  (input)="searchUnit($event)"
-                />
-            
+
+                <input matInput formControlName="unit_name" [matAutocomplete]="autoUnit"
+                  placeholder="Search or enter unit" (input)="searchUnit($event)" 
+                  (blur)="onUnitBlur(i)" />
+
                 <mat-autocomplete #autoUnit="matAutocomplete" (optionSelected)="onUnitSelected($event.option.value, i)">
                   <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.name">
                     {{ unit.name }}
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="detail.get('unit_name')?.hasError('required') && detail.get('unit_name')?.touched">
+                  Please select a unit
+                </mat-error>
               </mat-form-field>
+             
             </div>
 
             <div class="col-12 col-md-2">
