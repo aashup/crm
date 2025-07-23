@@ -46,7 +46,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   displayableCol = [
     'select',
     'id',
-    'type',
+    'expense_type',
     'amount',
     'notes',
     'action'
@@ -58,7 +58,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
-    {ref:'type',name:'Expense Type'},
+    {ref:'expense_type',name:'Expense Type'},
     { ref: 'amount', name: 'Amount' },
     { ref: 'notes', name: 'Notes' },
     { ref: 'action', name: 'Actions' },

@@ -32,9 +32,9 @@ export class AddExpenseComponent implements OnInit, AfterViewInit {
 
     this.form = this.fb.group({
       id: [null],
-      type: [null, Validators.required],
+      expense_type: [null, Validators.required],
       amount: [null, Validators.required],
-      notes: [''],
+      note: [''],
     });
 
     if (this.isEdit) {
