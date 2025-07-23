@@ -371,7 +371,15 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   addSaleDetail(): void {
     const group = this.createSaleDetailGroup();
     this.saleDetails.push(group);
-  
+    group.get('product_name')?.valueChanges
+    .pipe(startWith(''))
+    .subscribe((value: any) => {
+      const name = typeof value === 'string' ? value.toLowerCase() : value?.name?.toLowerCase() || '';
+      this.filteredProductList[index] = this.products.filter((product: any) =>
+        product.name.toLowerCase().includes(name)
+      );
+      this.cdr.detectChanges(); // To ensure view updates
+    });
     const index = this.saleDetails.length - 1;
   
     // Unit name field change listener (autocomplete ke liye)
