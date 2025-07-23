@@ -13,7 +13,7 @@ class MenuRepository
         $menuIds = $user->getPermissionsViaRoles()->pluck('menu_id')->unique()->toArray();
         $menu = $user->hasRole('Super Admin') ? Menu::where('status', 1) : Menu::whereIn('id', $menuIds)->where('status', 1);
         // $menu = Menu::where('status', 1);
-        return $this->sortMenu($menu->orderBy('id', 'asc')->get());
+        return $this->sortMenu($menu->orderBy('order_by', 'asc')->get());
     }
 
     protected function sortMenu(Collection $menu)
