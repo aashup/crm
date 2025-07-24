@@ -141,7 +141,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       contact_id: [null],
       mobile: [null, Validators.required],
       name: [null, Validators.required],
-      unit_id: [null], // This might be redundant if units are handled per saleDetail
+      unit_id: [null], 
       amount: [0, [Validators.required, this.nonNegativeValidator()]],
       discount_amount: [0, [this.nonNegativeValidator()]],
       discount_type: [1],
@@ -152,10 +152,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       cash_amount: [null, [Validators.required, Validators.min(0), this.nonNegativeValidator()]],
       online_amount: [null, this.nonNegativeValidator()],
       transaction_id: [null],
-      saleDetails: this.fb.array([]), // Initialize as empty array
+      saleDetails: this.fb.array([]), 
     });
 
-    // Add the first sale detail row and set up its subscriptions
     const firstSaleDetail = this.createSaleDetailGroup();
     this.saleDetails.push(firstSaleDetail);
     this.setupSaleDetailItem(firstSaleDetail, 0);
@@ -199,8 +198,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.showCashFields = false;
         cash?.setValue(0);
         online?.setValue(this.form.get('net_total')?.value || 0);
-        // online?.setValidators([Validators.required, Validators.min(0.01)]); // Keep this commented if not needed
-        // txn?.setValidators([Validators.required]); // Keep this commented if not needed
+        
       } else if (type == 3) {
         this.showCashFields = true;
         this.showOnlineFields = true;
@@ -208,7 +206,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         online?.setValue(0);
         cash?.setValidators([Validators.required, Validators.min(0)]);
         online?.setValidators([Validators.required, Validators.min(0)]);
-        // txn?.setValidators([Validators.required]); // Keep this commented if not needed
       }
 
       cash?.updateValueAndValidity();
@@ -217,19 +214,17 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  // Modified to take optional index for targeted update
   updateFilteredUnits(index?: number): void {
     const controlsToUpdate = index !== undefined ? [this.saleDetails.controls[index]] : this.saleDetails.controls;
 
     controlsToUpdate.forEach((group, i) => {
-      const currentRowIndex = index !== undefined ? index : i; // Use passed index or loop index
+      const currentRowIndex = index !== undefined ? index : i; 
 
       const selectedProductId = group.get('product_id')?.value;
-      let unitsForProduct = [...this.units]; // Start with all units by default
+      let unitsForProduct = [...this.units]; 
 
       if (selectedProductId) {
         const selectedProduct: any = this.products.find(p => p.id === selectedProductId);
-        // Ensure product_unit exists before mapping
         unitsForProduct = selectedProduct?.product_unit?.map((pu: any) => pu.unit) || [];
       }
 
@@ -238,20 +233,18 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         unit.name.toLowerCase().includes(searchValue)
       );
 
-      // Ensure the array for this index exists
       if (!this.filteredUnitsList[currentRowIndex]) {
         this.filteredUnitsList[currentRowIndex] = [];
       }
       this.filteredUnitsList[currentRowIndex] = [...filtered];
-      this.cdr.detectChanges(); // Trigger change detection
+      this.cdr.detectChanges(); 
     });
   }
 
-  // Simplified: Now only creates the FormGroup structure
   createSaleDetailGroup(): FormGroup {
     return this.fb.group({
       product_id: [null],
-      product_name: [null,Validators.required], // Set default to null
+      product_name: [null,Validators.required], 
       unit_id: [null, Validators.required],
       unit_name: [null, Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
@@ -260,12 +253,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  searchUnit(event: any, index: number) { // Added index to searchUnit
-    this.getAllUnits(); // Re-fetch all units (consider if this is optimal for performance)
+  searchUnit(event: any, index: number) { 
+    this.getAllUnits(); 
     let list;
     this.searchValue = event.target.value;
     list = this.units.filter((unit: any) => unit.name.toLowerCase().includes(this.searchValue.toLocaleLowerCase()))
-    this.filteredUnitsList[index] = list // Update specific index
+    this.filteredUnitsList[index] = list 
   }
 
   get returnAmount(): number {
@@ -326,8 +319,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.products = data.data.products;
         this.contacts = data.data.contacts;
         this.units = data.data.units;
-        this.updateFilteredProducts(); // Initial update for all rows
-        this.cdr.detectChanges(); // Ensure view reflects initial data
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error('Error fetching products:', err);
@@ -358,7 +350,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   getSelectedProductIds(): number[] {
-    // Only get IDs of products that have been *selected*, not just typed in
     return this.saleDetails.controls
       .map((control) => control.get('product_id')?.value)
       .filter((id) => id !== null);
@@ -366,47 +357,54 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   updateFilteredProducts(): void {
     const selectedIds = this.getSelectedProductIds();
-    this.filteredProductList = []; // Clear and re-populate for all rows
+    // Clear filteredProductList for all rows first
+    this.filteredProductList = []; 
 
     this.saleDetails.controls.forEach((group, index) => {
       const currentSelectedProductId = group.get('product_id')?.value;
       const availableProducts = this.products.filter(
         (product) => !selectedIds.includes(product.id) || product.id === currentSelectedProductId
       );
-      // Ensure the array for this index exists
       if (!this.filteredProductList[index]) {
         this.filteredProductList[index] = [];
       }
       this.filteredProductList[index] = availableProducts;
     });
-    this.cdr.detectChanges(); // Trigger change detection
+    this.cdr.detectChanges(); 
   }
 
-  // NEW: Helper method to set up subscriptions and initial values for a sale detail row
   private setupSaleDetailItem(group: FormGroup, index: number): void {
-    // Product name field change listener for autocomplete
     group.get('product_name')?.valueChanges
-      .pipe(startWith(''))
-      .subscribe((value: any) => {
+    .pipe(
+      map((value: any) => {
         const name = typeof value === 'string' ? value.toLowerCase() : value?.name?.toLowerCase() || '';
-        // Ensure filteredProductList[index] is initialized
-        if (!this.filteredProductList[index]) {
-          this.filteredProductList[index] = [];
-        }
-        this.filteredProductList[index] = this.products.filter((product: any) =>
-          product.name.toLowerCase().includes(name)
-        );
-        this.cdr.detectChanges(); // Update view
-      });
+        return name; 
+      }),
+      // Only filter and show options if something is typed OR if a product is already selected
+      filter(name => name.length > 0 || group.get('product_id')?.value !== null) 
+    )
+    .subscribe((name: string) => {
+      if (!this.filteredProductList[index]) {
+        this.filteredProductList[index] = [];
+      }
+      // Get all available products (not already selected in other rows)
+      const selectedIds = this.getSelectedProductIds();
+      const availableProducts = this.products.filter(
+        (product) => !selectedIds.includes(product.id) || product.id === group.get('product_id')?.value
+      );
 
-    // Unit name field change listener for autocomplete
+      this.filteredProductList[index] = availableProducts.filter((product: any) =>
+        product.name.toLowerCase().includes(name)
+      );
+      this.cdr.detectChanges();
+    });
+
     group.get('unit_name')?.valueChanges
       .pipe(startWith(''))
       .subscribe(() => {
-        this.updateFilteredUnits(index); // Update units for this specific row
+        this.updateFilteredUnits(index); 
       });
 
-    // Quantity change listener
     group.get('quantity')?.valueChanges.subscribe(() => {
       const quantity = group.get('quantity')?.value || 0;
       const amount = group.get('amount')?.value || 0;
@@ -414,52 +412,31 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       this.calculateNetTotal();
     });
 
-    // amount change listener
     group.get('amount')?.valueChanges.subscribe(() => {
       const quantity = group.get('quantity')?.value || 0;
       const amount = group.get('amount')?.value || 0;
       group.get('net')?.setValue(quantity * amount, { emitEvent: false });
       this.calculateNetTotal();
     });
-
-    // Initial update for product and unit lists for this row
-    this.updateFilteredProducts(); // This updates for all rows, ensuring new row gets filled
-    this.updateFilteredUnits(index); // Ensure units are initially filtered for this row
+    
+    // Initial population for units is fine as it doesn't affect product dropdown
+    this.updateFilteredUnits(index); 
   }
 
   addSaleDetail(): void {
     const group = this.createSaleDetailGroup();
     this.saleDetails.push(group);
     const index = this.saleDetails.length - 1;
-
-    // Setup all subscriptions and initial filtering for the newly added row
     this.setupSaleDetailItem(group, index);
-
-    this.cdr.detectChanges(); // Force change detection to render the new row and its autocomplete
+    this.cdr.detectChanges();
   }
 
-  // Changed to handle selected product object
-  onProductSelected(selectedProduct: any, index: number): void {
-    const group = this.saleDetails.at(index);
-    if (group) {
-      group.get('product_id')?.setValue(selectedProduct.id);
-      group.get('product_name')?.setValue(selectedProduct.name); // Set the display name
-      group.get('amount')?.setValue(selectedProduct.amount || 0); // Assuming product has a 'amount' property
-      this.updateFilteredProducts(); // Re-filter products for other rows (to remove selected one)
-      this.updateFilteredUnits(index); // Update units specifically for this product
-      this.calculateNetTotal(); // Recalculate net after product change
-      this.cdr.detectChanges(); // Trigger change detection
-    }
-  }
-
-  // Helper function for mat-autocomplete display
   displayProductName(product: ProductModel | string): string {
     return (product as ProductModel)?.name || (product as string);
   }
 
   onUnitSelected(selectedUnitName: string, index: number): void {
     const group = this.saleDetails.at(index);
-    // Find the selected unit from the currently filtered list for this index
     const selectedUnit = this.filteredUnitsList[index].find((u: UnitModel) => u.name === selectedUnitName);
     if (selectedUnit) {
       group.get('unit_id')?.setValue(selectedUnit.id);
@@ -470,11 +447,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.saleDetails.length > 1) {
       this.saleDetails.removeAt(index);
       this.filteredUnitsList.splice(index, 1);
-      this.filteredProductList.splice(index, 1);
+      this.filteredProductList.splice(index, 1); // Also remove the filtered list for this index
       this.calculateNetTotal();
-      this.updateFilteredProducts(); // Re-evaluate products for remaining rows
-      this.isManualAmount = false;
-      this.cdr.detectChanges(); // Trigger change detection
+      this.updateFilteredProducts(); // Re-run to update available products after removal
+      this.isManualAmount = false; 
+      this.cdr.detectChanges(); 
     }
   }
 
@@ -494,7 +471,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     net = Math.max(0, parseFloat(net.toFixed(2)));
-    item.get('net')?.setValue(net, { emitEvent: false }); // 'net' field seems to be missing in form group
+    item.get('net')?.setValue(net, { emitEvent: false }); 
 
     this.calculateNetTotal();
   }
@@ -514,19 +491,44 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
           discountControl.setErrors(null);
         }
       }
-      this.cdr.detectChanges(); // Trigger change detection for error state
+      this.cdr.detectChanges(); 
     });
 
     this.form.get('discount_type')?.valueChanges.subscribe(() => {
       this.form.get('discount_amount')?.updateValueAndValidity();
-      this.cdr.detectChanges(); // Trigger change detection for error state
+      this.cdr.detectChanges(); 
     });
+  }
+  onProductSelected(selectedProduct: any, index: number): void {
+    const group = this.saleDetails.at(index);
+    if (group) {
+      group.get('product_id')?.setValue(selectedProduct.id);
+      group.get('product_name')?.setValue(selectedProduct.name);
+      group.get('amount')?.setValue(selectedProduct.product_unit[0].sale_price || 0);
+  
+      if (selectedProduct.product_unit && selectedProduct.product_unit.length > 0) {
+        const defaultUnit = selectedProduct.product_unit[0].unit;
+        if (defaultUnit) {
+          group.get('unit_id')?.setValue(defaultUnit.id);
+          group.get('unit_name')?.setValue(defaultUnit.name);
+        } else {
+          group.get('unit_id')?.setValue(null);
+          group.get('unit_name')?.setValue(null);
+        }
+      } else {
+        group.get('unit_id')?.setValue(null);
+        group.get('unit_name')?.setValue(null);
+      }
+  
+      this.updateFilteredProducts(); // IMPORTANT: Update after selection to remove this product from other rows' options
+      this.updateFilteredUnits(index);
+      this.calculateNetTotal();
+      this.cdr.detectChanges();
+    }
   }
 
   calculateNetTotal(): void {
     let totalAmount = 0;
-
-    // Sum all 'net' values from saleDetails
     this.saleDetails.controls.forEach((ctrl) => {
       totalAmount += ctrl.get('net')?.value || 0;
     });
@@ -534,7 +536,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.isManualAmount) {
       totalAmount = parseFloat(this.form.get('amount')?.value) || 0;
     } else {
-      // If not manual, update the main 'amount' field
       this.updatingAmountFromCode = true;
       this.form.get('amount')?.setValue(totalAmount, { emitEvent: false });
       this.updatingAmountFromCode = false;
@@ -552,17 +553,16 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
     netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
 
-    // Update payment fields based on method
-    if (this.form.get('payment_method')?.value === 1) { // Cash Payment
+    if (this.form.get('payment_method')?.value === 1) { 
       this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
       this.form.get('online_amount')?.setValue(0, { emitEvent: false });
-    } else if (this.form.get('payment_method')?.value === 2) { // Online Payment
+    } else if (this.form.get('payment_method')?.value === 2) { 
       this.form.get('cash_amount')?.setValue(0, { emitEvent: false });
       this.form.get('online_amount')?.setValue(netTotal, { emitEvent: false });
     }
-    // If method is 3 (Split), do not auto-set; let handleSplitPaymentAutoCalculation do its job
+    
     this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
-    this.cdr.detectChanges(); // Trigger change detection after calculations
+    this.cdr.detectChanges(); 
   }
 
 
@@ -573,7 +573,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   patchForm(sale: any): void {
     this.form.patchValue({
       contact_id: sale.contact_id || null,
-      unit_id: sale.unit_id || null, // This might be redundant if saleDetails handles units
+      unit_id: sale.unit_id || null,
       amount: sale.amount || null,
       discount_amount: sale.discount_amount || null,
       discount_type: sale.discount_type || null,
@@ -591,24 +591,24 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if (Array.isArray(sale.sale_details)) {
       sale.sale_details.forEach((detail: any, index: number) => {
-        const group = this.createSaleDetailGroup(); // Use the simplified creation
+        const group = this.createSaleDetailGroup(); 
         group.patchValue({
           product_id: detail.product_id || null,
-          product_name: detail.product?.name || null, // Assuming product object has a name
+          product_name: detail.product?.name || null, 
           unit_id: detail.unit_id || null,
-          unit_name: detail.unit?.name || null, // Assuming unit object has a name
+          unit_name: detail.unit?.name || null, 
           quantity: detail.quantity || 1,
-          amount: detail.amount || 0, // Assuming 'amount' from backend is 'amount' for a single item
-          net: detail.net || (detail.quantity * detail.amount), // Set net if available or calculate
+          amount: detail.amount || 0, 
+          net: detail.net || (detail.quantity * detail.amount), 
         });
         this.saleDetails.push(group);
-        this.setupSaleDetailItem(group, index); // Set up subscriptions for patched row
+        this.setupSaleDetailItem(group, index); 
       });
     }
 
     this.calculateNetTotal();
-    this.updateFilteredProducts(); // Ensure products are filtered after patching
-    this.cdr.detectChanges(); // Ensure view reflects patched data
+    this.updateFilteredProducts(); 
+    this.cdr.detectChanges(); 
   }
 
   onUnitBlur(index: number) {
@@ -616,13 +616,13 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     const unitId = group.get('unit_id')?.value;
     const unitName = group.get('unit_name')?.value;
 
-    if (!unitId || !unitName) { // Check both ID and name
+    if (!unitId || !unitName) { 
       group.get('unit_name')?.setErrors({ required: true });
       group.get('unit_name')?.markAsTouched();
     } else {
-      group.get('unit_name')?.setErrors(null); // Clear errors if valid
+      group.get('unit_name')?.setErrors(null); 
     }
-    this.cdr.detectChanges(); // Trigger change detection
+    this.cdr.detectChanges(); 
   }
 
   onSubmit(redirectToPrint: boolean = false): void {
@@ -632,12 +632,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return;
     }
 
-    // Mark all saleDetail controls as touched to show errors before submission if invalid
     this.saleDetails.controls.forEach(control => {
       this.commonService.markFormGroupTouched(control as FormGroup);
     });
 
-    // Re-validate to ensure latest state
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors in the form.');
       return;
@@ -646,19 +644,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isLoading = true;
     this.spinnerService.show();
     const rawForm = this.form.getRawValue();
-
-  
-    
-
-
     if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
       rawForm.mobile = '+91' + rawForm.mobile.trim();
     }
-    debugger
 
     const payload = {
       ...rawForm,
-      
       payment_method: rawForm.payment_method,
       cash_amount: rawForm.cash_amount || 0,
       online_amount: rawForm.online_amount || 0,
@@ -683,12 +674,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
           this.saleDetails.clear();
           this.filteredUnitsList = [];
           this.filteredProductList = [];
-          // Add a new initial row after reset
           const newFirstSaleDetail = this.createSaleDetailGroup();
           this.saleDetails.push(newFirstSaleDetail);
           this.setupSaleDetailItem(newFirstSaleDetail, 0);
-          this.isManualAmount = false; // Reset manual amount flag
-          this.cdr.detectChanges(); // Trigger change detection after reset
+          this.isManualAmount = false; 
+          this.cdr.detectChanges(); 
           this.router.navigate(['/app/sale']);
         }
       },
@@ -738,7 +728,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return false;
     }
 
-    // Validate saleDetails items for negative values
     const saleDetailsInvalid = this.saleDetails.controls.some((group) => {
       return (group.get('quantity')?.hasError('negativeValue') && group.get('quantity')?.value < 0) ||
              (group.get('amount')?.hasError('negativeValue') && group.get('amount')?.value < 0);
@@ -749,7 +738,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return false;
     }
 
-    // Check if any product or unit field is empty in saleDetails
     const missingUnit = this.saleDetails.controls.some((group) => {
       return  !group.get('unit_id')?.value;
     });
@@ -760,32 +748,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
 
-    return true; // All validations passed
-  }
-
-
-  handleSplitPaymentAutoCalculation(payment_type: string): void {
-    // if(!this.form.get('payment_method')?.value || this.form.get('payment_method')?.value !== 3) {
-    //   return;
-    // }
-    // const cashControl = this.form.get('cash_amount');
-    // const onlineControl = this.form.get('online_amount');
-    // const netTotalControl = this.form.get('net_total');
-
-    // if (payment_type === 'cash') {
-    //   if (cashControl?.value > netTotalControl?.value) {
-    //     onlineControl?.setValue(0);
-    //   } else {
-    //     onlineControl?.setValue(netTotalControl?.value - cashControl?.value);
-    //   }
-    // }
-
-    // if (payment_type === 'online') {
-    //   if (onlineControl?.value > netTotalControl?.value) {
-    //     cashControl?.setValue(0);
-    //   } else {
-    //     cashControl?.setValue(netTotalControl?.value - onlineControl?.value);
-    //   }
-    // }
+    return true; 
   }
 }
