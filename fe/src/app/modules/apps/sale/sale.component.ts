@@ -28,6 +28,7 @@ import { AddressModel } from '../../settings/address/address.model';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-sale',
@@ -50,8 +51,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     'select',
     'id',
     'contact_id',
-    'unit_id',
-    'created_by',
+    'due_amount',
+    'return_amount',
     'amount',
     'discount_amount',
     'discount_type',
@@ -70,8 +71,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
     { ref: 'contact_id', name: 'Contact Person', mutator: (item: any) => item?.contact?.name || 'N/A' },
-    { ref: 'unit_id', name: 'Unit', mutator: (item: any) => item?.unit?.name || 'N/A' }, 
-    { ref: 'created_by', name: 'Created By',mutator: (item: AddressModel) => item.created_by?.name || 'N/A'  }, 
+    { ref: 'due_amount', name: 'Due Amount' }, 
+    { ref: 'return_amount', name: 'Return Amount'}, 
     { ref: 'amount', name: 'Amount' },
     { ref: 'discount_amount', name: 'Discount Amount' },
     { ref: 'discount_type', name: 'Discount Type', mutator: (item: any) => item.discount_type === 1 ? 'Flat' : 'Percentage' },
@@ -89,7 +90,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private cityService: CityService,
     private authService: AuthService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private router:Router
   ) {
     this.dataSource = new SaleDatasource(this.service);
   }
@@ -153,8 +155,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.cols = [
         'id',
         'contact_id',
-        'unit_id',
-        'created_by',
+        'due_amount',
+        'return_amount',
         'amount',
         'discount_amount',
         'discount_type',
@@ -239,24 +241,26 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
   add() {
-    this.dialog
-      .open(AddSaleComponent, {
-        height: 'auto',
-        width: '80%',
-        maxWidth:"100%",
-        data: {
-          model: new SaleModel().clear(),
-          isEdit: false,
-        },
-      })
-      .afterClosed()
-      .pipe(take(1))
-      .subscribe((flag) => {
-        if (flag) {
-          this.loadData();
-          this.cdr.detectChanges(); 
-        }
-      });
+    this.router.navigate(["/app/direct-sale"])
+    return
+    // this.dialog
+    //   .open(AddSaleComponent, {
+    //     height: 'auto',
+    //     width: '80%',
+    //     maxWidth:"100%",
+    //     data: {
+    //       model: new SaleModel().clear(),
+    //       isEdit: false,
+    //     },
+    //   })
+    //   .afterClosed()
+    //   .pipe(take(1))
+    //   .subscribe((flag) => {
+    //     if (flag) {
+    //       this.loadData();
+    //       this.cdr.detectChanges(); 
+    //     }
+    //   });
   }
 
   edit(item: SaleModel) {
