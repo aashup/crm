@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
@@ -37,7 +37,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     private productService: ProductService,
     private saleService: SaleService,
     private commonService: CommonService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private cdr:ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -46,9 +47,15 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     this.getAllUnits();
     this.getAllProducts();
     this.initializeForm();
-
+    
     if (this.isEdit) {
+      this.getAllContact();
       this.patchForm(this.data.model);
+      console.log(this.data.model);
+      console.log(this.contacts);
+      this.cdr.detectChanges()
+      
+      
     }
   }
 
@@ -63,9 +70,10 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   getAllContact() {
-    this.contactService.find().subscribe({
+    this.contactService.find({pageSize:10000}).subscribe({
       next: (data: any) => {
         this.contacts = data.data;
+        this.cdr.detectChanges()
       },
       error: (err) => {
         console.error('Error fetching contacts:', err);
@@ -74,9 +82,10 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   getAllUnits() {
-    this.unitService.find({pageSize:1000}).subscribe({
+    this.unitService.find({pageSize:10000}).subscribe({
       next: (data: any) => {
         this.units = data.data;
+        this.cdr.detectChanges()
       },
       error: (err) => {
         console.error('Error fetching units:', err);
@@ -85,7 +94,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   getAllProducts() {
-    this.productService.find().subscribe({
+    this.productService.find({pageSize:10000}).subscribe({
       next: (data: any) => {
         this.products = data.data;
       },
