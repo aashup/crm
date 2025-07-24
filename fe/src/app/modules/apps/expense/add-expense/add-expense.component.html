@@ -9,9 +9,9 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Expense Type</mat-label>
-              <mat-select formControlName="type">
-                <mat-option value="1">Expense</mat-option>
-                <mat-option value="2">Gain</mat-option>
+              <mat-select formControlName="expense_type">
+                <mat-option value="expense">Expense</mat-option>
+                <mat-option value="gain">Gain</mat-option>
               </mat-select>
               <mat-error>Expense type is <strong>required</strong></mat-error>
             </mat-form-field>
@@ -30,7 +30,7 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Notes</mat-label>
-              <textarea matInput formControlName="notes" placeholder="Enter Notes"></textarea>
+              <textarea matInput formControlName="note" placeholder="Enter Notes"></textarea>
             </mat-form-field>
           </div>
         </div>
