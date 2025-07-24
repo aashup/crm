@@ -286,6 +286,33 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     return returnAmt > 0 ? parseFloat(returnAmt.toFixed(2)) : 0;
   }
 
+  get dueAmount(): number {
+    console.log('Calculating due amount...' + this.form.get('due_amount')?.value);
+    const net = +this.form.get('net_total')?.value || 0;
+    const cash = +this.form.get('cash_amount')?.value || 0;
+    const online = +this.form.get('online_amount')?.value || 0;
+    const type = this.form.get('payment_method')?.value;
+
+    let paid = 0;
+
+    switch (type) {
+      case 1:
+        paid = cash;
+        break;
+      case 2:
+        paid = online;
+        break;
+      case 3:
+        paid = cash + online;
+        break;
+      default:
+        paid = 0;
+    }
+
+    const dueAmt = Math.max(0, net - paid);
+    return dueAmt;
+  }
+
   nonNegativeValidator() {
     return (control: AbstractControl) => {
       const value = parseFloat(control.value);
@@ -638,6 +665,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       online_amount: rawForm.online_amount || 0,
       transaction_id: rawForm.transaction_id || '',
       return_amount: this.returnAmount,
+      due_amount: this.dueAmount,
       amount: rawForm.amount 
     };
 
@@ -686,19 +714,19 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return false;
     }
 
-    if (method === 1 && cash < netTotal) {
-      this.commonService.toastr.error('Cash amount must be greater than or equal to Net net.');
-      return false;
+    if (method === 1 && cash + this.dueAmount < netTotal) {
+      this.commonService.toastr.error('Cash + due Amount must be greater than or equal to Net Total.');
+      return;
     }
 
-    if (method === 2 && online < netTotal) {
-      this.commonService.toastr.error('Online amount must be greater than or equal to Net net.');
-      return false;
+    if (method === 2 && online + this.dueAmount < netTotal) {
+      this.commonService.toastr.error('Online + due Amount must be greater than or equal to Net Total.');
+      return;
     }
 
-    if (method === 3 && cash + online < netTotal) {
-      this.commonService.toastr.error('Combined Cash and Online amount must cover Net net.');
-      return false;
+    if (method === 3 && cash + online + this.dueAmount < netTotal) {
+      this.commonService.toastr.error('Combined Cash and Online amount must cover Net Total.');
+      return;
     }
 
     const invalidFields = ['amount', 'discount_amount', 'cash_amount', 'online_amount'].filter((field) => {
@@ -738,32 +766,27 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
 
   handleSplitPaymentAutoCalculation(payment_type: string): void {
-    if (!this.form.get('payment_method')?.value || this.form.get('payment_method')?.value !== 3) {
-      return;
-    }
-    const cashControl = this.form.get('cash_amount');
-    const onlineControl = this.form.get('online_amount');
-    const netTotalControl = this.form.get('net_total');
+    // if(!this.form.get('payment_method')?.value || this.form.get('payment_method')?.value !== 3) {
+    //   return;
+    // }
+    // const cashControl = this.form.get('cash_amount');
+    // const onlineControl = this.form.get('online_amount');
+    // const netTotalControl = this.form.get('net_total');
 
-    if (payment_type === 'cash') {
-      const cashValue = parseFloat(cashControl?.value) || 0;
-      const netTotalValue = parseFloat(netTotalControl?.value) || 0;
-      if (cashValue > netTotalValue) {
-        onlineControl?.setValue(0, { emitEvent: false });
-      } else {
-        onlineControl?.setValue(netTotalValue - cashValue, { emitEvent: false });
-      }
-    }
+    // if (payment_type === 'cash') {
+    //   if (cashControl?.value > netTotalControl?.value) {
+    //     onlineControl?.setValue(0);
+    //   } else {
+    //     onlineControl?.setValue(netTotalControl?.value - cashControl?.value);
+    //   }
+    // }
 
-    if (payment_type === 'online') {
-      const onlineValue = parseFloat(onlineControl?.value) || 0;
-      const netTotalValue = parseFloat(netTotalControl?.value) || 0;
-      if (onlineValue > netTotalValue) {
-        cashControl?.setValue(0, { emitEvent: false });
-      } else {
-        cashControl?.setValue(netTotalValue - onlineValue, { emitEvent: false });
-      }
-    }
-    this.cdr.detectChanges(); // Ensure view updates after auto-calculation
+    // if (payment_type === 'online') {
+    //   if (onlineControl?.value > netTotalControl?.value) {
+    //     cashControl?.setValue(0);
+    //   } else {
+    //     cashControl?.setValue(netTotalControl?.value - onlineControl?.value);
+    //   }
+    // }
   }
 }
