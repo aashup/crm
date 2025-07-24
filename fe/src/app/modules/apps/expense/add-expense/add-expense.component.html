@@ -1,0 +1,57 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Expense</h2>
+
+<div mat-dialog-content class="expense-dialog-content" style="width:fit-content">
+  <div class="card m-auto">
+    <div class="card-body">
+      <form class="form" [formGroup]="form" *ngIf="form">
+        <div class="row">
+          <!-- Expense Type -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Expense Type</mat-label>
+              <mat-select formControlName="expense_type">
+                <mat-option value="expense">Expense</mat-option>
+                <mat-option value="gain">Gain</mat-option>
+              </mat-select>
+              <mat-error>Expense type is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Amount -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Amount</mat-label>
+              <input matInput type="number" formControlName="amount" placeholder="Enter Amount" />
+              <mat-error>Amount is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Notes -->
+          <div class="col-12 kt-margin-bottom-20-mobile">
+            <mat-form-field class="w-100">
+              <mat-label>Notes</mat-label>
+              <textarea matInput formControlName="note" placeholder="Enter Notes"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div mat-dialog-actions>
+  <button [mat-dialog-close]="false" type="button" class="btn btn-primary" [disabled]="isLoading" style="margin-right: 5px;">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit()" (keyup.enter)="onSubmit()">
+    <ng-container *ngIf="!isLoading">
+      {{ isEdit ? 'Update' : 'Create' }}
+    </ng-container>
+    <ng-container *ngIf="isLoading">
+      <span class="indicator-progress" [style.display]="'block'">
+        Please wait...
+        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+      </span>
+    </ng-container>
+  </button>
+</div>

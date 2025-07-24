@@ -61,7 +61,8 @@ export class EditPermissionComponent implements AfterViewInit, OnInit {
     return new Promise((resolve, reject) => {
       this.menuService.find({
         with: ['permissions'],
-        cols: ['id', 'name']
+        cols: ['id', 'name'],
+        pageSize:1000
       }).subscribe(
         (response: any) => {
           this.sections = response.data;
