@@ -30,6 +30,7 @@ class StorePOSRequest extends FormRequest
             'online_amount' => ['nullable', 'required_if:payment_method,2,3', 'numeric', 'min:0'],
             'transaction_id' => ['nullable', 'string', 'max:255'],
             'return_amount' => ['nullable', 'numeric', 'min:0'],
+            'due_amount' => ['nullable', 'numeric', 'min:0'],
 
             'saleDetails' => ['required', 'array', 'min:1'],
             'saleDetails.*.product_id' => ['nullable', 'exists:products,id'],
