@@ -48,7 +48,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
     'id',
     'expense_type',
     'amount',
-    'notes',
+    'note',
     'action'
   ];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -60,7 +60,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
     {ref:'expense_type',name:'Expense Type'},
     { ref: 'amount', name: 'Amount' },
-    { ref: 'notes', name: 'Notes' },
+    { ref: 'note', name: 'Notes' },
     { ref: 'action', name: 'Actions' },
   ];
 
@@ -121,8 +121,8 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.cols = [
         'id',
         'amount',
-        'notes',
-        'type'
+        'note',
+        'expense_type'
       ]; 
       this.dataSource.find(_.pickBy(this.filter));
     }
