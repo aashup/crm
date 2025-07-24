@@ -280,7 +280,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   get dueAmount(): number {
-    console.log('Calculating due amount...' + this.form.get('due_amount')?.value);
     const net = +this.form.get('net_total')?.value || 0;
     const cash = +this.form.get('cash_amount')?.value || 0;
     const online = +this.form.get('online_amount')?.value || 0;
