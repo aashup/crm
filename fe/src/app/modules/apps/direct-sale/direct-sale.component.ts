@@ -647,7 +647,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
       rawForm.mobile = '+91' + rawForm.mobile.trim();
     }
-    debugger
 
     const payload = {
       ...rawForm,
