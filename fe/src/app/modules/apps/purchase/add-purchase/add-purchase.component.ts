@@ -24,13 +24,10 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
   units: any = [];
   suppliers: any = [];
   products: any = [];
-  contactControl = new FormControl('', [
-    Validators.required,
-    this.autocompleteObjectValidator()
-  ]);
+  contactControl = new FormControl('', [Validators.required, this.autocompleteObjectValidator()]);
   filteredContacts: any[] = [];
 
-  unitControl = new FormControl('');
+  unitControl = new FormControl('', [Validators.required, this.autocompleteObjectValidator()]);
   filteredUnits: any[] = [];
   isEdit = false;
   isLoading = false;
@@ -56,76 +53,89 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
 
   ngOnInit(): void {
     this.isEdit = this.data.isEdit;
-  
+
     this.form = this.fb.group({
       contact_id: [null, Validators.required],
       unit_id: [null, Validators.required],
       supplier_id: [null, Validators.required],
       amount: [null, [Validators.required, Validators.min(1)]],
       notes: [''],
-      purchaseDetails: this.fb.array([this.createPurchaseDetail()])
+      purchaseDetails: this.fb.array([this.createPurchaseDetail()]),
     });
-  
+
     forkJoin([
       this.unitService.find({ pageSize: 1000 }),
       this.supplierService.find({}),
       this.contactService.find({}),
-      this.productService.find({})
+      this.productService.find({}),
     ]).subscribe(([unitsRes, suppliersRes, contactsRes, productsRes]: any[]) => {
       this.units = unitsRes.data;
       this.suppliers = suppliersRes.data;
       this.contacts = contactsRes.data;
       this.products = productsRes.data;
-  
+
       if (this.isEdit && this.data.model) {
         this.patchForm(this.data.model);
       }
     });
-  
-    
-    // Contact autocomplete
-    this.contactControl.valueChanges.pipe(
-      map((value: any) => typeof value === 'string' ? value : value?.name),
-      map(name => name ? this.contacts.filter((c: any) => c.name.toLowerCase().includes(name.toLowerCase())) : this.contacts)
-    ).subscribe(filtered => this.filteredContacts = filtered);
-  
-    // Unit autocomplete
-    this.unitControl.valueChanges.pipe(
-      startWith(''),
-      map((value: any) => typeof value === 'string' ? value : value?.name),
-      map(name => name ? this.units.filter((u: any) => u.name.toLowerCase().includes(name.toLowerCase())) : this.units)
-    ).subscribe(filtered => this.filteredUnits = filtered);
-  
+
+    this.contactControl.valueChanges
+      .pipe(
+        map((value: any) => (typeof value === 'string' ? value : value?.name)),
+        map((name) =>
+          name ? this.contacts.filter((c: any) => c.name.toLowerCase().includes(name.toLowerCase())) : this.contacts
+        )
+      )
+      .subscribe((filtered) => (this.filteredContacts = filtered));
+
+    this.unitControl.valueChanges
+      .pipe(
+        startWith(''),
+        map((value: any) => (typeof value === 'string' ? value : value?.name)),
+        map((name) =>
+          name ? this.units.filter((u: any) => u.name.toLowerCase().includes(name.toLowerCase())) : this.units
+        )
+      )
+      .subscribe((filtered) => (this.filteredUnits = filtered));
+
     this.contactControl.valueChanges.subscribe((val: any) => {
       if (val?.id) this.form.get('contact_id')?.setValue(val.id);
     });
-  
+
     this.unitControl.valueChanges.subscribe((val: any) => {
       if (val?.id) this.form.get('unit_id')?.setValue(val.id);
     });
   }
-
   autocompleteObjectValidator() {
     return (control: AbstractControl) => {
       const value = control.value;
       if (value && typeof value === 'object' && value.id) {
-        return null; 
+        return null;
       }
-      return { invalidSelection: true }; 
+      return { invalidSelection: true };
     };
+  }
+ 
+  validateUnitControl(): void {
+    const value:any = this.unitControl.value;
+    if (!value || typeof value !== 'object' || !value.id) {
+      this.unitControl.setErrors({ invalidSelection: true });
+    } else {
+      this.unitControl.setErrors(null);
+    }
+    this.unitControl.markAsTouched();
   }
 
 
   displayContact(contact: any): string {
-    return contact ? `${contact.name} - ${contact.mob1}` : '';
-  }
-  
-  displayUnit(unit: any): string {
-    return unit?.name || '';
+    return contact ? `${contact.name}` : '';
   }
 
+  displayUnit(unit: any): string {
+    return unit ? unit.name : '';
+  }
   validateContactControl(): void {
-    const value:any = this.contactControl.value;
+    const value: any = this.contactControl.value;
     if (!value || typeof value !== 'object' || !value.id) {
       this.contactControl.setErrors({ invalidSelection: true });
     } else {
@@ -201,16 +211,18 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     this.purchaseDetails.clear();
 
     purchase.purchase_details.forEach((detail: any) => {
-      this.purchaseDetails.push(this.fb.group({
-        product_id: [detail.product_id, Validators.required],
-        unit_id: [detail.unit_id, Validators.required],
-        quantity: [detail.quantity || 1, [Validators.required, Validators.min(1)]],
-        amount: [detail.amount, Validators.required]
-      }));
+      this.purchaseDetails.push(
+        this.fb.group({
+          product_id: [detail.product_id, Validators.required],
+          unit_id: [detail.unit_id, Validators.required],
+          quantity: [detail.quantity || 1, [Validators.required, Validators.min(1)]],
+          amount: [detail.amount, Validators.required],
+        })
+      );
     });
 
-    const selectedContact = this.contacts.find((c:any) => c.id === purchase.contact_id);
-    const selectedUnit = this.units.find((u:any) => u.id === purchase.unit_id);
+    const selectedContact = this.contacts.find((c: any) => c.id === purchase.contact_id);
+    const selectedUnit = this.units.find((u: any) => u.id === purchase.unit_id);
     if (selectedContact) this.contactControl.setValue(selectedContact);
     if (selectedUnit) this.unitControl.setValue(selectedUnit);
   }

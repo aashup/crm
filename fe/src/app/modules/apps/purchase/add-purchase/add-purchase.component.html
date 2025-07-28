@@ -15,7 +15,7 @@
                 [ngClass]="{ 'is-invalid': contactControl.invalid && contactControl.touched }" /> <mat-autocomplete
                 #autoContact="matAutocomplete" [displayWith]="displayContact">
                 <mat-option *ngFor="let contact of filteredContacts" [value]="contact">
-                  {{ contact.name }} - {{ contact.mob1 }}
+                  {{ contact.name }}
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="contactControl.hasError('required')">
@@ -29,15 +29,27 @@
 
           <!-- Unit -->
           <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100" style="margin-bottom: 10px;">
+            <mat-form-field  class="w-100" style="margin-bottom: 10px;"> 
               <mat-label>Unit</mat-label>
-              <input type="text" matInput [formControl]="unitControl" [matAutocomplete]="autoUnit" />
-              <mat-autocomplete #autoUnit="matAutocomplete" [displayWith]="displayUnit">
+              <input
+                type="text"
+                matInput
+                [formControl]="unitControl"
+                [matAutocomplete]="autoUnit"
+                (blur)="validateUnitControl()"
+              />
+            
+              <mat-autocomplete
+                #autoUnit="matAutocomplete"
+                [displayWith]="displayUnit"   
+              >
                 <mat-option *ngFor="let unit of filteredUnits" [value]="unit">
                   {{ unit.name }}
                 </mat-option>
               </mat-autocomplete>
-              <mat-error *ngIf="form.get('unit_id')?.invalid">Unit is <strong>required</strong></mat-error>
+            
+              <mat-error *ngIf="unitControl.hasError('required')">Unit is required</mat-error>
+              <mat-error *ngIf="unitControl.hasError('invalidSelection')">Please select a valid unit</mat-error>
             </mat-form-field>
           </div>
 
