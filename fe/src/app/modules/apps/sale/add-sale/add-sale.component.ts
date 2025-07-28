@@ -76,8 +76,36 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
         if (this.isEdit) {
           this.patchForm(this.data.model);
         }
+        this.form.get('contact_id')?.setValidators([
+          Validators.required,
+          this.autocompleteValidator(this.contacts)
+        ]);
+        this.form.get('contact_id')?.updateValueAndValidity();
+        this.cdr.detectChanges();
+
+        this.form.get('unit_id')?.setValidators([
+          Validators.required,
+          this.autocompleteValidator(this.units)
+        ]);
+        this.form.get('unit_id')?.updateValueAndValidity();
+
+        this.saleDetails.controls.forEach((row: AbstractControl) => {
+          row.get('product_id')?.setValidators([
+            Validators.required,
+            this.autocompleteValidator(this.products)
+          ]);
+          row.get('product_id')?.updateValueAndValidity();
+    
+          row.get('unit_id')?.setValidators([
+            Validators.required,
+            this.autocompleteValidator(this.units)
+          ]);
+          row.get('unit_id')?.updateValueAndValidity();
+        });
+    
         this.cdr.detectChanges();
       },
+      
       error: (err) => {
         console.error('Error fetching initial data:', err);
       },
@@ -112,6 +140,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     );
   }
 
+  
   ngAfterViewInit(): void {
     this.isLoading = false;
     this.spinnerService.hide();
@@ -183,8 +212,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   initializeForm(): void {
     this.form = this.fb.group({
-      contact_id: [null, Validators.required],
-      unit_id: [null, Validators.required],
+      contact_id: [null],
+      unit_id: [null],
       amount: [null, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
@@ -197,8 +226,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   createSaleDetailWithCalculation(index: number): FormGroup {
     const group = this.fb.group({
-      product_id: [null, Validators.required],
-      unit_id: [null, Validators.required],
+      product_id: [null],
+      unit_id: [null],
       quantity: [1, [Validators.required, Validators.min(1)]],
       amount: [0, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
