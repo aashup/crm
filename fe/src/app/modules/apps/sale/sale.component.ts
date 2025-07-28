@@ -156,6 +156,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
         'id',
         'contact_id',
         'due_amount',
+        'unit_id',
         'return_amount',
         'amount',
         'discount_amount',

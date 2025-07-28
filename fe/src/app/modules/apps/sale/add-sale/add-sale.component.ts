@@ -1,5 +1,5 @@
-import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { FormGroup, FormBuilder, Validators, FormArray, FormControl, AbstractControl, ValidatorFn } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
 import { SaleModel } from '../sale.model';
@@ -9,18 +9,23 @@ import { ProductService } from '../../product/product.service';
 import { SaleService } from '../sale.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { map, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-add-sale',
   templateUrl: './add-sale.component.html',
   styleUrls: ['./add-sale.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class AddSaleComponent implements AfterViewInit, OnInit {
   form: FormGroup;
   contacts: any[] = [];
   units: any[] = [];
   products: any[] = [];
+  filteredContacts: Observable<any[]>;
+  filteredUnits: Observable<any[]>;
   isLoading = false;
   isEdit = false;
   readonly _ = _;
@@ -30,6 +35,9 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     isEdit: boolean;
   }>(MAT_DIALOG_DATA);
 
+  @ViewChild('contactInput') contactInput: ElementRef<HTMLInputElement>;
+  @ViewChild('unitInput') unitInput: ElementRef<HTMLInputElement>;
+
   constructor(
     private fb: FormBuilder,
     private contactService: ContactService,
@@ -38,70 +46,164 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     private saleService: SaleService,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
-    private cdr:ChangeDetectorRef
+    private cdr: ChangeDetectorRef
   ) {}
+
+ autocompleteValidator(validList: any[], valueProp: string = 'id'): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = control.value;
+      if (value === null || value === undefined || value === '') return { required: true };
+  
+      const isValid = validList.some(item => item[valueProp] === value);
+      return isValid ? null : { invalidAutocomplete: true };
+    };
+  }
 
   ngOnInit(): void {
     this.isEdit = this.data.isEdit;
-    this.getAllContact();
-    this.getAllUnits();
-    this.getAllProducts();
     this.initializeForm();
+
+    forkJoin([
+      this.contactService.find({ pageSize: 10000 }),
+      this.unitService.find({ pageSize: 10000 }),
+      this.productService.find({ pageSize: 10000 })
+    ]).subscribe({
+      next: ([contactsData, unitsData, productsData]: [any, any, any]) => {
+        this.contacts = contactsData.data;
+        this.units = unitsData.data;
+        this.products = productsData.data;
+
+        if (this.isEdit) {
+          this.patchForm(this.data.model);
+        }
+        this.form.get('contact_id')?.setValidators([
+          Validators.required,
+          this.autocompleteValidator(this.contacts)
+        ]);
+        this.form.get('contact_id')?.updateValueAndValidity();
+        this.cdr.detectChanges();
+
+        this.form.get('unit_id')?.setValidators([
+          Validators.required,
+          this.autocompleteValidator(this.units)
+        ]);
+        this.form.get('unit_id')?.updateValueAndValidity();
+
+        this.saleDetails.controls.forEach((row: AbstractControl) => {
+          row.get('product_id')?.setValidators([
+            Validators.required,
+            this.autocompleteValidator(this.products)
+          ]);
+          row.get('product_id')?.updateValueAndValidity();
     
-    if (this.isEdit) {
-      this.getAllContact();
-      this.patchForm(this.data.model);
-      console.log(this.data.model);
-      console.log(this.contacts);
-      this.cdr.detectChanges()
+          row.get('unit_id')?.setValidators([
+            Validators.required,
+            this.autocompleteValidator(this.units)
+          ]);
+          row.get('unit_id')?.updateValueAndValidity();
+        });
+    
+        this.cdr.detectChanges();
+      },
       
-      
-    }
+      error: (err) => {
+        console.error('Error fetching initial data:', err);
+      },
+    });
+
+    this.filteredContacts = this.contactControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(value => {
+        if (typeof value === 'string' && value.length > 0) {
+          return this._filterContacts(value);
+        } else if (typeof value === 'number') {
+            return this.contacts.slice(); 
+        } else {
+            return this.contacts.slice();
+        }
+      })
+    );
+
+    this.filteredUnits = this.unitControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(value => {
+        if (typeof value === 'string' && value.length > 0) {
+          return this._filterUnits(value);
+        } else if (typeof value === 'number') {
+            return this.units.slice();
+        } else {
+            return this.units.slice();
+        }
+      })
+    );
   }
 
+  
   ngAfterViewInit(): void {
-    this.isEdit = this.data.isEdit;
-    this.isLoading = false; 
-    this.spinnerService.hide(); 
+    this.isLoading = false;
+    this.spinnerService.hide();
     this.dialogRef.afterClosed().subscribe(() => {
-      this.isLoading = false; 
+      this.isLoading = false;
       this.spinnerService.hide();
     });
+
+    if (this.contactInput) {
+      this.contactInput.nativeElement.blur();
+    }
+    if (this.unitInput) {
+      this.unitInput.nativeElement.blur();
+    }
+    this.cdr.detectChanges();
   }
 
-  getAllContact() {
-    this.contactService.find({pageSize:10000}).subscribe({
-      next: (data: any) => {
-        this.contacts = data.data;
-        this.cdr.detectChanges()
-      },
-      error: (err) => {
-        console.error('Error fetching contacts:', err);
-      }
-    });
+  get contactControl(): FormControl {
+    return this.form.get('contact_id') as FormControl;
   }
 
-  getAllUnits() {
-    this.unitService.find({pageSize:10000}).subscribe({
-      next: (data: any) => {
-        this.units = data.data;
-        this.cdr.detectChanges()
-      },
-      error: (err) => {
-        console.error('Error fetching units:', err);
-      }
-    });
+  get unitControl(): FormControl {
+    return this.form.get('unit_id') as FormControl;
   }
 
-  getAllProducts() {
-    this.productService.find({pageSize:10000}).subscribe({
-      next: (data: any) => {
-        this.products = data.data;
-      },
-      error: (err) => {
-        console.error('Error fetching products:', err);
-      }
-    });
+  displayContactFn = (contactId: number): string => {
+    const contact = this.contacts.find((c) => c.id === contactId);
+    return contact ? contact.name : '';
+  };
+
+  private _filterContacts(value: string): any[] {
+    const filterValue = value.toLowerCase();
+    return this.contacts.filter((contact) => contact.name.toLowerCase().includes(filterValue));
+  }
+
+  displayUnitFn = (unitId: number): string => {
+    const unit = this.units.find((u) => u.id === unitId);
+    return unit ? unit.name : '';
+  };
+
+  private _filterUnits(value: string): any[] {
+    const filterValue = value.toLowerCase();
+    return this.units.filter((unit) => unit.name.toLowerCase().includes(filterValue));
+  }
+
+  displayProductFn = (productId: number): string => {
+    const product = this.products.find((p) => p.id === productId);
+    return product ? product.name : '';
+  };
+
+  private _filterProducts(value: string): any[] {
+    const filterValue = value.toLowerCase();
+    return this.products.filter((product) => product.name.toLowerCase().includes(filterValue));
+  }
+
+  displaySaleDetailUnitFn = (unitId: number): string => {
+    const unit = this.units.find((u) => u.id === unitId);
+    return unit ? unit.name : '';
+  };
+
+  private _filterSaleDetailUnits(value: string): any[] {
+    const filterValue = value.toLowerCase();
+    return this.units.filter((unit) => unit.name.toLowerCase().includes(filterValue));
   }
 
   get saleDetails(): FormArray {
@@ -110,39 +212,73 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   initializeForm(): void {
     this.form = this.fb.group({
-      contact_id: [null, Validators.required],
-      unit_id: [null, Validators.required],
+      contact_id: [null],
+      unit_id: [null],
       amount: [null, [Validators.required, Validators.min(1)]],
-      discount_amount: [null, [Validators.required, Validators.min(0)]],
-      discount_type: [null, Validators.required],
+      discount_amount: [0, [Validators.required, Validators.min(0)]],
+      discount_type: [1, Validators.required],
       net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       notes: [''],
       status: [1, Validators.required],
-      saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)])
+      saleDetails: this.fb.array([this.createSaleDetailWithCalculation(0)]),
     });
-
-    if (this.isEdit) {
-      this.patchForm(this.data.model);
-    }
   }
 
   createSaleDetailWithCalculation(index: number): FormGroup {
     const group = this.fb.group({
-      product_id: [null, Validators.required],
-      unit_id: [null, Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1)]], // Added quantity field
+      product_id: [null],
+      unit_id: [null],
+      quantity: [1, [Validators.required, Validators.min(1)]],
       amount: [0, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
       discount_type: [1, Validators.required],
-      net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]]
+      net: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
     });
-  
-    group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index)); // Added quantity change listener
+
+    const productControl = group.get('product_id') as FormControl;
+    (group as any).filteredProducts = productControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(value => {
+        if (typeof value === 'string' && value.length > 0) {
+          return this._filterProducts(value);
+        } else if (typeof value === 'number') {
+            return this.products.slice();
+        } else {
+          return this.products.slice();
+        }
+      })
+    );
+
+    const unitControl = group.get('unit_id') as FormControl;
+    (group as any).filteredUnits = unitControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(value => {
+        if (typeof value === 'string' && value.length > 0) {
+          return this._filterSaleDetailUnits(value);
+        } else if (typeof value === 'number') {
+            return this.units.slice();
+        } else {
+          return this.units.slice();
+        }
+      })
+    );
+
+    group.get('quantity')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNet(index));
     group.get('discount_type')?.valueChanges.subscribe(() => this.calculateNet(index));
-  
+
     return group;
+  }
+
+  getFilteredProducts(detail: AbstractControl): Observable<any[]> {
+    return (detail as any).filteredProducts;
+  }
+
+  getFilteredUnits(detail: AbstractControl): Observable<any[]> {
+    return (detail as any).filteredUnits;
   }
 
   addSaleDetail(): void {
@@ -159,27 +295,27 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   calculateNet(index: number): void {
     const item = this.saleDetails.at(index);
-    const quantity = item?.get('quantity')?.value || 1; // Use quantity in calculation
+    const quantity = item?.get('quantity')?.value || 1;
     const amount = item?.get('amount')?.value || 0;
     const discountAmount = item?.get('discount_amount')?.value || 0;
     const discountType = item?.get('discount_type')?.value;
-  
-    let net = amount * quantity; // Multiply amount by quantity
-  
+
+    let net = amount * quantity;
+
     if (discountType === 1) {
       net -= discountAmount;
     } else if (discountType === 2) {
-      net -= (amount * discountAmount / 100) * quantity;
+      net -= ((amount * discountAmount) / 100) * quantity;
     }
-  
+
     net = Math.max(0, parseFloat(net.toFixed(2)));
     item?.get('net')?.setValue(net, { emitEvent: false });
-  
+
     this.calculateNetTotal();
   }
   calculateNetTotal(): void {
     let total = 0;
-    this.saleDetails.controls.forEach(ctrl => {
+    this.saleDetails.controls.forEach((ctrl) => {
       total += ctrl.get('net')?.value || 0;
     });
     this.form.get('net_total')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
@@ -187,57 +323,66 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   patchForm(sale: any): void {
     this.form.patchValue({
-      contact_id: sale.contact_id || null,
-      unit_id: sale.unit_id || null,
       amount: sale.amount || null,
-      discount_amount: sale.discount_amount || null,
-      discount_type: sale.discount_type || null,
+      discount_amount: sale.discount_amount || 0,
+      discount_type: sale.discount_type || 1,
       notes: sale.notes || '',
       status: sale.status || 1,
     });
-  
+
+    if (sale.contact_id) {
+        this.contactControl.setValue(sale.contact_id, { emitEvent: false });
+    }
+    if (sale.unit_id) {
+        this.unitControl.setValue(sale.unit_id, { emitEvent: false });
+    }
+
     this.saleDetails.clear();
-  
+
     if (sale.sale_details && Array.isArray(sale.sale_details)) {
       sale.sale_details.forEach((detail: any, index: number) => {
         const group = this.createSaleDetailWithCalculation(index);
-        group.patchValue({
-          product_id: detail.product_id || null,
-          unit_id: detail.unit_id || null,
-          quantity: detail.quantity || 1, // Patch quantity value
-          amount: detail.amount || 0,
-          discount_amount: detail.discount_amount || 0,
-          discount_type: detail.discount_type || 1
-        });
         this.saleDetails.push(group);
+        
+        group.get('quantity')?.setValue(detail.quantity || 1, { emitEvent: false });
+        group.get('amount')?.setValue(detail.amount || 0, { emitEvent: false });
+        group.get('discount_amount')?.setValue(detail.discount_amount || 0, { emitEvent: false });
+        group.get('discount_type')?.setValue(detail.discount_type || 1, { emitEvent: false });
+
+        if (detail.product_id) {
+          group.get('product_id')?.setValue(detail.product_id, { emitEvent: false });
+        }
+        if (detail.unit_id) {
+          group.get('unit_id')?.setValue(detail.unit_id, { emitEvent: false });
+        }
         this.calculateNet(index);
       });
     }
-  
+
     this.calculateNetTotal();
   }
   onSubmit(): void {
     this.commonService.markFormGroupTouched(this.form);
-  
+
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-  
-    this.isLoading = true; 
+
+    this.isLoading = true;
     this.spinnerService.show();
-  
+
     const payload = {
       ...this.form.getRawValue(),
       id: this.data.model?.id || null,
     };
-  
+
     if (this.isEdit) {
       this.saleService.update(payload).subscribe({
         next: () => {
           this.commonService.toastr.success('Updated Successfully');
-          this.dialogRef.close(true); 
-          this.isLoading = false; 
+          this.dialogRef.close(true);
+          this.isLoading = false;
           this.spinnerService.hide();
         },
         error: (err) => {
@@ -252,13 +397,13 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
         next: () => {
           this.commonService.toastr.success('Sale Created Successfully');
           this.dialogRef.close(true);
-          this.isLoading = false; 
+          this.isLoading = false;
           this.spinnerService.hide();
         },
         error: (err) => {
           console.error('Error creating sale:', err);
           this.commonService.handleError(err);
-          this.isLoading = false; 
+          this.isLoading = false;
           this.spinnerService.hide();
         },
       });
