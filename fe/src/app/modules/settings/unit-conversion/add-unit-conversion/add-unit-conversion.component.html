@@ -2,51 +2,70 @@
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
-     
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
-          <!-- Product Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" style="margin-bottom: 10px;">
               <mat-label>Product</mat-label>
-              <mat-select placeholder="Select Product" formControlName="product_id">
-                <mat-option *ngFor="let product of products" [value]="product.id">
+              <input
+                type="text"
+                matInput
+                [formControl]="productControl"
+                [matAutocomplete]="autoProduct"
+                (focus)="onProductInputFocus()"
+              />
+              <mat-autocomplete #autoProduct="matAutocomplete" (optionSelected)="selectProduct($event.option.value)">
+                <mat-option *ngFor="let product of filteredProducts" [value]="product.name">
                   {{ product.name }}
                 </mat-option>
-              </mat-select>
-              <mat-error>Product is <strong>required</strong></mat-error>
+              </mat-autocomplete>
+              <mat-error *ngIf="productControl.hasError('required') && productControl.touched">
+                Product is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="productControl.hasError('invalidItemName') && productControl.touched">
+                Please select a valid Product from the options.
+              </mat-error>
             </mat-form-field>
           </div>
 
-          <!-- From Unit Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" style="margin-bottom: 10px;">
               <mat-label>From Unit</mat-label>
-              <mat-select placeholder="Select From Unit" formControlName="from_unit_id">
-                <mat-option *ngFor="let unit of units" [value]="unit.id">
+              <input type="text" matInput [formControl]="fromUnitControl" [matAutocomplete]="autoFrom" />
+              <mat-autocomplete #autoFrom="matAutocomplete" (optionSelected)="selectFromUnit($event.option.value)">
+                <mat-option *ngFor="let unit of filteredFromUnits" [value]="unit.name">
                   {{ unit.name }}
                 </mat-option>
-              </mat-select>
-              <mat-error>From Unit is <strong>required</strong></mat-error>
+              </mat-autocomplete>
+              <mat-error *ngIf="fromUnitControl.hasError('required') && fromUnitControl.touched">
+                From Unit is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="fromUnitControl.hasError('invalidItemName') && fromUnitControl.touched">
+                Please select a valid From Unit from the options.
+              </mat-error>
             </mat-form-field>
           </div>
 
-          <!-- To Unit Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100"  style="margin-bottom: 10px;">
               <mat-label>To Unit</mat-label>
-              <mat-select placeholder="Select To Unit" formControlName="to_unit_id">
-                <mat-option *ngFor="let unit of units" [value]="unit.id">
+              <input type="text" matInput [formControl]="toUnitControl" [matAutocomplete]="autoTo" />
+              <mat-autocomplete #autoTo="matAutocomplete" (optionSelected)="selectToUnit($event.option.value)">
+                <mat-option *ngFor="let unit of filteredToUnits" [value]="unit.name">
                   {{ unit.name }}
                 </mat-option>
-              </mat-select>
-              <mat-error>To Unit is <strong>required</strong></mat-error>
+              </mat-autocomplete>
+              <mat-error *ngIf="toUnitControl.hasError('required') && toUnitControl.touched">
+                To Unit is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="toUnitControl.hasError('invalidItemName') && toUnitControl.touched">
+                Please select a valid To Unit from the options.
+              </mat-error>
             </mat-form-field>
           </div>
 
-          <!-- Conversion Factor Text Box -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" style="margin-bottom: 10px;">
               <mat-label>Conversion Factor</mat-label>
               <input
                 matInput
@@ -54,13 +73,17 @@
                 formControlName="conversion_factor"
                 type="number"
               />
-              <mat-error>Conversion Factor is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('conversion_factor')?.hasError('required') && form.get('conversion_factor')?.touched">
+                Conversion Factor is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="form.get('conversion_factor')?.hasError('min') && form.get('conversion_factor')?.touched">
+                Conversion Factor must be greater than or equal to 0.
+              </mat-error>
             </mat-form-field>
           </div>
 
-          <!-- Description Text Area -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" style="margin-bottom: 10px;">
               <mat-label>Description</mat-label>
               <textarea
                 matInput
@@ -68,19 +91,22 @@
                 formControlName="description"
                 rows="3"
               ></textarea>
-              <mat-error>Description is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('description')?.hasError('required') && form.get('description')?.touched">
+                Description is <strong>required</strong>
+              </mat-error>
             </mat-form-field>
           </div>
 
-          <!-- Status Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+            <mat-form-field class="w-100" style="margin-bottom: 10px;">
               <mat-label>Status</mat-label>
               <mat-select placeholder="Select Status" formControlName="status">
                 <mat-option [value]="1">Active</mat-option>
                 <mat-option [value]="0">In-Active</mat-option>
               </mat-select>
-              <mat-error>Status is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('status')?.hasError('required') && form.get('status')?.touched">
+                Status is <strong>required</strong>
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
@@ -88,17 +114,30 @@
     </div>
   </div>
 </div>
+
 <div mat-dialog-actions>
-  <button [mat-dialog-close]="false" type="button" class="btn btn-primary" [disabled]="isLoading" style="margin-right: 5px;">
+  <button
+    [mat-dialog-close]="false"
+    type="button"
+    class="btn btn-primary"
+    [disabled]="isLoading"
+    style="margin-right: 5px;"
+  >
     Cancel
   </button>
-  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="submit()" (keyup.enter)="submit()">
+  <button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="isLoading"
+    (click)="submit()"
+    (keyup.enter)="submit()"
+  >
     <ng-container *ngIf="!isLoading">
       {{ isEdit ? 'Update' : 'Create' }}
     </ng-container>
     <ng-container *ngIf="isLoading">
       <span class="indicator-progress" [style.display]="'block'">
-        Please wait...{{ ' ' }}
+        Please wait... {{ ' ' }}
         <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
       </span>
     </ng-container>
