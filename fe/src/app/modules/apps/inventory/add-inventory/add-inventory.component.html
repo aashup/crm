@@ -2,32 +2,57 @@
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
-      
+
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
-          <!-- Product Dropdown -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Product</mat-label>
-              <mat-select placeholder="Select Product" formControlName="product_id">
-                <mat-option *ngFor="let product of products" [value]="product.id">
+              <input
+              #productInput
+              type="text"
+              matInput
+              [formControl]="productControl"
+              [matAutocomplete]="autoProduct"
+              (focus)="onProductInputFocus()"
+            />
+            
+              <mat-autocomplete #autoProduct="matAutocomplete" (optionSelected)="selectProduct($event.option.value)">
+                <mat-option *ngFor="let product of filteredProducts" [value]="product.name">
                   {{ product.name }}
                 </mat-option>
-              </mat-select>
-              <mat-error>Product is <strong>required</strong></mat-error>
+              </mat-autocomplete>
+              <mat-error *ngIf="productControl.hasError('required') && productControl.touched">
+                Product is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="productControl.hasError('invalidItemName') && productControl.touched">
+                Please select a valid Product from the options.
+              </mat-error>
             </mat-form-field>
           </div>
 
-          <!-- Unit Dropdown -->
+          <!-- Unit Autocomplete -->
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Unit</mat-label>
-              <mat-select placeholder="Select Unit" formControlName="unit_id">
-                <mat-option *ngFor="let unit of units" [value]="unit.id">
+              <input
+                type="text"
+                matInput
+                [formControl]="unitControl"
+                [matAutocomplete]="autoUnit"
+                (focus)="onUnitInputFocus()"
+              />
+              <mat-autocomplete #autoUnit="matAutocomplete" (optionSelected)="selectUnit($event.option.value)">
+                <mat-option *ngFor="let unit of filteredUnits" [value]="unit.name">
                   {{ unit.name }}
                 </mat-option>
-              </mat-select>
-              <mat-error>Unit is <strong>required</strong></mat-error>
+              </mat-autocomplete>
+              <mat-error *ngIf="unitControl.hasError('required') && unitControl.touched">
+                Unit is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="unitControl.hasError('invalidItemName') && unitControl.touched">
+                Please select a valid Unit from the options.
+              </mat-error>
             </mat-form-field>
           </div>
 
@@ -37,13 +62,14 @@
               <mat-label>Quantity</mat-label>
               <input
                 matInput
-                type="text"
+                type="number" 
                 placeholder="Enter Quantity"
                 formControlName="qty"
                 min="0"
-                step="1" 
+                step="1"
               />
-              <mat-error>Quantity is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('qty')?.hasError('required') && form.get('qty')?.touched">Quantity is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('qty')?.hasError('min') && form.get('qty')?.touched">Quantity must be greater than or equal to 0</mat-error>
             </mat-form-field>
           </div>
 
@@ -53,12 +79,13 @@
               <mat-label>Remaining Quantity</mat-label>
               <input
                 matInput
-                type="text"
+                type="number" 
                 placeholder="Enter Remaining Quantity"
                 formControlName="rem_qty"
                 min="0"
-                step="1" 
+                step="1"
               />
+              <mat-error *ngIf="form.get('rem_qty')?.hasError('min') && form.get('rem_qty')?.touched">Remaining Quantity must be greater than or equal to 0</mat-error>
             </mat-form-field>
           </div>
           <div class="col-12 kt-margin-bottom-20-mobile">
@@ -66,10 +93,11 @@
               <mat-label>Purchase Price</mat-label>
               <input
                 matInput
-                type="text"
+                type="number" 
                 placeholder="Enter Purchase Price"
                 formControlName="purchase_price"
               />
+              <mat-error *ngIf="form.get('purchase_price')?.hasError('min') && form.get('purchase_price')?.touched">Purchase Price must be greater than or equal to 0</mat-error>
             </mat-form-field>
           </div>
           <div class="col-12 kt-margin-bottom-20-mobile">
@@ -77,10 +105,11 @@
               <mat-label>Sale Price</mat-label>
               <input
                 matInput
-                type="text"
+                type="number" 
                 placeholder="Enter Sale Price"
                 formControlName="sale_price"
               />
+              <mat-error *ngIf="form.get('sale_price')?.hasError('min') && form.get('sale_price')?.touched">Sale Price must be greater than or equal to 0</mat-error>
             </mat-form-field>
           </div>
           <div class="col-12 kt-margin-bottom-20-mobile">
@@ -102,7 +131,7 @@
                 <mat-option [value]="1">Active</mat-option>
                 <mat-option [value]="0">Inactive</mat-option>
               </mat-select>
-              <mat-error>Status is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('status')?.hasError('required') && form.get('status')?.touched">Status is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
         </div>
