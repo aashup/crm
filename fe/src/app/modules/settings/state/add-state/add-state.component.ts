@@ -4,11 +4,11 @@ import { StateService } from '../state.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from 'src/app/modules/core/common.service';
-import { FindService } from 'src/app/modules/core/find.service';
-import { take } from 'rxjs';
-import { ErrorStateMatcher } from '@angular/material/core';
 import _ from 'lodash';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { CountryModel } from '../../country/country.model';
+import { CountryService } from '../../country/country.service';
+import { catchError, of, tap } from 'rxjs';
 
 @Component({
     selector: 'app-add-state',
@@ -28,23 +28,33 @@ export class AddStateComponent implements AfterViewInit, OnInit {
     isEdit: boolean;
   }>(MAT_DIALOG_DATA);
 
-  countries: StateModel[] = [];
+  countries: CountryModel[] = [];
 
   constructor(
     private fb: FormBuilder,
     private service: StateService,
-    private find: FindService,
     private commonService: CommonService,
-    private spinnerService:SpinnerService
+    private spinnerService:SpinnerService,
+    private countryService:CountryService
   ) {}
 
   ngOnInit(): void {
-    this.find.country().pipe(take(1)).subscribe({
-      next: (data:any) => this.countries = data.data,
-      error : err => this.commonService.handleError(err),
-    });
+    this.getAllCountry()
   }
 
+  getAllCountry(): void {
+    this.countryService.find({ pageSize: 1000 }).pipe(
+      tap((res: any) => {
+        if (res?.data) {
+          this.countries = res.data;
+        }
+      }),
+      catchError(error => {
+        console.error('Error fetching countries:', error);
+        return of([]); 
+      })
+    ).subscribe();
+  }
   ngAfterViewInit(): void {
     this.isLoading= false;
     this.spinnerService.hide()

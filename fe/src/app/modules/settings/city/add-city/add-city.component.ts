@@ -85,6 +85,12 @@ export class AddCityComponent implements AfterViewInit, OnInit {
     });
     this.clone = this.form.value;
   }
+  onStateChange(stateId: number) {
+    const selectedState = this.states.find(s => s.id === stateId);
+    if (selectedState) {
+      this.form.patchValue({ country_id: selectedState.country_id });
+    }
+  }
 
   submit() {
     this.commonService.markFormGroupTouched(this.form);

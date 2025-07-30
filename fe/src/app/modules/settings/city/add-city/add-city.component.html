@@ -8,7 +8,7 @@
           <div class="col-12 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100">
               <mat-label>Select State </mat-label>
-              <mat-select placeholder="State" formControlName="state_id">
+              <mat-select placeholder="State" formControlName="state_id" (selectionChange)="onStateChange($event.value)">
                 <mat-option *ngFor="let item of states" [value]="item.id">
                   {{item.name}}
                 </mat-option>
