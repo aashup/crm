@@ -82,6 +82,6 @@ class City extends Model
 
     public function country()
     {
-        return $this->belongsTo(\App\Models\Country::class, 'state_id', 'id');
+        return $this->belongsTo(\App\Models\Country::class, 'country_id', 'id');
     }
 }
