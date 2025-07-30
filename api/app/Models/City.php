@@ -37,6 +37,7 @@ class City extends Model
             'name' => 'text',
             'status' => 'int',
             'state_id' => 'int',
+            'country_id' => 'int',
             'created_at' => 'text',
             'updated_at' => 'text',
         ];
@@ -49,6 +50,7 @@ class City extends Model
             'name',
             'status',
             'state_id',
+            'country_id',
             'created_at',
             'updated_at',
         ];
@@ -60,7 +62,7 @@ class City extends Model
             'id' => '',
             'name' => 'required',
             'state_id' => ['required','exists:App\Models\State,id'],
-            'country_id' => '',
+            'country_id' => ['required','exists:App\Models\Country,id'],
             'created_at' => '',
             'updated_at' => '',
         ];
