@@ -23,6 +23,7 @@ import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/conf
 import { AddCountryComponent } from './add-country/add-country.component';
 import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 'rxjs';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { style } from '@angular/animations';
 
 @Component({
     selector: 'app-country',
@@ -47,14 +48,14 @@ export class CountryComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild("searchElementRef", { static: true }) searchElementRef: ElementRef;
 
   tableColumns: Array<any> = [
-    { ref: 'select', name: 'select', style: { 'width': '70px' } },
+    { ref: 'select', name: 'select', style: { 'width': '70px','text-align':'center' } },
     {
       ref: 'id',
       name: 'ID',
-      style: { 'max-width': '30px' },
+      style: { 'max-width': '30px',} ,
     },
-    { ref: 'name', name: 'Name' },
-    { ref: 'action', name: 'Actions' },
+    { ref: 'name', name: 'Name',  },
+    { ref: 'action', name: 'Actions', style:{'text-align':'right' } },
   ];
 
   constructor(

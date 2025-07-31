@@ -44,7 +44,7 @@ export class UnitComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     { ref: 'name', name: 'Name' },
     { ref: 'status', name: 'Status', mutator: (item: UnitModel) => item.status == 0 ? 'In-Active' : 'Active' },
-    { ref: 'action', name: 'Actions' },
+    { ref: 'action', name: 'Actions', style:{'text-align':'right'} },
   ];
 
   constructor(
