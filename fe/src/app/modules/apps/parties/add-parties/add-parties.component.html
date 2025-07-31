@@ -1,0 +1,162 @@
+<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding:15px;">
+  <div>
+    <h2>{{ isEdit ? 'Edit' : 'Add' }} Party</h2>
+  </div>
+  <div>
+    <button mat-icon-button aria-label="Settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+<hr>
+<div mat-dialog-content style="padding-top: 15px;">
+  <form class="form" [formGroup]="form" *ngIf="form">
+    <div class="row mb-6">
+      <div class="col-md-4">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Party Name *</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>GSTIN</mat-label>
+          <input matInput formControlName="gstin" />
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Mobile</mat-label>
+          <input matInput formControlName="mobile" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group class="party-form-tabs">
+      <!-- GST & Address Tab -->
+      <mat-tab label="GST & Address">
+        <div style="display: flex; flex-direction: row;">
+          <div
+            style="display: flex; flex-direction: column; margin-top: 15px; width: 35%; padding: 15px; border-right: 1px solid rgb(153, 153, 153);">
+            <div class="col-md-4 w-100">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>GST Type</mat-label>
+                <mat-select formControlName="gst_type">
+                  <mat-option value="unregistered">Unregistered/Consumer</mat-option>
+                  <mat-option value="regular">Regular</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-4 w-100">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>State</mat-label>
+                <mat-select formControlName="state_id">
+                  <mat-option *ngFor="let state of states" [value]="state.id">{{ state.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-4 w-100">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Email ID</mat-label>
+                <input matInput formControlName="email" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div
+            style="display: flex; flex-direction: row; margin-top: 15px; width: 65%; padding: 15px; justify-content: space-between;">
+            <div class="col-md-6 w-50" style="display: flex; flex-direction: column; margin-right: 15px;">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Billing Address</mat-label>
+                <textarea matInput rows="2" formControlName="billing_address"></textarea>
+              </mat-form-field>
+              <a class="text-primary cursor-pointer" (click)="enableShipping = !enableShipping">
+                + Enable Shipping Address
+              </a>
+            </div>
+
+            <div class="col-md-6 w-50" *ngIf="enableShipping">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Shipping Address</mat-label>
+                <textarea matInput rows="2" formControlName="shipping_address"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+
+
+      </mat-tab>
+
+      <!-- Credit & Balance Tab -->
+      <mat-tab label="Credit & Balance">
+        <div class="row  mt-3">
+          <!-- Opening Balance -->
+          <div class="col-md-6 mb-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Opening Balance</mat-label>
+              <input matInput type="number" formControlName="opening_balance" />
+            </mat-form-field>
+          </div>
+
+          <!-- As of Date -->
+          <div class="col-md-6 mb-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Opening Balance Date</mat-label>
+              <input matInput [matDatepicker]="balancePicker" formControlName="opening_balance_date" />
+              <mat-datepicker-toggle matSuffix [for]="balancePicker"></mat-datepicker-toggle>
+              <mat-datepicker #balancePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Credit Limit Section -->
+        <div class="row" style="display: flex;flex-direction: column;">
+          <!-- Toggle -->
+          <div class="col-md-6 mb-3" style="width: 215px; display: flex; flex-direction: column;">
+            <mat-label
+              style="font-size: 15px;  display: flex;flex-direction: row; justify-content: flex-start; align-items: center;">
+              Credit Limit
+              <button mat-icon-button color="primary" aria-label="Info">
+                <mat-icon>info</mat-icon>
+              </button>
+            </mat-label>
+            <mat-button-toggle-group [value]="form.get('credit_limit')?.value"
+              (change)="form.get('credit_limit')?.setValue($event.value)" exclusive>
+              <mat-button-toggle [value]="false">No Limit</mat-button-toggle>
+              <mat-button-toggle [value]="true">Custom Limit</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <!-- Custom Credit Limit Amount -->
+          <div class="col-md-6 mb-3" *ngIf="form.get('credit_limit')?.value">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Credit Limit Amount</mat-label>
+              <input matInput type="number" formControlName="credit_limit_amount" />
+            </mat-form-field>
+          </div>
+        </div>
+
+      </mat-tab>
+
+
+    </mat-tab-group>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+
+  <button mat-flat-button color="primary" class="mr-2" [disabled]="isLoading" (click)="save(true)">
+    Save & New
+  </button>
+  <button mat-flat-button color="primary" [disabled]="isLoading" (click)="save(false)">
+    Save
+  </button>
+</div>
