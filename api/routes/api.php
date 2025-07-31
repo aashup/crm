@@ -38,5 +38,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('inventory', controller: 'App\Http\Controllers\API\v1\InventoryController');
         Route::apiResource('pos', controller: 'App\Http\Controllers\API\v1\PosController');
         Route::apiResource('expense', controller: 'App\Http\Controllers\API\v1\ExpenseController');
+        Route::apiResource('party', controller: 'App\Http\Controllers\API\v1\PartyController');
     });
 });
