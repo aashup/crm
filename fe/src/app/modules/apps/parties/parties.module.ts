@@ -7,7 +7,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PartiesComponent } from './parties.component';
 import { AddPartiesComponent } from './add-parties/add-parties.component';
-import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
-  declarations: [PartiesComponent, AddPartiesComponent],
+  declarations: [PartiesComponent],
   imports: [
     CommonModule,
     MatTooltipModule,
@@ -30,7 +30,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatButtonModule,
     RouterModule.forChild([
       { path: '', component: PartiesComponent },
-      { path: 'add', component: AddPartiesComponent },
     ]),
     NgxPermissionsModule.forChild(),
     SharedMaterialModuleModule,
