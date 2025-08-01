@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('mobile')->nullable();
             $table->decimal('opening_balance', 15, 2)->nullable()->default(0.00);
             $table->date('opening_balance_date')->nullable();
-            $table->integer('gst_type')->nullable->comment("1: Unregiter/Consumer, 2: Registered - Regular, 3: Register - Composition");
+            $table->integer('gst_type')->nullable()->comment("1: Unregiter/Consumer, 2: Registered - Regular, 3: Register - Composition");
             $table->boolean('credit_limit')->default(false);
             $table->decimal('credit_limit_amount', 15, 2)->default(0.00);
             $table->string('billing_address')->nullable();
