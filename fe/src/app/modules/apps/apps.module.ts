@@ -36,6 +36,10 @@ import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-d
         loadChildren: () => import('./vendor/vendor.module').then((m) => m.VendorModule),
       },
       {
+        path: 'parties',
+        loadChildren: () => import('../apps/parties/parties.module').then((m) => m.PartiesModule),
+      },
+      {
         path: 'inventory',
         loadChildren: () => import('./inventory/inventory.module').then((m) =>m.InventoryModule),
       },
