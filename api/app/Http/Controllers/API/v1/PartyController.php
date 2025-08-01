@@ -6,8 +6,11 @@ use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePartyRequest;
 use App\Http\Requests\UpdatePartyRequest;
+use App\Models\Contact;
 use App\Models\Party;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PartyController extends Controller
 {
@@ -36,9 +39,36 @@ class PartyController extends Controller
     {
         $this->authorize('create', Party::class);
 
-        $model = new Party();
-        $model->fill($request->all());
-        $model->save();
+        try {
+
+            DB::beginTransaction();
+
+            $validated = $request->validated();
+
+            if (!$validated['contact_id']) {
+                $contactExists = Contact::where('mob1', $validated['name'])->orWhere('name', $validated['mobile'])->exists();
+                if ($contactExists) {
+                    return $this->error("Contact with this mobile or name already exists");
+                }
+                $contact = Contact::create([
+                    'name' => $validated['name'],
+                    'mob1' => $validated['mobile'],
+                    'status' => 1,
+                    'created_by' => Auth::id(),
+                ]);
+                $validated['contact_id'] = $contact->id;
+            }
+
+            $model = new Party();
+            $model->fill($validated);
+            $model->save();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Party cannot be created! : " . $e->getMessage(), 500);
+        }
+
 
         return $this->success("Party created successfully!", $model);
     }
@@ -62,8 +92,17 @@ class PartyController extends Controller
     {
         $this->authorize('update', $party);
 
-        $party->fill($request->all());
-        $party->save();
+        try {
+            DB::beginTransaction();
+            $validated = $request->validated();
+
+            $party->fill($validated);
+            $party->save();
+        } catch (\Exception $e) {
+            return $this->error("Party cannot be updated! : " . $e->getMessage(), 500);
+        }
+
+
 
         return $this->success("Party updated successfully!", $party);
     }

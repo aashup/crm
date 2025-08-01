@@ -22,15 +22,17 @@ class UpdatePartyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:parties,name,' . $this->route('party')->id,
+            'contact_id' => ['nullable', 'exists:contacts,id'],
+            'name' => ['required_without:contact_id', 'string', 'max:255'],
+            'mobile' => ['required_without:contact_id', 'string', 'max:20', 'regex:/^\+[0-9\s\-\(\)\.]{7,20}$/'],
             'gstin' => 'nullable|string|max:15',
-            'mobile' => 'nullable|string|max:15',
             'opening_balance' => 'nullable|numeric',
             'opening_balance_date' => 'nullable|date',
             'gst_type' => 'nullable|integer|in:1,2,3', // 1: Unregistered/Consumer, 2: Registered - Regular, 3: Registered - Composition
             'credit_limit' => 'boolean',
             'credit_limit_amount' => 'required_if:credit_limit,true|numeric',
-            'billing_address' => 'required|string|max:500',
+            'billing_address_id' => 'required|exists:addresses,id',
+            'shipping_address_id' => 'nullable|exists:addresses,id',
             'state_id' => 'nullable|exists:states,id',
             'email' => 'nullable|email|max:255',
         ];

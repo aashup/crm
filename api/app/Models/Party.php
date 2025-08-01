@@ -9,9 +9,8 @@ class Party extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
+        'contact_id',
         'gstin',
-        'mobile',
         'opening_balance',
         'opening_balance_date',
         'gst_type',
@@ -23,15 +22,13 @@ class Party extends Model
     ];
 
     protected $relations = [
-        'state'
+        'state', 'contact', 'billingAddress', 'shippingAddress'
     ];
 
     public function searchableColumns()
     {
         return [
-            'name',
             'gstin',
-            'mobile',
             'email',
             'billing_address',
         ];
@@ -41,9 +38,7 @@ class Party extends Model
     {
         return [
             'id' => 'int',
-            'name' => 'string',
             'gstin' => 'string',
-            'mobile' => 'string',
             'opening_balance' => 'string',
             'opening_balance_date' => 'string',
             'gst_type' => 'int',
@@ -61,9 +56,7 @@ class Party extends Model
     {
         return [
             'id',
-            'name',
             'gstin',
-            'mobile',
             'opening_balance',
             'opening_balance_date',
             'gst_type',
@@ -80,5 +73,20 @@ class Party extends Model
     public function state()
     {
         return $this->belongsTo(State::class);
+    }
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class);
+    }
+
+    public function billingAddress()
+    {
+        return $this->belongsTo(Address::class, 'billing_address_id');
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(Address::class, 'shipping_address_id');
     }
 }

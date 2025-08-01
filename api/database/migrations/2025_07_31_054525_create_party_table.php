@@ -16,15 +16,15 @@ return new class extends Migration
     {
         Schema::create('parties', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->foreignId('contact_id')->nullable()->constrained('contacts')->onDelete('set null');
             $table->string('gstin')->nullable();
-            $table->string('mobile')->nullable();
             $table->decimal('opening_balance', 15, 2)->nullable()->default(0.00);
             $table->date('opening_balance_date')->nullable();
             $table->integer('gst_type')->nullable()->comment("1: Unregiter/Consumer, 2: Registered - Regular, 3: Register - Composition");
             $table->boolean('credit_limit')->default(false);
             $table->decimal('credit_limit_amount', 15, 2)->default(0.00);
-            $table->string('billing_address')->nullable();
+            $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->onDelete('set null');
+            $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('state_id')->nullable()->constrained('states')->onDelete('set null');
             $table->string('email')->nullable();
             $table->timestamps();

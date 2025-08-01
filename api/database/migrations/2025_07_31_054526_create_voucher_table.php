@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('voucher', function (Blueprint $table) {
             $table->id()->unsigned();
+            
             $table->bigInteger('party_id', false, true);
             $table->foreign('party_id')->references('id')->on('parties');
+
             $table->tinyInteger('voucher_type', false, true)->nullable();
             $table->string('notes')->nullable();
             $table->enum('txn_type', ['Credit', 'Debit'])->default('Credit');
             $table->tinyText('refence_model')->nullable();
             $table->bigInteger('reference_id', false, true)->nullable();
-            $table->bigInteger('amount', false, false)->default(0);
+            $table->decimal('amount', 15, 2)->default(0);
             $table->dateTime('opening_ts')->nullable();
             $table->timestamps();
         });
