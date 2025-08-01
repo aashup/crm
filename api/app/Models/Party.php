@@ -16,7 +16,8 @@ class Party extends Model
         'gst_type',
         'credit_limit',
         'credit_limit_amount',
-        'billing_address',
+        'billing_address_id',
+        'shipping_address_id',
         'state_id',
         'email',
     ];
@@ -30,7 +31,9 @@ class Party extends Model
         return [
             'gstin',
             'email',
-            'billing_address',
+            'billing_address_id',
+            'shipping_address_id',
+            'state_id',
         ];
     }
 
@@ -39,12 +42,14 @@ class Party extends Model
         return [
             'id' => 'int',
             'gstin' => 'string',
+            'contact_id' => 'int',
             'opening_balance' => 'string',
             'opening_balance_date' => 'string',
             'gst_type' => 'int',
             'credit_limit' => 'boolean',
             'credit_limit_amount' => 'string',
-            'billing_address' => 'string',
+            'billing_address_id' => 'int',
+            'shipping_address_id' => 'int',
             'state_id' => 'int',
             'email' => 'string',
             'created_at' => 'string',
@@ -56,13 +61,15 @@ class Party extends Model
     {
         return [
             'id',
+            'contact_id',
             'gstin',
             'opening_balance',
             'opening_balance_date',
             'gst_type',
             'credit_limit',
             'credit_limit_amount',
-            'billing_address',
+            'billing_address_id',
+            'shipping_address_id',
             'state_id',
             'email',
             'created_at',
