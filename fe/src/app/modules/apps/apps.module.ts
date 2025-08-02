@@ -40,6 +40,10 @@ import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-d
         loadChildren: () => import('../apps/parties/parties.module').then((m) => m.PartiesModule),
       },
       {
+        path: 'party',
+        loadChildren: () => import('../apps/parties/add-parties/add-parties.module').then((m) => m.AddPartiesModule),
+      },
+      {
         path: 'inventory',
         loadChildren: () => import('./inventory/inventory.module').then((m) =>m.InventoryModule),
       },

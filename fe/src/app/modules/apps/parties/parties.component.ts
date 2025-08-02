@@ -28,6 +28,7 @@ import { PartiesModel } from './parties.model';
 import { PartiesService } from './parties.service';
 import { AddPartiesComponent } from './add-parties/add-parties.component';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-parties',
   templateUrl: './parties.component.html',
@@ -56,7 +57,6 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     'opening_balance',
     'opening_balance_date',
     'credit_limit_amount',
-    'billing_address',
     'state',
     'email',
     'action',
@@ -74,7 +74,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
       style: { 'max-width': '30px' },
       mutator: (item: any) => item?.id || '--',
     },
-    { ref: 'name', name: 'Name' }, 
+    { ref: 'name', name: 'Name'  , mutator: (item: any) => item?.contact?.name || '--'}, 
     {
       ref: 'gstin',
       name: 'GST Number',
@@ -84,7 +84,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       ref: 'mobile',
       name: 'Mobile',
-      mutator: (item: any) => item?.mobile || '--', 
+      mutator: (item: any) => item?.contact?.mob1 ||item?.contact?.mob2|| '--', 
     },
     {
       ref: 'opening_balance',
@@ -102,11 +102,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
       name: 'Limit Amount',
       mutator: (item: any) => item?.credit_limit_amount || '--', 
     },
-    {
-      ref: 'billing_address',
-      name: 'Billing Address',
-      mutator: (item: any) => item?.billing_address || '--', 
-    },
+   
     {
       ref: 'state',
       name: ' State',
@@ -128,7 +124,8 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     private cityService: CityService,
     private addressService: AddressService,
     private spinnerService: SpinnerService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private router:Router
   ) {
     this.dataSource = new PartiesDatasource(this.service);
   }
@@ -197,17 +194,18 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
     this.filter.filter = JSON.stringify(_.pickBy(this.search));
-    this.filter.with = ['state'];
+    this.filter.with = ['state',"contact"];
     this.filter.cols = [
       'id',
       'name',
       'gstin',
-      'mobile',
+      'contact_id',
       'opening_balance',
       'opening_balance_date',
       'credit_limit',
       'credit_limit_amount',
-      'billing_address',
+      'billing_address_id',
+      'shipping_address_id',
       'state_id',
       'email',
       'state',
@@ -230,8 +228,8 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialog
       .open(ConfirmationDialogComponent, {
         data: {
-          title: 'Delete Supplier',
-          body: `Are you sure you want to delete this Supplier <span class="text-danger bold">${item.name}?</span>`,
+          title: 'Delete Party',
+          body: `Are you sure you want to delete this Party <span class="text-danger bold">${item.name}?</span>`,
           okBtnName: 'Delete',
         },
       })
@@ -244,7 +242,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
             complete: () => {
               this.isLoading = false;
               this.spinnerService.hide();
-              this.commonService.toastr.success('Supplier has been deleted.');
+              this.commonService.toastr.success('Party has been deleted.');
               this.loadData();
             },
             error: (err) => {
@@ -260,6 +258,9 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   add() {
+
+    this.router.navigate(["/app/party"])
+    return
     this.dialog
       .open(AddPartiesComponent, {
         maxWidth: '1200px',
@@ -284,7 +285,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
   edit(item: PartiesModel) {
     this.dialog
       .open(AddPartiesComponent, {
-        maxWidth: '1500px',
+        maxWidth: '1200px',
         maxHeight: '650px',
         height: '100%',
         width: '100%',

@@ -7,7 +7,8 @@ export class PartiesModel {
   opening_balance_date: string | null; // or Date if you're using DatePicker
   credit_limit: boolean;
   credit_limit_amount: number | null;
-  billing_address: string;
+  billing_address_id: string;
+  shipping_address_id: string;
   state_id: string;
   email: string;
   gst_type:string
@@ -23,7 +24,8 @@ export class PartiesModel {
     this.opening_balance_date = null;
     this.credit_limit = true;
     this.credit_limit_amount = null;
-    this.billing_address = '';
+    this.billing_address_id = '';
+    this.shipping_address_id = '';
     this.gst_type=""
     this.state_id = '';
     this.email = '';
@@ -39,7 +41,8 @@ export class PartiesModel {
     this.opening_balance_date = null;
     this.credit_limit = true;
     this.credit_limit_amount = null;
-    this.billing_address = '';
+    this.billing_address_id = '';
+    this.shipping_address_id = '';
     this.state_id = '';
     this.email = '';
     this.gst_type=""

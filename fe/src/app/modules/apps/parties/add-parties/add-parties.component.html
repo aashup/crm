@@ -6,9 +6,7 @@
     <button mat-icon-button aria-label="Settings">
       <mat-icon>settings</mat-icon>
     </button>
-    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close">
-      <mat-icon>close</mat-icon>
-    </button>
+
   </div>
 </div>
 <hr>
@@ -16,9 +14,33 @@
   <form class="form" [formGroup]="form" *ngIf="form">
     <div class="row mb-6">
       <div class="col-md-4">
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Party Name *</mat-label>
-          <input matInput formControlName="name" />
+        <mat-form-field class="w-100">
+          <mat-label>Party Name</mat-label>
+          <input class="d-none" formControlName="contact_id" />
+          <input matInput formControlName="name" [matAutocomplete]="autoName" (blur)="onNameBlur()"
+            placeholder="Search or enter name" />
+          <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="isNameSelected = true">
+            <mat-option *ngFor="let contact of filteredNames | async" [value]="contact.name">
+              <span [innerHTML]="contact.html"></span>
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="form.get('name')?.hasError('required') && form.get('name')?.touched">Contact Name is
+            <strong>required</strong></mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4">
+        <mat-form-field class="w-100">
+          <mat-label>Mobile</mat-label>
+          <input matInput formControlName="mobile" [matAutocomplete]="autoMob" (blur)="onContactBlur()"
+            placeholder="Search or enter mobile" />
+          <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
+            <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
+              <span [innerHTML]="contact.html"></span>
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="form.get('mobile')?.hasError('required') && form.get('mobile')?.touched">Mobile Number is
+            <strong>required</strong></mat-error>
         </mat-form-field>
       </div>
 
@@ -29,12 +51,7 @@
         </mat-form-field>
       </div>
 
-      <div class="col-md-4">
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Mobile</mat-label>
-          <input matInput formControlName="mobile" />
-        </mat-form-field>
-      </div>
+
     </div>
 
     <!-- Tabs -->
@@ -48,8 +65,9 @@
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>GST Type</mat-label>
                 <mat-select formControlName="gst_type">
-                  <mat-option value="unregistered">Unregistered/Consumer</mat-option>
-                  <mat-option value="regular">Regular</mat-option>
+                  <mat-option value="1">Unregistered/Consumer</mat-option>
+                  <mat-option value="2">Regular</mat-option>
+                  <mat-option value="3">Composition</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -75,7 +93,9 @@
             <div class="col-md-6 w-50" style="display: flex; flex-direction: column; margin-right: 15px;">
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Billing Address</mat-label>
-                <textarea matInput rows="2" formControlName="billing_address"></textarea>
+                <mat-select formControlName="billing_address_id">
+                  <mat-option *ngFor="let item of billing_address" [value]="item.id">{{item.address}}</mat-option>
+                </mat-select>
               </mat-form-field>
               <a class="text-primary cursor-pointer" (click)="enableShipping = !enableShipping">
                 + Enable Shipping Address
@@ -85,7 +105,9 @@
             <div class="col-md-6 w-50" *ngIf="enableShipping">
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Shipping Address</mat-label>
-                <textarea matInput rows="2" formControlName="shipping_address"></textarea>
+                <mat-select formControlName="shipping_address_id">
+                  <mat-option *ngFor="let item of shipping_address" [value]="item.id">{{item.address}}</mat-option>
+                </mat-select>
               </mat-form-field>
             </div>
           </div>
@@ -102,7 +124,7 @@
           <div class="col-md-6 mb-3">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Opening Balance</mat-label>
-              <input matInput type="number" formControlName="opening_balance" />
+              <input matInput type="number" formControlName="opening_balance" min="0" (keydown)="preventMinus($event)" />
             </mat-form-field>
           </div>
 
@@ -110,7 +132,7 @@
           <div class="col-md-6 mb-3">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Opening Balance Date</mat-label>
-              <input matInput [matDatepicker]="balancePicker" formControlName="opening_balance_date" />
+              <input matInput [matDatepicker]="balancePicker" formControlName="opening_balance_date"  />
               <mat-datepicker-toggle matSuffix [for]="balancePicker"></mat-datepicker-toggle>
               <mat-datepicker #balancePicker></mat-datepicker>
             </mat-form-field>
@@ -137,10 +159,19 @@
 
           <!-- Custom Credit Limit Amount -->
           <div class="col-md-6 mb-3" *ngIf="form.get('credit_limit')?.value">
-            <mat-form-field appearance="outline" class="w-100">
+            <mat-form-field >
               <mat-label>Credit Limit Amount</mat-label>
-              <input matInput type="number" formControlName="credit_limit_amount" />
+              <input matInput formControlName="credit_limit_amount" type="number" min="0"
+                (keydown)="preventMinus($event)" />
+
+              <mat-error *ngIf="form.get('credit_limit_amount')?.hasError('required')">
+                Credit limit amount is required
+              </mat-error>
+              <mat-error *ngIf="form.get('credit_limit_amount')?.hasError('min')">
+                Credit limit cannot be negative
+              </mat-error>
             </mat-form-field>
+
           </div>
         </div>
 
@@ -153,7 +184,8 @@
 
 <div mat-dialog-actions align="end">
 
-  <button mat-flat-button color="primary" class="mr-2" [disabled]="isLoading" (click)="save(true)">
+  <button mat-flat-button color="primary" class="mr-3" [disabled]="isLoading" (click)="save(true)"
+    style="margin-right: 15px;">
     Save & New
   </button>
   <button mat-flat-button color="primary" [disabled]="isLoading" (click)="save(false)">
