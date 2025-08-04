@@ -1,70 +1,140 @@
-<h2 mat-dialog-title>{{ isEdit ? "Edit" : "Create" }} Unit</h2>
+<h2 mat-dialog-title>
+  {{ isEdit ? "Edit" : "Create" }} Unit
+</h2>
+
 <div mat-dialog-content>
   <div class="card m-auto">
     <div class="card-body min-w-500px">
       <form class="form" [formGroup]="form" *ngIf="form">
+
+        <h3>Unit Details</h3>
+        <hr />
         <div class="row">
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
+          <div class="col-md-12 mb-3">
+            <mat-form-field class="w-100" appearance="outline">
               <mat-label>Unit</mat-label>
               <input
-              matInput
-              placeholder="Search Unit"
-              [formControl]="unitIdControl"
-              [matAutocomplete]="autoUnits"
-            />
-              <mat-autocomplete #autoUnits="matAutocomplete" [displayWith]="displayUnitName">
+                matInput
+                placeholder="Search Unit"
+                [formControl]="unitIdControl"
+                [matAutocomplete]="autoUnits"
+              />
+              <mat-autocomplete
+                #autoUnits="matAutocomplete"
+                [displayWith]="displayUnitName"
+              >
                 <mat-option *ngFor="let item of filteredUnits | async" [value]="item.id">
                   {{ item.name }}
                 </mat-option>
               </mat-autocomplete>
-              <mat-error *ngIf="unitIdControl.hasError('required')">Unit is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Please enter Purchase Price </mat-label>
-              <input matInput placeholder="Enter Purchsae price" formControlName="purchase_price" maxlength="200"
-                type="number" />
-              <mat-error>Purchase price is <strong>required</strong> and must be
-                <strong>Number only</strong>
+              <mat-error *ngIf="unitIdControl.hasError('required')">
+                Unit is <strong>required</strong>
               </mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Please enter Sale Price </mat-label>
-              <input matInput placeholder="Enter Price" formControlName="sale_price" maxlength="200" type="number" />
-              <mat-error>Sale price is <strong>required</strong> and must be
-                <strong>Number only</strong>
-              </mat-error>
+        </div>
+
+        <h3 class="mt-4">Sale Details</h3>
+        <hr />
+        <div class="row">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Sale Price</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Enter price"
+              formControlName="salePrice"
+              
+            />
+            <mat-select
+              formControlName="priceTaxType"
+              matSuffix
+              disableOptionCentering
+              style="width: fit-content; background-color: rgb(168, 167, 167); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
+              value="0"
+            >
+              <mat-option [value]="1">With Tax</mat-option>
+              <mat-option [value]="0">Without Tax</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="row">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Discount</mat-label>
+              <input matInput formControlName="discount" type="number" />
+              <mat-select
+                formControlName="discount_type"
+                matSuffix
+                disableOptionCentering
+                style="width: fit-content; background-color: rgb(168, 167, 167); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
+                value="1"
+              >
+                <mat-option [value]="1">Percentage</mat-option>
+                <mat-option [value]="0">Flat</mat-option>
+              </mat-select>
+              <mat-error>Discount type is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Status </mat-label>
+        </div>
+
+        <h3 class="mt-4">Purchase Details</h3>
+        <hr />
+        <div class="row">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Purchase Price</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Enter purchase price"
+              formControlName="purchasePrice"
+            />
+            <mat-select
+              formControlName="purchaseTaxType"
+              matSuffix
+              disableOptionCentering
+              style="width: fit-content; background-color: rgb(168, 167, 167); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
+              value="0"
+            >
+              <mat-option [value]="1">With Tax</mat-option>
+              <mat-option [value]="0">Without Tax</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        
+        <hr />
+       
+
+        <h3 class="mt-4">Additional Information</h3>
+        <hr />
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <mat-form-field class="w-100" appearance="outline">
+              <mat-label>Status</mat-label>
               <mat-select placeholder="Status" formControlName="status">
                 <mat-option [value]="1">Active</mat-option>
                 <mat-option [value]="0">In-Active</mat-option>
               </mat-select>
-              <mat-error>Status is <strong>required</strong> </mat-error>
+              <mat-error>Status is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Notes </mat-label>
+          <div class="col-md-8 mb-3">
+            <mat-form-field class="w-100" appearance="outline">
+              <mat-label>Notes</mat-label>
               <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
-              <mat-error>Notes is <strong>required</strong> </mat-error>
+              <mat-error>Notes are <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
         </div>
+
       </form>
     </div>
   </div>
 </div>
+
 <div mat-dialog-actions>
   <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-button (click)="submit()">
+  <button mat-button color="primary" (click)="submit()">
     {{ isEdit ? "Update" : "Create" }}
   </button>
 </div>
