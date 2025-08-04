@@ -82,11 +82,11 @@
                 <input type="text" matInput [matAutocomplete]="autoBilling"
                        formControlName="billing_address"
                        placeholder="Search or enter billing address" />
-                <mat-autocomplete #autoBilling="matAutocomplete">
-                  <mat-option >
-                    <button mat-button color="primary" class="w-100 add-new-button"  (click)="add('billing')">
-                      <mat-icon>add</mat-icon> Add New
-                    </button>
+                <mat-autocomplete #autoBilling="matAutocomplete" style="padding: 0px;" >
+                  <mat-option  (click)="add('billing')" style="color: blue !important;" class="sticky-option">
+                    <span>
+                      + Add New Address
+                    </span>
                   </mat-option>
                   <mat-option *ngFor="let item of filteredBillingAddresses | async" [value]="item.address" (click)="onBillingSelect(item.address)">
                     {{ item.address }}
@@ -110,10 +110,10 @@
                        formControlName="shipping_address"
                        placeholder="Search or enter shipping address" />
                 <mat-autocomplete #autoShipping="matAutocomplete">
-                  <mat-option >
-                    <button mat-button class="w-100 add-new-button" (click)="add('shipping')">
-                      <mat-icon>add</mat-icon> Add New
-                    </button>
+                  <mat-option  style="color: blue !important;" class="sticky-option">
+                    <span mat-button  (click)="add('shipping')" >
+                       + Add New Address
+                    </span>
                   </mat-option>
                   <mat-option *ngFor="let item of filteredShippingAddresses | async" [value]="item.address" (click)="onShippingSelect(item.address)">
                     {{ item.address }}
