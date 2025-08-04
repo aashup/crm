@@ -58,6 +58,8 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
       name: ['', [Validators.required]],
       status: [1, [Validators.required]],
       slug: [''],
+      hsn: [''],
+      item_code:[''],
     });
   }
   loadProductDetails(productId: string) {
@@ -70,12 +72,16 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
           name: product.data.name,
           status: product.data.status,
           slug: product.data.slug,
+          hsn: product.data.hsn,
+          item_code: product.data.item_code,
         });
         this.form.value.productInfo = {
           id: product.data.id,
           name: product.data.name,
           status: product.data.status,
           slug: product.data.slug,
+          hsn: product.data.hsn,
+          item_code: product.data.item_code,
         };
       },
       error: (err) => {
