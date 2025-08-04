@@ -11,7 +11,12 @@ class ProductUnit extends Model
         'product_id',
         'unit_id',
         'sale_price',
+        'sale_price_tax_type', // 'sale_price_tax_type' can be 'with tax' or 'without tax'
+        'sale_price_discount_amount',
+        'sale_price_discount_type', // 'sale_price_discount_type' can be 'fixed' or 'percentage'
         'purchase_price',
+        'purchase_price_tax_type', // 'purchase_price_tax_type' can be 'with tax' or 'without tax'
+        'tax_rate',
         'notes',
         'status',
     ];
@@ -36,7 +41,12 @@ class ProductUnit extends Model
             'product_id' => 'int',
             'unit_id' => 'int',
             'sale_price' => 'int',
+            'sale_price_tax_type' => 'int', // 1 for with tax, 2 for without tax
+            'sale_price_discount_amount' => 'decimal',
+            'sale_price_discount_type' => 'int', // 1 for flat, 2 for percent
+            'sale_price_tax_type' => 'string',
             'purchase_price' => 'int',
+            'purchase_price_tax_type' => 'int', // 1 for with tax, 2 for without tax
             'notes' => 'text',
 
             'id' => 'int',
@@ -53,7 +63,11 @@ class ProductUnit extends Model
             'product_id',
             'unit_id',
             'sale_price',
+            'sale_price_tax_type',
+            'sale_price_discount_amount',
+            'sale_price_discount_type',
             'purchase_price',
+            'purchase_price_tax_type',
             'notes',
             'created_at',
             'updated_at',
@@ -65,10 +79,14 @@ class ProductUnit extends Model
     public function validationRule()
     {
         return [
-            'product_id' => '',
             'unit_id' => '',
             'sale_price' => '',
+            'sale_price_tax_type' => 'required_if:sale_price,!=,0,|in:1,2', // 1 for with tax, 2 for without tax
+            'sale_price_discount_amount' => '',
+            'sale_price_discount_type' => 'required_if:sale_price_discount_amount,!=,0,|in:1,2', // 1 for flat, 2 for percent
             'purchase_price' => '',
+            'purchase_price_tax_type' => 'required_if:purchase_price,!=,0,|in:1,2', // 1 for with tax, 2 for without tax
+            'tax_rate' => '',
             'notes' => '',
             'status' => '',
         ];
@@ -77,7 +95,12 @@ class ProductUnit extends Model
     public function validationMessage()
     {
         return [
-            'name' => 'Name is required field',
+            'sale_price_tax_type.required_if' => 'Sale price tax type is required when sale price is not zero.',
+            'sale_price_tax_type.in' => 'Sale price tax type must be either 1 (with tax) or 2 (without tax).',
+            'sale_price_discount_type.required_if' => 'Sale price discount type is required when sale price discount amount is not zero.',
+            'sale_price_discount_type.in' => 'Sale price discount type must be either 1 (flat) or 2 (percent).',
+            'purchase_price_tax_type.required_if' => 'Purchase price tax type is required when purchase price is not zero.',
+            'purchase_price_tax_type.in' => 'Purchase price tax type must be either 1 (with tax) or 2 (without tax).',
         ];
     }
 

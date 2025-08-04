@@ -32,7 +32,8 @@ class ProductUnitController extends Controller
      */
     public function store(Request $request, Product $product)
     {
-        return BaseResponse::success($product->units()->create($request->all()));
+        $validatd = $request->validate((new ProductUnit())->validationRule(), (new ProductUnit())->validationMessage());
+        return BaseResponse::success($product->units()->create($validatd));
     }
 
     /**

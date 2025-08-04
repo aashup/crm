@@ -12,6 +12,8 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'hsn',
+        'item_code',
         'slug',
         'type',
         'status',
@@ -26,6 +28,8 @@ class Product extends Model
     {
         return [
             'name',
+            'hsn',
+            'item_code',
             'slug',
             'type',
             'status',
@@ -37,6 +41,8 @@ class Product extends Model
         return [
             'id' => 'int',
             'name' => 'text',
+            'hsn' => 'text',
+            'item_code' => 'text',
             'slug' => 'text',
             'status' => 'int',
             'type' => 'int',
@@ -50,6 +56,8 @@ class Product extends Model
         return [
             'id',
             'name',
+            'hsn',
+            'item_code',
             'status',
             'slug',
             'type',
