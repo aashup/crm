@@ -17,11 +17,14 @@ import { PartiesService } from '../parties.service';
 import { PartiesModel } from '../parties.model';
 import _ from 'lodash';
 import { StateService } from 'src/app/modules/settings/state/state.service';
-import { map, Observable, startWith } from 'rxjs';
+import { map, Observable, startWith, take } from 'rxjs';
 import { ContactModel } from '../../product/product.model';
 import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { AddressService } from 'src/app/modules/settings/address/address.service';
 import { Router } from '@angular/router';
+import { AddAddressComponent } from 'src/app/modules/settings/address/add-address/add-address.component';
+import { AddressModel } from 'src/app/modules/settings/address/address.model';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-parties',
@@ -44,8 +47,9 @@ export class AddPartiesComponent implements OnInit, AfterViewInit,OnDestroy {
   shipping_address:any=[]
   isNameSelected = false;
   states:any= []
-  
-
+  filteredBillingAddresses!: Observable<any[]>;
+filteredShippingAddresses!: Observable<any[]>;
+readonly dialog = inject(MatDialog);
   constructor(
     private fb: FormBuilder,
     private service: PartiesService,
@@ -63,6 +67,22 @@ export class AddPartiesComponent implements OnInit, AfterViewInit,OnDestroy {
     this.getAllStates()
     this.getContacts()
     this.initForm(this.model);
+
+    this.filteredBillingAddresses = this.form.controls.billing_address.valueChanges.pipe(
+      startWith(''),
+      map((val: string) => {
+        const value = val?.toLowerCase() || '';
+        return this.billing_address.filter((a:any) => a.address.toLowerCase().includes(value));
+      })
+    );
+    
+    this.filteredShippingAddresses = this.form.controls.shipping_address.valueChanges.pipe(
+      startWith(''),
+      map((val: string) => {
+        const value = val?.toLowerCase() || '';
+        return this.shipping_address.filter((a:any) => a.address.toLowerCase().includes(value));
+      })
+    );
 
     this.form.get('credit_limit')?.valueChanges.subscribe((isLimitEnabled: boolean) => {
       const control = this.form.get('credit_limit_amount');
@@ -165,6 +185,25 @@ export class AddPartiesComponent implements OnInit, AfterViewInit,OnDestroy {
         });
 
   }
+
+  onBillingSelect(addressStr: string) {
+    const selected = this.billing_address.find((a:any) => a.address === addressStr);
+    if (selected) {
+      this.form.patchValue({
+        billing_address_id: selected.id
+      });
+    }
+  }
+  
+  onShippingSelect(addressStr: string) {
+    const selected = this.shipping_address.find((a:any) => a.address === addressStr);
+    if (selected) {
+      this.form.patchValue({
+        shipping_address_id: selected.id
+      });
+    }
+  }
+
   getAllStates(): void {
     this.spinnerService.show(); 
     this.stateService.find({ pageSize: 100, sortBy: 'name', sortOrder: 'asc' }).subscribe({
@@ -211,6 +250,8 @@ preventMinus(event: KeyboardEvent) {
       opening_balance_date: [model?.opening_balance_date || new Date()],
       credit_limit: [model?.credit_limit ?? false],
       credit_limit_amount: [model?.credit_limit_amount || 0],
+      billing_address: ['' ,[Validators.required]],
+      shipping_address: [''],
       billing_address_id: [model?.billing_address_id || ''],
       shipping_address_id: [model?.billing_address_id || ''],
       state_id: [model?.state_id || ''],
@@ -250,6 +291,29 @@ preventMinus(event: KeyboardEvent) {
     });
   }
   
+  add(type: any): void {
+    this.dialog
+      .open(AddAddressComponent, {
+        data: {
+          model: new AddressModel().clear(),
+          isEdit: false,
+          addressType: type || null,
+        },
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((newAddress: any) => {
+        if (newAddress) {
+          if (newAddress.type === 1) {
+            this.billing_address.push(newAddress);
+            this.form.get('billing_address')?.updateValueAndValidity();
+          } else if (newAddress.type === 2) {
+            this.shipping_address.push(newAddress);
+            this.form.get('shipping_address')?.updateValueAndValidity();
+          }
+        }
+      });
+  }
 
 
   onNameBlur(): void {

@@ -23,6 +23,8 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
   isLoading: boolean = false;
   cityOptions: any[] = [];
   currentUser: any;
+  isShipping: boolean = false;
+  isBilling: boolean = false;
   typeOptions: Array<{ value: number; label: string }> = [
     { value: 1, label: 'Billing' },
     { value: 2, label: 'Shipping' },
@@ -31,6 +33,7 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
   readonly data = inject<{
     model: AddressModel;
     isEdit: boolean;
+    addressType:  null;
   }>(MAT_DIALOG_DATA);
 
   constructor(
@@ -43,7 +46,13 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.model = this.data.model || this.getDefaultModel(); // Default model for "Add"
+
+    console.log('address type : ',this.data?.addressType);
+    if (this.data?.addressType) {
+      this.isShipping = this.data.addressType === 'shipping';
+      this.isBilling = this.data.addressType === 'billing';
+    }
+    this.model = this.data.model || this.getDefaultModel(); 
     this.isEdit = this.data.isEdit;
     this.initForm(this.model);
     this.loadCities()
@@ -93,7 +102,7 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
     this.form = this.fb.group({
       id: [model.id, []],
       address: [model.address, [Validators.required]],
-      type: [model.type, [Validators.required]],
+      type: [model?.type, [Validators.required]],
       city: [model.city?.id, [Validators.required]],
       mob1: [model.mob1, [Validators.required]],
       mob2: [model.mob2, []],
@@ -104,16 +113,25 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
   }
 
   submit() {
+    if(this.isShipping ) {
+      this.form.patchValue({ type: 2 }); 
+    }
+    if(this.isBilling ) {
+      this.form.patchValue({ type: 1 }); 
+    }
+  
     this.commonService.markFormGroupTouched(this.form);
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
+
   
     const payload = {
       ...this.form.value,
       city_id: this.form.value.city,
       created_by: this.currentUser.user.id,
+
     };
   
     if (_.isEqual(payload, this.clone)) {
@@ -121,22 +139,27 @@ export class AddAddressComponent implements AfterViewInit, OnInit {
       return;
     }
   
+    console.log("payload", payload);
+    
     this.isLoading = true; 
     this.spinnerService.show()
-    this.service[this.isEdit ? 'update' : 'create'](payload).subscribe({
-      complete: () => {
+    this.service[this.isEdit ? 'update' : 'create'](payload).subscribe((res:any)=>{
+      if(res.data){
         this.isLoading = false; 
         this.spinnerService.hide()
         this.commonService.toastr.success(
           this.isEdit ? 'Address has been updated.' : 'Address has been created.'
         );
-        this.dialogRef.close(true);
-      },
-      error: (err) => {
-        this.isLoading = false; 
-        this.spinnerService.hide()
-        this.commonService.handleError(err);
-      },
-    });
+        this.dialogRef.close(res.data);
+      }
+   
+      
+    },
+    (err) => {
+      this.isLoading = false; 
+      this.spinnerService.hide()
+      this.commonService.handleError(err);
+    },
+  );
   }
 }

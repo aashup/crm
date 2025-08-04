@@ -21,7 +21,7 @@
           </div>
 
           <!-- Type Dropdown -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile"  *ngIf="!(isShipping || isBilling)">
             <mat-form-field class="w-100">
               <mat-label>Type</mat-label>
               <mat-select placeholder="Select Type" formControlName="type">

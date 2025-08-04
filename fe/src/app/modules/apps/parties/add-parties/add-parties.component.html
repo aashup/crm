@@ -1,14 +1,4 @@
-<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding:15px;">
-  <div>
-    <h2>{{ isEdit ? 'Edit' : 'Add' }} Party</h2>
-  </div>
-  <div>
-    <button mat-icon-button aria-label="Settings">
-      <mat-icon>settings</mat-icon>
-    </button>
-
-  </div>
-</div>
+<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Add' }} Party</h2>
 <hr>
 <div mat-dialog-content style="padding-top: 15px;">
   <form class="form" [formGroup]="form" *ngIf="form">
@@ -50,13 +40,9 @@
           <input matInput formControlName="gstin" />
         </mat-form-field>
       </div>
-
-
     </div>
 
-    <!-- Tabs -->
     <mat-tab-group class="party-form-tabs">
-      <!-- GST & Address Tab -->
       <mat-tab label="GST & Address">
         <div style="display: flex; flex-direction: row;">
           <div
@@ -93,97 +79,113 @@
             <div class="col-md-6 w-50" style="display: flex; flex-direction: column; margin-right: 15px;">
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Billing Address</mat-label>
-                <mat-select formControlName="billing_address_id">
-                  <mat-option *ngFor="let item of billing_address" [value]="item.id">{{item.address}}</mat-option>
-                </mat-select>
+                <input type="text" matInput [matAutocomplete]="autoBilling"
+                       formControlName="billing_address"
+                       placeholder="Search or enter billing address" />
+                <mat-autocomplete #autoBilling="matAutocomplete" style="padding: 0px;" >
+                  <mat-option  (click)="add('billing')" style="color: blue !important;" class="sticky-option">
+                    <span>
+                      + Add New Address
+                    </span>
+                  </mat-option>
+                  <mat-option *ngFor="let item of filteredBillingAddresses | async" [value]="item.address" (click)="onBillingSelect(item.address)">
+                    {{ item.address }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="form.get('billing_address')?.hasError('required') && form.get('billing_address')?.touched">
+                  Billing address is <strong>required</strong>
+                </mat-error>
               </mat-form-field>
-              <a class="text-primary cursor-pointer" (click)="enableShipping = !enableShipping">
-                + Enable Shipping Address
+              
+              <a class="cursor-pointer" [class.text-primary]="!enableShipping" [class.text-danger]="enableShipping" (click)="enableShipping = !enableShipping">
+                <span *ngIf="!enableShipping">+ Enable Shipping Address</span>
+                <span *ngIf="enableShipping">- Disable Shipping Address</span>
               </a>
             </div>
 
             <div class="col-md-6 w-50" *ngIf="enableShipping">
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Shipping Address</mat-label>
-                <mat-select formControlName="shipping_address_id">
-                  <mat-option *ngFor="let item of shipping_address" [value]="item.id">{{item.address}}</mat-option>
-                </mat-select>
+                <input type="text" matInput [matAutocomplete]="autoShipping"
+                       formControlName="shipping_address"
+                       placeholder="Search or enter shipping address" />
+                <mat-autocomplete #autoShipping="matAutocomplete">
+                  <mat-option  style="color: blue !important;" class="sticky-option">
+                    <span mat-button  (click)="add('shipping')" >
+                       + Add New Address
+                    </span>
+                  </mat-option>
+                  <mat-option *ngFor="let item of filteredShippingAddresses | async" [value]="item.address" (click)="onShippingSelect(item.address)">
+                    {{ item.address }}
+                  </mat-option>
+                </mat-autocomplete>
               </mat-form-field>
             </div>
           </div>
         </div>
-
-
-
       </mat-tab>
 
-      <!-- Credit & Balance Tab -->
       <mat-tab label="Credit & Balance">
-        <div class="row  mt-3">
-          <!-- Opening Balance -->
-          <div class="col-md-6 mb-3">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Opening Balance</mat-label>
-              <input matInput type="number" formControlName="opening_balance" min="0" (keydown)="preventMinus($event)" />
-            </mat-form-field>
+        <div class="credit-balance-tab">
+          <div class="row">
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Opening Balance</mat-label>
+                <input matInput type="number" formControlName="opening_balance" min="0" (keydown)="preventMinus($event)" />
+              </mat-form-field>
+            </div>
+      
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Opening Balance Date</mat-label>
+                <input matInput [matDatepicker]="balancePicker" formControlName="opening_balance_date" />
+                <mat-datepicker-toggle matSuffix [for]="balancePicker"></mat-datepicker-toggle>
+                <mat-datepicker #balancePicker></mat-datepicker>
+              </mat-form-field>
+            </div>
           </div>
-
-          <!-- As of Date -->
-          <div class="col-md-6 mb-3">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Opening Balance Date</mat-label>
-              <input matInput [matDatepicker]="balancePicker" formControlName="opening_balance_date"  />
-              <mat-datepicker-toggle matSuffix [for]="balancePicker"></mat-datepicker-toggle>
-              <mat-datepicker #balancePicker></mat-datepicker>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <!-- Credit Limit Section -->
-        <div class="row" style="display: flex;flex-direction: column;">
-          <!-- Toggle -->
-          <div class="col-md-6 mb-3" style="width: 215px; display: flex; flex-direction: column;">
-            <mat-label
-              style="font-size: 15px;  display: flex;flex-direction: row; justify-content: flex-start; align-items: center;">
-              Credit Limit
-              <button mat-icon-button color="primary" aria-label="Info">
-                <mat-icon>info</mat-icon>
-              </button>
-            </mat-label>
-            <mat-button-toggle-group [value]="form.get('credit_limit')?.value"
-              (change)="form.get('credit_limit')?.setValue($event.value)" exclusive>
-              <mat-button-toggle [value]="false">No Limit</mat-button-toggle>
-              <mat-button-toggle [value]="true">Custom Limit</mat-button-toggle>
-            </mat-button-toggle-group>
-          </div>
-
-          <!-- Custom Credit Limit Amount -->
-          <div class="col-md-6 mb-3" *ngIf="form.get('credit_limit')?.value">
-            <mat-form-field >
-              <mat-label>Credit Limit Amount</mat-label>
-              <input matInput formControlName="credit_limit_amount" type="number" min="0"
-                (keydown)="preventMinus($event)" />
-
-              <mat-error *ngIf="form.get('credit_limit_amount')?.hasError('required')">
-                Credit limit amount is required
-              </mat-error>
-              <mat-error *ngIf="form.get('credit_limit_amount')?.hasError('min')">
-                Credit limit cannot be negative
-              </mat-error>
-            </mat-form-field>
-
+      
+          <div class="row credit_limit_row">
+            <div class="col-md-6 credit-limit-toggle">
+              <mat-label class="credit-label">
+                Credit Limit
+                <button mat-icon-button color="primary" aria-label="Info">
+                  <mat-icon>info</mat-icon>
+                </button>
+              </mat-label>
+      
+              <mat-button-toggle-group
+                [value]="form.get('credit_limit')?.value"
+                (change)="form.get('credit_limit')?.setValue($event.value)"
+                exclusive
+              >
+                <mat-button-toggle [value]="false">No Limit</mat-button-toggle>
+                <mat-button-toggle [value]="true">Custom Limit</mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+      
+            <div class="col-md-6" *ngIf="form.get('credit_limit')?.value">
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-label>Credit Limit Amount</mat-label>
+                <input matInput formControlName="credit_limit_amount" type="number" min="0" (keydown)="preventMinus($event)" />
+                <mat-error *ngIf="form.get('credit_limit_amount')?.hasError('required')">
+                  Credit limit amount is required
+                </mat-error>
+                <mat-error *ngIf="form.get('credit_limit_amount')?.hasError('min')">
+                  Credit limit cannot be negative
+                </mat-error>
+              </mat-form-field>
+            </div>
           </div>
         </div>
-
       </mat-tab>
-
-
+      
+      
     </mat-tab-group>
   </form>
 </div>
 
 <div mat-dialog-actions align="end">
-
   <button mat-flat-button color="primary" class="mr-3" [disabled]="isLoading" (click)="save(true)"
     style="margin-right: 15px;">
     Save & New
