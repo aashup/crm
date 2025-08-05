@@ -68,6 +68,10 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   add() {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
+        width:"800px",
+        height:"fit-content",
+        maxWidth: '100vw',
+        maxHeight: '100vh',
         data: {
           product: this.form.value,
           isEdit: false,
@@ -88,6 +92,10 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
   update(data: ProductUnitModel) {
     this.unsubscribe.subscribe = this.dialog
       .open(AddProductUnitComponent, {
+        width:"800px",
+        height:"fit-content",
+        maxWidth: '100vw',
+        maxHeight: '100vh',
         data: {
           unit: data,
           isEdit: true,

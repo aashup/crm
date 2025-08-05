@@ -51,7 +51,11 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
       product_id: [model.product_id, [Validators.required]],
       unit_id: new FormControl({ value: model.unit_id, disabled: this.isEdit }, [Validators.required]),
       sale_price: [model.sale_price, [Validators.required]],
+      priceTaxType: [0], // Default to 0 (Without Tax)
+      discount: [model.discount],
+      discount_type: [1], // Default to 1 (Percentage)
       purchase_price: [model.purchase_price],
+      purchaseTaxType: [0], // Default to 0 (Without Tax)
       notes: [model.notes],
       status: [model.status],
     });
@@ -98,7 +102,11 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     if (this.isEdit) {
       payload = {
         sale_price: this.form.value.sale_price,
+        priceTaxType: this.form.value.priceTaxType,
+        discount: this.form.value.discount,
+        discount_type: this.form.value.discount_type,
         purchase_price: this.form.value.purchase_price,
+        purchaseTaxType: this.form.value.purchaseTaxType,
         notes: this.form.value.notes,
         status: this.form.value.status,
       };

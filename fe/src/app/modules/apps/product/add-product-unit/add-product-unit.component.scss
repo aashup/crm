@@ -1,0 +1,16 @@
+::ng-deep .mat-form-field-infix {
+    display: flex;
+    align-items: center;
+  }
+  ::ng-deep .mat-select-trigger {
+    font-size: 13px;
+  }
+  .select-panel-fit-content {
+    min-width: fit-content !important;
+  }
+
+  .select-panel-fit-content {
+    .mat-mdc-select-panel {
+      min-width: fit-content !important;
+    }
+  }

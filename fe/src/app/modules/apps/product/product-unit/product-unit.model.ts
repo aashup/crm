@@ -8,7 +8,7 @@ export class ProductUnitModel {
   purchase_price: number;
   notes: string;
   status: number;
-
+  discount: number;
   unit?: UnitModel
 
   clear() {
