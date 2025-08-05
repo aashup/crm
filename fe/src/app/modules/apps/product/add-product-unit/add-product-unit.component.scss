@@ -26,3 +26,10 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+.mat-select-value {
+  padding-right: 10px !important;
+}
+
+.mat-select-arrow-wrapper {
+  padding-left: 10px !important;
+}
