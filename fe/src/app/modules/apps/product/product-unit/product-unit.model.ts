@@ -9,7 +9,12 @@ export class ProductUnitModel {
   notes: string;
   status: number;
   discount: number;
-  unit?: UnitModel
+  unit?: UnitModel;
+  sale_price_tax_type: number;
+  sale_price_discount_amount:number
+  sale_price_discount_type:number;
+  purchase_price_tax_type: number;
+  tax_rate: string;
 
   clear() {
       this.status = 1;

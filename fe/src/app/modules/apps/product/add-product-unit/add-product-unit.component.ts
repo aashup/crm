@@ -8,6 +8,8 @@ import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductUnitModel } from '../product-unit/product-unit.model';
 import { UnitModel } from 'src/app/modules/settings/unit/unit.model';
 import { ProductUnitService } from '../product-unit/product-unit.service';
+import { RateModal } from './rate-modal';
+import { RateService } from './rate-service';
 
 @Component({
   selector: 'app-add-product-unit',
@@ -20,7 +22,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   isEdit = false;
   units: UnitModel[];
   filteredUnits: Observable<UnitModel[]>;
-
+  rates: RateModal[] = [];
   private unsubscribe = new SubscriptionHandler();
   readonly dialogRef = inject(MatDialogRef<AddProductUnitComponent>);
   readonly data = inject<{ unit: ProductUnitModel; isEdit: boolean; productId: number }>(MAT_DIALOG_DATA);
@@ -30,14 +32,18 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     private service: ProductUnitService,
     private commonService: CommonService,
     private us: UnitService,
-    private cb: ChangeDetectorRef
+    private cb: ChangeDetectorRef,
+    private rateService:RateService
   ) {}
 
   ngOnInit(): void {
+    this.getAllTaxRates();
     this.model = new ProductUnitModel().clear();
     this.isEdit = this.data.isEdit ?? false;
     if (this.isEdit && this.data.unit) {
       this.model = this.data.unit;
+      console.log(this.data);
+      
     }
 
     this.initForm(this.model);
@@ -45,19 +51,36 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     this.cb.detectChanges();
   }
 
+  getFormattedTaxLabel(type: number, rate: number): string {
+    const taxTypeMap: { [key: number]: string } = {
+      1: 'GST',
+      2: 'IGST',
+      3: 'CGST',
+      4: 'SGST',
+      5: 'VAT',
+      6: 'Service Tax',
+      7: 'Other'
+    };
+  
+    const taxName = taxTypeMap[type] || 'Unknown';
+    return `${taxName}@${rate}%`;
+  }
+  
+
   initForm(model: ProductUnitModel) {
     this.form = this.fb.group({
       id: [model.unit_id],
-      product_id: [model.product_id, [Validators.required]],
+      product_id: [this.data.productId, [Validators.required]],
       unit_id: new FormControl({ value: model.unit_id, disabled: this.isEdit }, [Validators.required]),
-      sale_price: [model.sale_price, [Validators.required]],
-      priceTaxType: [0], // Default to 0 (Without Tax)
-      discount: [model.discount],
-      discount_type: [1], // Default to 1 (Percentage)
+      sale_price: [model?.sale_price, [Validators.required]],
+      sale_price_tax_type: [model?.sale_price_tax_type || 0],
+      sale_price_discount_amount: [model?.sale_price_discount_amount],
+      sale_price_discount_type: [model?.sale_price_discount_type || 1],
       purchase_price: [model.purchase_price],
-      purchaseTaxType: [0], // Default to 0 (Without Tax)
+      purchase_price_tax_type: [model?.purchase_price_tax_type || 0],
       notes: [model.notes],
       status: [model.status],
+      tax_rate: [model?.tax_rate || 'None', [Validators.required]],
     });
   }
 
@@ -66,63 +89,77 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
   }
 
   loadUnits() {
-    this.us.find({ pageSize: 1000}).pipe(take(1)).subscribe({
-      next: (resp: any) => {
-        this.units = resp.data;
+    this.us
+      .find({ pageSize: 1000 })
+      .pipe(take(1))
+      .subscribe({
+        next: (resp: any) => {
+          this.units = resp.data;
+          const unitControl = this.unitIdControl;
+          this.filteredUnits = unitControl.valueChanges.pipe(
+            startWith(''),
+            map((value: any) => {
+              const search =
+                typeof value === 'string' ? value.toLowerCase() : this.displayUnitName(value).toLowerCase();
+              return this.units.filter((unit: any) => unit.name.toLowerCase().includes(search));
+            })
+          );
+          if (this.isEdit && this.model.unit_id) {
+            unitControl.setValue(this.model.unit_id);
+            unitControl.disable();
+          }
+        },
+        error: (err) => this.commonService.handleError(err),
+      });
+  }
 
-        const unitControl = this.unitIdControl;
-
-        this.filteredUnits = unitControl.valueChanges.pipe(
-          startWith(''),
-          map((value: any) => {
-            const search =
-              typeof value === 'string' ? value.toLowerCase() : this.displayUnitName(value).toLowerCase();
-
-            return this.units.filter((unit: any) => unit.name.toLowerCase().includes(search));
-          })
-        );
-
-        if (this.isEdit && this.model.unit_id) {
-          unitControl.setValue(this.model.unit_id);
-          unitControl.disable();
+  getAllTaxRates(): void {
+    this.rateService.find({ pageSize: 1000 }).pipe(take(1)).subscribe({
+      next: (res: any) => {     
+        if (res?.data?.length) {
+          this.rates = res.data;
+        } else {
+          this.rates = [];
+          console.warn('No tax rates found.');
         }
       },
-      error: (err) => this.commonService.handleError(err),
+      error: (error: any) => {
+        console.error('Failed to fetch tax rates:', error);
+        this.rates = [];
+      }
     });
   }
+  
 
   displayUnitName = (id: number | string): string => {
     if (!id || !this.units) return '';
-    const unit:any = this.units.find((u) => u.id === +id);
+    const unit: any = this.units.find((u) => u.id === +id);
     return unit ? unit.name : '';
   };
 
   submit() {
-    let payload: any = {};
+    if (this.form.invalid) {
+      return;
+    }
+
+    let payload: any;
+
     if (this.isEdit) {
-      payload = {
-        sale_price: this.form.value.sale_price,
-        priceTaxType: this.form.value.priceTaxType,
-        discount: this.form.value.discount,
-        discount_type: this.form.value.discount_type,
-        purchase_price: this.form.value.purchase_price,
-        purchaseTaxType: this.form.value.purchaseTaxType,
-        notes: this.form.value.notes,
-        status: this.form.value.status,
-      };
+      payload = this.form.getRawValue();
+      delete payload.id;
     } else {
       payload = this.form.value;
     }
+
     this.unsubscribe.subscribe = this.service[this.isEdit ? 'update' : 'create'](
       this.data.productId,
-      this.data?.unit?.unit_id || '',
+      this.data?.unit?.unit_id || payload.unit_id,
       payload
     ).subscribe({
       complete: () => {
-        if (!this.isEdit) this.commonService.toastr.success('Unit has been added.');
-        this.loadUnits();
-        this.form.value.product_id = this.data.productId;
-        this.dialogRef.close(this.form.value);
+        const message = this.isEdit ? 'Unit has been updated.' : 'Unit has been added.';
+        this.commonService.toastr.success(message);
+        this.dialogRef.close(true);
       },
       error: (err) => {
         this.commonService.toastr.error(err.error.message);

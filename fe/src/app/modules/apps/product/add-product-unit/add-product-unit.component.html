@@ -13,16 +13,8 @@
           <div class="col-md-12 mb-3">
             <mat-form-field class="w-100" appearance="outline">
               <mat-label>Unit</mat-label>
-              <input
-                matInput
-                placeholder="Search Unit"
-                [formControl]="unitIdControl"
-                [matAutocomplete]="autoUnits"
-              />
-              <mat-autocomplete
-                #autoUnits="matAutocomplete"
-                [displayWith]="displayUnitName"
-              >
+              <input matInput placeholder="Search Unit" [formControl]="unitIdControl" [matAutocomplete]="autoUnits" />
+              <mat-autocomplete #autoUnits="matAutocomplete" [displayWith]="displayUnitName">
                 <mat-option *ngFor="let item of filteredUnits | async" [value]="item.id">
                   {{ item.name }}
                 </mat-option>
@@ -34,81 +26,55 @@
           </div>
         </div>
 
-        <h3 class="mt-4">Sale Details</h3>
+        <h3 class="mt-4">Sale Price</h3>
         <hr />
         <div class="row">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Sale Price</mat-label>
-            <input
-              matInput
-              type="number"
-              placeholder="Enter price"
-              formControlName="salePrice"
-              
-            />
-            <mat-select
-              formControlName="priceTaxType"
-              matSuffix
-              disableOptionCentering
-              style="width: fit-content; background-color: rgb(168, 167, 167); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
-              value="0"
-            >
-              <mat-option [value]="1">With Tax</mat-option>
-              <mat-option [value]="0">Without Tax</mat-option>
+            <input matInput type="number" placeholder="Enter price" formControlName="sale_price" />
+
+            <mat-select formControlName="sale_price_tax_type" matSuffix disableOptionCentering
+              style="width:130px; background-color: rgb(243, 245, 255); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
+              value="0" class="custom-select">
+              <mat-option [value]="1">With Tax </mat-option>
+              <mat-option [value]="0">Without Tax </mat-option>
             </mat-select>
           </mat-form-field>
-
-          <div class="row">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Discount</mat-label>
-              <input matInput formControlName="discount" type="number" />
-              <mat-select
-                formControlName="discount_type"
-                matSuffix
-                disableOptionCentering
-                style="width: fit-content; background-color: rgb(168, 167, 167); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
-                value="1"
-              >
-                <mat-option [value]="1">Percentage</mat-option>
-                <mat-option [value]="0">Flat</mat-option>
-              </mat-select>
-              <mat-error>Discount type is <strong>required</strong></mat-error>
-            </mat-form-field>
-          </div>
         </div>
 
-        <h3 class="mt-4">Purchase Details</h3>
+        <div class="row">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Discount</mat-label>
+            <input matInput formControlName="sale_price_discount_amount" type="number" />
+            <mat-select formControlName="sale_price_discount_type" matSuffix disableOptionCentering
+              style="width:130px; background-color:  rgb(243, 245, 255); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
+              value="1">
+              <mat-option [value]="1">Percentage</mat-option>
+              <mat-option [value]="2">Flat</mat-option>
+            </mat-select>
+            <mat-error>Discount type is <strong>required</strong></mat-error>
+          </mat-form-field>
+        </div>
+
+        <h3 class="mt-4">Purchase Price</h3>
         <hr />
         <div class="row">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Purchase Price</mat-label>
-            <input
-              matInput
-              type="number"
-              placeholder="Enter purchase price"
-              formControlName="purchasePrice"
-            />
-            <mat-select
-              formControlName="purchaseTaxType"
-              matSuffix
-              disableOptionCentering
-              style="width: fit-content; background-color: rgb(168, 167, 167); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
-              value="0"
-            >
+            <input matInput type="number" placeholder="Enter purchase price" formControlName="purchase_price" />
+            <mat-select formControlName="purchase_price_tax_type" matSuffix disableOptionCentering
+              style="width:130px; background-color:  rgb(243, 245, 255); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
+              value="0">
               <mat-option [value]="1">With Tax</mat-option>
               <mat-option [value]="0">Without Tax</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
 
-        
         <hr />
-       
 
-        <h3 class="mt-4">Additional Information</h3>
-        <hr />
         <div class="row">
-          <div class="col-md-4 mb-3">
+          <div class="col-md-6 mb-3">
             <mat-form-field class="w-100" appearance="outline">
               <mat-label>Status</mat-label>
               <mat-select placeholder="Status" formControlName="status">
@@ -118,7 +84,22 @@
               <mat-error>Status is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
-          <div class="col-md-8 mb-3">
+          <div class="col-md-6 mb-3">
+            <mat-form-field class="w-100" appearance="outline">
+              <mat-label>Tax Rate</mat-label>
+              <mat-select placeholder="Tax Rate" formControlName="tax_rate">
+                <mat-option [value]="'None'">None</mat-option>
+                <mat-option *ngFor="let rate of rates" [value]="rate.id">
+                  {{getFormattedTaxLabel(rate.type, rate.rate)}}
+                </mat-option>
+              </mat-select>
+              <mat-error>Tax Rate is <strong>required</strong></mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12 mb-3">
             <mat-form-field class="w-100" appearance="outline">
               <mat-label>Notes</mat-label>
               <textarea matInput placeholder="Notes" formControlName="notes"></textarea>

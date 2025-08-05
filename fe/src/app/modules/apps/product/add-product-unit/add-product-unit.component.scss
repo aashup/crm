@@ -14,3 +14,22 @@
       min-width: fit-content !important;
     }
   }
+
+  /* For Chrome, Safari, Edge, and Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+.mat-select-value {
+  padding-right: 10px !important;
+}
+
+.mat-select-arrow-wrapper {
+  padding-left: 10px !important;
+}
