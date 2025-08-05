@@ -4,6 +4,26 @@
     <div class="card-body">
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
+
+          <div class="col-12 col-md-6" style="margin-bottom: 20px">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Party Name</mat-label>
+              <input type="text"
+                     matInput
+                     [formControl]="partyControl"
+                     [matAutocomplete]="auto"
+                     (blur)="onPartyBlur()">
+            
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayParty">
+                <mat-option *ngFor="let party of filteredParties" [value]="party">
+                  {{ party.contact.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            
+          </div>
+
+
           <div class="col-12 col-md-6" style="margin-bottom: 20px">
             <mat-form-field class="w-100">
               <mat-label>Mobile</mat-label>

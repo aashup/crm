@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl, FormControl } from '@angular/forms';
 import { filter, map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { ContactModel, ProductModel } from '../product/product.model';
@@ -11,6 +11,7 @@ import { SubscriptionHandler } from '../../core/subscription.handler';
 import { UnitModel } from '../../settings/unit/unit.model';
 import { UnitService } from '../../settings/unit/unit.service';
 import { ProductUnitService } from '../product/product-unit/product-unit.service';
+import { PartiesService } from '../parties/parties.service';
 
 @Component({
   selector: 'app-direct-sale',
@@ -26,6 +27,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   filteredNames: Observable<ContactModel[]>;
   products: ProductModel[] = [];
   filteredProductList: ProductModel[][] = [];
+  parties: any[] = [];
+  filteredParties: any[] = [];
+  partyControl = new FormControl();
 
   units: UnitModel[] = [];
   filteredUnitsList: any[][] = [];
@@ -46,10 +50,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     private spinnerService: SpinnerService,
     private router: Router,
     private unitService: UnitService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private partyService: PartiesService
   ) { }
 
   ngOnInit(): void {
+    this.getAllParties()
     this.getAllProducts();
     this.initializeForm();
     this.validateDiscountAmount();
@@ -119,6 +125,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
 
+    this.partyControl.valueChanges.subscribe(value => {
+      this.filterParties(value);
+    });
+
   }
 
   ngAfterViewInit(): void {
@@ -169,6 +179,40 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.calculateNetTotal();
       }
     });
+  }
+
+  getAllParties(): void {
+    this.partyService.find({ pageSize: 1000,with:['contact'] }).subscribe({
+      next: (res: any) => {
+        this.parties = res?.data || [];
+        this.filteredParties = this.parties;
+        this.cdr.markForCheck(); 
+      },
+      error: err => {
+        console.error('Error fetching parties:', err);
+        this.parties = [];
+        this.filteredParties = [];
+      }
+    });
+  }
+
+  displayParty = (party: any): string => {
+    return party?.contact?.name || '';
+  };
+
+  filterParties(search: string | any): void {
+    const query = typeof search === 'string' ? search.toLowerCase() : search?.contact?.name?.toLowerCase() || '';
+  
+    this.filteredParties = this.parties.filter(p =>
+      p?.contact?.name?.toLowerCase().includes(query)
+    );
+  }
+
+  onPartyBlur() {
+    const current = this.partyControl.value;
+    if (typeof current === 'string') {
+      this.partyControl.setValue(null);
+    }
   }
 
   getAllUnits() {
