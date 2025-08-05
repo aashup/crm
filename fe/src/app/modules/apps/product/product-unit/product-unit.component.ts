@@ -106,7 +106,6 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
       .subscribe((result) => {
         if (result) {
           this.loadUnit();
-          this.commonService.toastr.success('Product unit updated successfully');
           this.cdr.markForCheck();
           this.loadUnit();
           this.cdr.detectChanges();
