@@ -15,8 +15,8 @@
                 placeholder="Search or enter mobile"
               />
               <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
-                <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
-                  <span [innerHTML]="contact.html"></span>
+                <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mobile">
+                   <span [innerHTML]="contact.html"></span>
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="form.get('mobile')?.hasError('required') && form.get('mobile')?.touched">Mobile Number is <strong>required</strong></mat-error>
@@ -25,21 +25,22 @@
 
           <div class="col-12 col-md-6" style="margin-bottom: 20px">
             <mat-form-field class="w-100">
-              <mat-label>Name</mat-label>
+              <mat-label>Party name</mat-label>
               <input class="d-none" formControlName="contact_id" />
+              <input class="d-none" formControlName="party_id" />
               <input
                 matInput
-                formControlName="name"
+                formControlName="partyName"
                 [matAutocomplete]="autoName"
                 (blur)="onNameBlur()"
-                placeholder="Search or enter name"
+                placeholder="Search or enter party name"
               />
               <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="isNameSelected = true">
-                <mat-option *ngFor="let contact of filteredNames | async" [value]="contact.name">
-                  <span [innerHTML]="contact.html"></span>
+                <mat-option *ngFor="let party of filteredParties | async" [value]="party.name">
+                  <span [innerHTML]="party.html"></span>
                 </mat-option>
               </mat-autocomplete>
-              <mat-error *ngIf="form.get('name')?.hasError('required') && form.get('name')?.touched">Contact Name is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('partyName')?.hasError('required') && form.get('partyName')?.touched">Party Name is <strong>required</strong></mat-error>
             </mat-form-field>
           </div>
         </div>

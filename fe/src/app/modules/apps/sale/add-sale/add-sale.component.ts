@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators, FormArray, FormControl, AbstractCon
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import _ from 'lodash';
 import { SaleModel } from '../sale.model';
-import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
 import { SaleService } from '../sale.service';
@@ -11,6 +10,7 @@ import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { map, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
 import { Observable } from 'rxjs';
+import { PartiesService } from '../../parties/parties.service';
 
 
 @Component({
@@ -21,10 +21,10 @@ import { Observable } from 'rxjs';
 })
 export class AddSaleComponent implements AfterViewInit, OnInit {
   form: FormGroup;
-  contacts: any[] = [];
+  parties: any[] = [];
   units: any[] = [];
   products: any[] = [];
-  filteredContacts: Observable<any[]>;
+  filteredParties: Observable<any[]>;
   filteredUnits: Observable<any[]>;
   isLoading = false;
   isEdit = false;
@@ -35,54 +35,46 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     isEdit: boolean;
   }>(MAT_DIALOG_DATA);
 
-  @ViewChild('contactInput') contactInput: ElementRef<HTMLInputElement>;
+  @ViewChild('partyInput') partyInput: ElementRef<HTMLInputElement>;
   @ViewChild('unitInput') unitInput: ElementRef<HTMLInputElement>;
 
   constructor(
     private fb: FormBuilder,
-    private contactService: ContactService,
     private unitService: UnitService,
     private productService: ProductService,
     private saleService: SaleService,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
+    private partyService: PartiesService,
     private cdr: ChangeDetectorRef
   ) {}
 
- autocompleteValidator(validList: any[], valueProp: string = 'id'): ValidatorFn {
+  autocompleteValidator(validList: any[], valueProp: string = 'id'): ValidatorFn {
     return (control: AbstractControl) => {
       const value = control.value;
       if (value === null || value === undefined || value === '') return { required: true };
-  
       const isValid = validList.some(item => item[valueProp] === value);
       return isValid ? null : { invalidAutocomplete: true };
     };
   }
 
   ngOnInit(): void {
+    this.getAllParties();
     this.isEdit = this.data.isEdit;
     this.initializeForm();
 
     forkJoin([
-      this.contactService.find({ pageSize: 10000 }),
       this.unitService.find({ pageSize: 10000 }),
       this.productService.find({ pageSize: 10000 })
     ]).subscribe({
-      next: ([contactsData, unitsData, productsData]: [any, any, any]) => {
-        this.contacts = contactsData.data;
+      next: ([unitsData, productsData]: [any, any]) => {
         this.units = unitsData.data;
         this.products = productsData.data;
 
         if (this.isEdit) {
           this.patchForm(this.data.model);
         }
-        this.form.get('contact_id')?.setValidators([
-          Validators.required,
-          this.autocompleteValidator(this.contacts)
-        ]);
-        this.form.get('contact_id')?.updateValueAndValidity();
-        this.cdr.detectChanges();
-
+        
         this.form.get('unit_id')?.setValidators([
           Validators.required,
           this.autocompleteValidator(this.units)
@@ -111,16 +103,16 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
       },
     });
 
-    this.filteredContacts = this.contactControl.valueChanges.pipe(
+    this.filteredParties = this.partyControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       map(value => {
         if (typeof value === 'string' && value.length > 0) {
-          return this._filterContacts(value);
+          return this._filterParties(value);
         } else if (typeof value === 'number') {
-            return this.contacts.slice(); 
+            return this.parties.slice(); 
         } else {
-            return this.contacts.slice();
+            return this.parties.slice();
         }
       })
     );
@@ -149,8 +141,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
       this.spinnerService.hide();
     });
 
-    if (this.contactInput) {
-      this.contactInput.nativeElement.blur();
+    if (this.partyInput) {
+      this.partyInput.nativeElement.blur();
     }
     if (this.unitInput) {
       this.unitInput.nativeElement.blur();
@@ -158,22 +150,22 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     this.cdr.detectChanges();
   }
 
-  get contactControl(): FormControl {
-    return this.form.get('contact_id') as FormControl;
+  get partyControl(): FormControl {
+    return this.form.get('party_id') as FormControl;
   }
 
   get unitControl(): FormControl {
     return this.form.get('unit_id') as FormControl;
   }
 
-  displayContactFn = (contactId: number): string => {
-    const contact = this.contacts.find((c) => c.id === contactId);
-    return contact ? contact.name : '';
+  displayPartyFn = (partyId: number): string => {
+    const party = this.parties.find((p) => p.id === partyId);
+    return party ? party.name : '';
   };
 
-  private _filterContacts(value: string): any[] {
+  private _filterParties(value: string): any[] {
     const filterValue = value.toLowerCase();
-    return this.contacts.filter((contact) => contact.name.toLowerCase().includes(filterValue));
+    return this.parties.filter((party) => party.name.toLowerCase().includes(filterValue));
   }
 
   displayUnitFn = (unitId: number): string => {
@@ -210,9 +202,26 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     return this.form.get('saleDetails') as FormArray;
   }
 
+
+  getAllParties() {
+    this.partyService.find({pageSize:10000,with:['contact']}).subscribe((res: any) => {
+      if (res.data.length) {
+        console.log(res.data);
+        
+        this.parties = res.data;
+        // After fetching parties, apply the validator
+        this.form.get('party_id')?.setValidators([
+          Validators.required,
+          this.autocompleteValidator(this.parties)
+        ]);
+        this.form.get('party_id')?.updateValueAndValidity();
+        this.cdr.detectChanges();
+      }
+    })
+  }
   initializeForm(): void {
     this.form = this.fb.group({
-      contact_id: [null],
+      party_id: [null],
       unit_id: [null],
       amount: [null, [Validators.required, Validators.min(1)]],
       discount_amount: [0, [Validators.required, Validators.min(0)]],
@@ -323,6 +332,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
 
   patchForm(sale: any): void {
     this.form.patchValue({
+      party_id: sale.party_id,
+      unit_id: sale.unit_id,
       amount: sale.amount || null,
       discount_amount: sale.discount_amount || 0,
       discount_type: sale.discount_type || 1,
@@ -330,8 +341,8 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
       status: sale.status || 1,
     });
 
-    if (sale.contact_id) {
-        this.contactControl.setValue(sale.contact_id, { emitEvent: false });
+    if (sale.party_id) {
+        this.partyControl.setValue(sale.party_id, { emitEvent: false });
     }
     if (sale.unit_id) {
         this.unitControl.setValue(sale.unit_id, { emitEvent: false });

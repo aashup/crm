@@ -50,7 +50,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   displayableCol = [
     'select',
     'id',
-    'contact_id',
+    'party_id',
     'due_amount',
     'return_amount',
     'amount',
@@ -70,7 +70,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
-    { ref: 'contact_id', name: 'Contact Person', mutator: (item: any) => item?.contact?.name || 'N/A' },
+    { ref: 'party_id', name: 'Party', mutator: (item: any) => item?.party?.name || 'N/A' },
     { ref: 'due_amount', name: 'Due Amount' }, 
     { ref: 'return_amount', name: 'Return Amount'}, 
     { ref: 'amount', name: 'Amount' },
@@ -151,10 +151,10 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with= ["saleDetails","contact","unit","createdby"],
+      this.filter.with= ["saleDetails","party","unit","createdby"],
       this.filter.cols = [
         'id',
-        'contact_id',
+        'party_id',
         'due_amount',
         'unit_id',
         'return_amount',
