@@ -53,7 +53,7 @@
             class="row align-items-center"
             style="margin-bottom: 15px"
           >
-            <div class="col-12 col-md-5">
+            <div class="col-12 col-md-3">
               <mat-form-field class="w-100">
                 <mat-label>Product</mat-label>
                 <input formControlName="product_id" class="d-none" />
@@ -78,7 +78,23 @@
               </mat-form-field>
             </div>
 
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-1">
+              <mat-form-field class="w-100">
+                <mat-label>Quantity</mat-label>
+                <input matInput type="number" [min]="1" formControlName="quantity" placeholder="Enter Quantity" />
+                <mat-error *ngIf="detail.get('quantity')?.hasError('required') && detail.get('quantity')?.touched">
+                  Quantity is <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="detail.get('quantity')?.hasError('min') && detail.get('quantity')?.touched">
+                  Quantity must be at least 1.
+                </mat-error>
+                <mat-error *ngIf="detail.get('quantity')?.hasError('negativeValue')">
+                  Quantity cannot be negative.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-1">
               <mat-form-field class="w-100">
                 <mat-label>Unit</mat-label>
                 <input formControlName="unit_id" class="d-none" />
@@ -101,23 +117,64 @@
               </mat-form-field>
             </div>
 
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-1">
               <mat-form-field class="w-100">
-                <mat-label>Quantity</mat-label>
-                <input matInput type="number" [min]="1" formControlName="quantity" placeholder="Enter Quantity" />
-                <mat-error *ngIf="detail.get('quantity')?.hasError('required') && detail.get('quantity')?.touched">
-                  Quantity is <strong>required</strong>
-                </mat-error>
-                <mat-error *ngIf="detail.get('quantity')?.hasError('min') && detail.get('quantity')?.touched">
-                  Quantity must be at least 1.
-                </mat-error>
-                <mat-error *ngIf="detail.get('quantity')?.hasError('negativeValue')">
-                  Quantity cannot be negative.
+                <mat-label>Price/Unit</mat-label>
+                <input matInput type="number" [min]="0" formControlName="amount" placeholder="Enter Amount" />
+                <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched">Amount is <strong>required</strong></mat-error>
+                <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
+                  Amount cannot be negative.
                 </mat-error>
               </mat-form-field>
             </div>
 
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-1">
+              <mat-form-field class="w-100">
+                <mat-label>Discount Amount</mat-label>
+                <input matInput type="number" [min]="0" formControlName="" placeholder="Enter Amount" />
+                <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched">Amount is <strong>required</strong></mat-error>
+                <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
+                  Amount cannot be negative.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-1">
+              <mat-form-field class="w-100">
+                <mat-label>Discount %</mat-label>
+                <input matInput type="number" [min]="0" formControlName="" placeholder="Enter Amount" />
+                <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched">Amount is <strong>required</strong></mat-error>
+                <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
+                  Amount cannot be negative.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-1">
+              <mat-form-field class="w-100">
+                <mat-label>Tax %</mat-label>
+                <input matInput type="number" [min]="0" formControlName="" placeholder="Enter Amount" />
+                <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched">Amount is <strong>required</strong></mat-error>
+                <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
+                  Amount cannot be negative.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-1">
+              <mat-form-field class="w-100">
+                <mat-label>Tax Amount</mat-label>
+                <input matInput type="number" [min]="0" formControlName="" placeholder="Enter Amount" />
+                <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched">Amount is <strong>required</strong></mat-error>
+                <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
+                  Amount cannot be negative.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            
+
+            <div class="col-12 col-md-1">
               <mat-form-field class="w-100">
                 <mat-label>Amount</mat-label>
                 <input matInput type="number" [min]="0" formControlName="amount" placeholder="Enter Amount" />
