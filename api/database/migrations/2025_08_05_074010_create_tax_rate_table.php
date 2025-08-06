@@ -26,6 +26,11 @@ return new class extends Migration
             $table->unique(['rate', 'type'], 'unique_tax_rate'); // Ensure unique combination of rate and type
         });
 
+        DB::table('tax_rates')->insert([
+            ['rate' => 0.00, 'type' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 0.00, 'type' => 2, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
         $permisions = [
             "view any",
             "show",
