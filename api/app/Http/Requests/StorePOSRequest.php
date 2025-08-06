@@ -15,7 +15,7 @@ class StorePOSRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'contact_id' => ['nullable', 'exists:contacts,id'],
+            'party_id' => ['nullable', 'exists:parties,id'],
             'mobile' => ['required_without:contact_id', 'string', 'max:20', 'regex:/^\+[0-9\s\-\(\)\.]{7,20}$/'],
             'name' => ['required_without:contact_id', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0'],

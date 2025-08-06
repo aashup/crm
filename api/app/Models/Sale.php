@@ -8,7 +8,7 @@ class Sale extends Model
 {
 
     protected $fillable = [
-        'contact_id',
+        'party_id',
         'unit_id',
         'created_by',
         'amount',
@@ -29,7 +29,7 @@ class Sale extends Model
     ];
 
     protected $relations = [
-        "contact",
+        "party",
         "unit",
         "saleDetails",
         'createdBy'
@@ -39,7 +39,7 @@ class Sale extends Model
     {
         return [
             'id',
-            'contact_id',
+            'party_id',
             'unit_id',
             'created_by',
             'amount',
@@ -64,7 +64,7 @@ class Sale extends Model
     {
         return [
             'id' => 'int',
-            'contact_id' => 'int',
+            'party_id' => 'int',
             'unit_id' => 'int',
             'created_by' => 'int',
             'amount' => 'int',
@@ -89,7 +89,7 @@ class Sale extends Model
     {
         return [
             'id',
-            'contact_id',
+            'party_id',
             'unit_id',
             'created_by',
             'amount',
@@ -110,9 +110,9 @@ class Sale extends Model
         ];
     }
 
-    public function contact()
+    public function party()
     {
-        return $this->belongsTo(Contact::class);
+        return $this->belongsTo(Party::class);
     }
 
     public function unit()

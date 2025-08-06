@@ -33,6 +33,17 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        Schema::table('sales', function (Blueprint $table) {
+            if (Schema::hasColumn('sales', 'contact_id')) {
+                $table->dropForeign(['contact_id']);
+                $table->dropColumn('contact_id');
+            }
+
+            $table->unsignedBigInteger('party_id')->after('id'); // adjust 'after' as needed
+
+            $table->foreign('party_id')->references('id')->on('parties')->onDelete('cascade');
+        });
+
         $permisions = [
             "view any",
             "show",
