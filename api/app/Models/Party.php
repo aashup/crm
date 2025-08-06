@@ -10,6 +10,8 @@ class Party extends Model
 
     protected $fillable = [
         'contact_id',
+        'name',
+        'mobile',
         'gstin',
         'opening_balance',
         'opening_balance_date',
@@ -43,6 +45,8 @@ class Party extends Model
             'id' => 'int',
             'gstin' => 'string',
             'contact_id' => 'int',
+            'name' => 'string',
+            'mobile' => 'string',
             'opening_balance' => 'string',
             'opening_balance_date' => 'string',
             'gst_type' => 'int',
@@ -62,6 +66,8 @@ class Party extends Model
         return [
             'id',
             'contact_id',
+            'name',
+            'mobile',
             'gstin',
             'opening_balance',
             'opening_balance_date',

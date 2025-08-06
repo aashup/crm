@@ -17,6 +17,8 @@ return new class extends Migration
         Schema::create('parties', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contact_id')->nullable()->constrained('contacts')->onDelete('set null');
+            $table->string('name')->nullable();
+            $table->string('mobile')->nullable();
             $table->string('gstin')->nullable();
             $table->decimal('opening_balance', 15, 2)->nullable()->default(0.00);
             $table->date('opening_balance_date')->nullable();

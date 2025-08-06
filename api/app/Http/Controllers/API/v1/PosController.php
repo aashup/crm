@@ -9,6 +9,7 @@ use App\Http\Requests\StorePOSRequest;
 use App\Http\Requests\UpdateInventoryRequest;
 use App\Models\Contact;
 use App\Models\Inventory;
+use App\Models\Party;
 use App\Models\Product;
 use App\Models\ProductUnit;
 use App\Models\Sale;
@@ -65,18 +66,18 @@ class PosController extends Controller
 
             $validated = $request->validated();
 
-            if (!$validated['contact_id']) {
-                $contactExists = Contact::where('mob1', $validated['mobile'])->orWhere('mob2', $validated['mobile'])->orWhere('name', $validated['name'])->exists();
-                if ($contactExists) {
-                    return $this->error("Contact with this mobile or name already exists");
+            if (!$validated['party_id']) {
+                $partyExists = Party::where('name', $validated['name'])->exists();
+                if ($partyExists) {
+                    return $this->error("Party with this name already exists");
                 }
-                $contact = Contact::create([
+
+                $party = Party::create([
                     'name' => $validated['name'],
-                    'mob1' => $validated['mobile'],
-                    'status' => 1,
-                    'created_by' => Auth::id(),
+                    'mobile' => $validated['mobile'],
                 ]);
-                $validated['contact_id'] = $contact->id;
+                
+                $validated['party_id'] = $party->id;
             }
 
             $validated['created_by'] = Auth::id();

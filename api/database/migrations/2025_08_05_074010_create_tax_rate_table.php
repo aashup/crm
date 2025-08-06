@@ -34,13 +34,14 @@ return new class extends Migration
             "delete",
         ];
 
-        $parentId = DB::table('menus')->insertGetId([
+        $parentId = DB::table('menus')->where('name', 'Settings')->value('id');
+        $menuId = DB::table('menus')->insertGetId([
             'name' => 'Tax Rates',
             'page' => '/app/tax-rates',
             'icon' => 'element-11',
             'root' => 1,
             'status' => 1,
-            'parent_id' => null,
+            'parent_id' => $parentId,
             'order_by' => 12,
             'created_at' => now(),
             'updated_at' => now(),
@@ -51,7 +52,7 @@ return new class extends Migration
                 'name' => Str::slug("Tax Rates {$permission}", '.'),
                 'guard_name' => 'api',
                 'description' => $permission,
-                'menu_id' => $parentId,
+                'menu_id' => $menuId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
