@@ -7,21 +7,21 @@
         <div class="row">
           <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100" style="margin-bottom: 10px;">
-              <mat-label>Contact Name</mat-label>
-              <input matInput placeholder="Select Contact" [formControl]="contactControl"
-                [matAutocomplete]="autoContact" (blur)="contactControl.markAsTouched()" #contactInput>
-              <mat-autocomplete #autoContact="matAutocomplete" [displayWith]="displayContactFn">
-                <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.id">
-                  {{ contact.name }}
+              <mat-label>Party Name</mat-label>
+              <input matInput placeholder="Select Party" [formControl]="partyControl"
+                [matAutocomplete]="autoParty" (blur)="partyControl.markAsTouched()" #partyInput>
+              <mat-autocomplete #autoParty="matAutocomplete" [displayWith]="displayPartyFn">
+                <mat-option *ngFor="let party of filteredParties | async" [value]="party.id">
+                  {{ party.name }}
                 </mat-option>
               </mat-autocomplete>
-              <mat-error *ngIf="contactControl.hasError('required') && contactControl.touched">
-                Contact is required.
+              <mat-error *ngIf="partyControl.hasError('required') && partyControl.touched">
+                Party is required.
               </mat-error>
-
-              <mat-error *ngIf="contactControl.hasError('invalidAutocomplete') && contactControl.touched">
-                Please select a valid contact.
-              </mat-error> </mat-form-field>
+              <mat-error *ngIf="partyControl.hasError('invalidAutocomplete') && partyControl.touched">
+                Please select a valid party.
+              </mat-error>
+            </mat-form-field>
           </div>
           <div class="col-12 col-md-6 kt-margin-bottom-20-mobile">
             <mat-form-field class="w-100" style="margin-bottom: 10px;">

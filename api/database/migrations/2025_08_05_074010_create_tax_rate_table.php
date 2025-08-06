@@ -27,8 +27,21 @@ return new class extends Migration
         });
 
         DB::table('tax_rates')->insert([
-            ['rate' => 0.00, 'type' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['rate' => 0.00, 'type' => 2, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 0.25, 'type' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 12.00, 'type' => 2, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 14.00, 'type' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 28.00, 'type' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 5.00, 'type' => 4, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 12.00, 'type' => 5, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 0.25, 'type' => 5, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 6.00, 'type' => 6, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 18.00, 'type' => 7, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 25.00, 'type' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 10.00, 'type' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 5.00, 'type' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 2.50, 'type' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 2.50, 'type' => 4, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['rate' => 6.00, 'type' => 4, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         $permisions = [

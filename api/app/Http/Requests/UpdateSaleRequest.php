@@ -22,7 +22,7 @@ class UpdateSaleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'contact_id' => 'required|integer',
+            'party_id' => 'required|integer',
             'unit_id' => 'required|integer',
             'amount' => 'required|numeric',
             'discount_amount' => 'nullable|numeric',
