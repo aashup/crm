@@ -26,13 +26,17 @@ class PosController extends Controller
      */
     public function index(Request $request)
     {
-        $contacts = Contact::select(['id', 'name', 'mob1', 'mob2', 'status'])->where('status', 1)->orderBy('name')->get();
+        $parties = Party::select(['id', 'name', 'mobile'])->orderBy('name')->get();
         $products = Product::with([
             'productUnit' => function ($q) {
                 return $q->with('unit')->select([
                     'product_id',
                     'unit_id',
                     'sale_price',
+                    'sale_price_tax_type',
+                    'sale_price_discount_amount',
+                    'sale_price_discount_type',
+                    'tax_rate',
                     'status'
                 ]);
             }
@@ -45,7 +49,7 @@ class PosController extends Controller
         ])->where('status', 1)->orderBy('name')->get();
 
         $units = Unit::select(['id', 'name', 'status'])->orderBy('name')->where('status', 1)->get();
-        return BaseResponse::success(['contacts' => $contacts, 'products' => $products, 'units' => $units]);
+        return BaseResponse::success(['parties' => $parties, 'products' => $products, 'units' => $units]);
     }
 
     /**
@@ -144,4 +148,18 @@ class PosController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(Inventory $inventory) {}
+
+    private function updateInventory($productUnit, $quantity)
+    {
+        $inventory = Inventory::where('product_unit_id', $productUnit->id)->first();
+        if ($inventory) {
+            $inventory->quantity += $quantity;
+            $inventory->save();
+        } else {
+            Inventory::create([
+                'product_unit_id' => $productUnit->id,
+                'quantity' => $quantity,
+            ]);
+        }
+    }
 }

@@ -32,7 +32,8 @@ class Sale extends Model
         "party",
         "unit",
         "saleDetails",
-        'createdBy'
+        'createdBy',
+        'vouchers'
     ];
 
     public function searchableColumns()
@@ -128,5 +129,10 @@ class Sale extends Model
     public function saleDetails()
     {
         return $this->hasMany(SaleDetail::class);
+    }
+
+    public function vouchers()
+    {
+        return $this->morphMany(Voucher::class, 'reference');
     }
 }
