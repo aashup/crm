@@ -17,10 +17,12 @@
               />
               <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
                 <mat-option *ngFor="let party of filteredParties | async" [value]="party.mobile">
-                   <span [innerHTML]="party.html"></span>
+                  <span [innerHTML]="party.html"></span>
                 </mat-option>
               </mat-autocomplete>
-              <mat-error *ngIf="form.get('mobile')?.hasError('required') && form.get('mobile')?.touched">Mobile Number is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('mobile')?.hasError('required') && form.get('mobile')?.touched"
+                >Mobile Number is <strong>required</strong></mat-error
+              >
             </mat-form-field>
           </div>
 
@@ -41,154 +43,196 @@
                   <span [innerHTML]="party.html"></span>
                 </mat-option>
               </mat-autocomplete>
-              <mat-error *ngIf="form.get('partyName')?.hasError('required') && form.get('partyName')?.touched">Party Name is <strong>required</strong></mat-error>
+              <mat-error *ngIf="form.get('partyName')?.hasError('required') && form.get('partyName')?.touched"
+                >Party Name is <strong>required</strong></mat-error
+              >
             </mat-form-field>
           </div>
         </div>
 
         <div class="row" style="border-top: 2px dashed #ccc; padding-bottom: 20px"></div>
         <div formArrayName="saleDetails" class="col-12">
-          <div
-            *ngFor="let detail of saleDetails.controls; let i = index"
-            [formGroupName]="i"
-            class="row align-items-center"
-            style="margin-bottom: 15px"
-          >
-            <div class="col-12 col-md-3">
-              <mat-form-field class="w-100">
-                <mat-label>Product</mat-label>
-                <input formControlName="product_id" class="d-none" />
-                <input
-                  matInput
-                  formControlName="product_name"
-                  [matAutocomplete]="productId"
-                  placeholder="Search or enter product"
+          <ng-container *ngFor="let detail of saleDetails.controls; let i = index" [formGroupName]="i" style="margin-bottom: 15px">
+            <div class="row align-items-center">
+              <div class="col-12 col-md-3">
+                <mat-form-field class="w-100">
+                  <mat-label>Product</mat-label>
+                  <input formControlName="product_id" class="d-none" />
+                  <input
+                    matInput
+                    formControlName="product_name"
+                    [matAutocomplete]="productId"
+                    placeholder="Search or enter product"
                   />
-                <mat-autocomplete #productId="matAutocomplete" [displayWith]="displayProductName">
-                  <mat-option
-                    *ngFor="let product of filteredProductList[i]"
-                    [value]="product"
-                    (click)="onProductSelected(product, i)"
+                  <mat-autocomplete #productId="matAutocomplete" [displayWith]="displayProductName">
+                    <mat-option
+                      *ngFor="let product of filteredProductList[i]"
+                      [value]="product"
+                      (click)="onProductSelected(product, i)"
+                    >
+                      {{ product.name }}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error
+                    *ngIf="detail.get('product_name')?.hasError('required') && detail.get('product_name')?.touched"
                   >
-                    {{ product.name }}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="detail.get('product_name')?.hasError('required') && detail.get('product_name')?.touched">
-                  Product is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </div>
+                    Product is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
-            <div class="col-12 col-md-1">
-              <mat-form-field class="w-100">
-                <mat-label>Quantity</mat-label>
-                <input matInput type="number" [min]="1" formControlName="quantity" placeholder="Enter Quantity" />
-                <mat-error *ngIf="detail.get('quantity')?.hasError('required') && detail.get('quantity')?.touched">
-                  Quantity is <strong>required</strong>
-                </mat-error>
-                <mat-error *ngIf="detail.get('quantity')?.hasError('min') && detail.get('quantity')?.touched">
-                  Quantity must be at least 1.
-                </mat-error>
-                <mat-error *ngIf="detail.get('quantity')?.hasError('negativeValue')">
-                  Quantity cannot be negative.
-                </mat-error>
-              </mat-form-field>
-            </div>
+              <div class="col-12 col-md-1">
+                <mat-form-field class="w-100">
+                  <mat-label>Quantity</mat-label>
+                  <input matInput type="number" [min]="1" formControlName="quantity" placeholder="Enter Quantity" />
+                  <mat-error *ngIf="detail.get('quantity')?.hasError('required') && detail.get('quantity')?.touched">
+                    Quantity is <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="detail.get('quantity')?.hasError('min') && detail.get('quantity')?.touched">
+                    Quantity must be at least 1.
+                  </mat-error>
+                  <mat-error *ngIf="detail.get('quantity')?.hasError('negativeValue')">
+                    Quantity cannot be negative.
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
-            <div class="col-12 col-md-1">
-              <mat-form-field class="w-100">
-                <mat-label>Unit</mat-label>
-                <input formControlName="unit_id" class="d-none" />
-                <input
-                  matInput
-                  formControlName="unit_name"
-                  [matAutocomplete]="autoUnit"
-                  placeholder="Search or enter unit"
-                  (input)="searchUnit($event, i)"
-                  (blur)="onUnitBlur(i)"
-                />
-                <mat-autocomplete #autoUnit="matAutocomplete" (optionSelected)="onUnitSelected($event.option.value, i)">
-                  <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.name">
-                    {{ unit.name }}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="detail.get('unit_name')?.hasError('required') && detail.get('unit_name')?.touched">
-                  Please select a unit
-                </mat-error>
-              </mat-form-field>
-            </div>
+              <div class="col-12 col-md-2">
+                <mat-form-field class="w-100">
+                  <mat-label>Unit</mat-label>
+                  <input formControlName="unit_id" class="d-none" />
+                  <input
+                    matInput
+                    formControlName="unit_name"
+                    [matAutocomplete]="autoUnit"
+                    placeholder="Search or enter unit"
+                    (input)="searchUnit($event, i)"
+                    (blur)="onUnitBlur(i)"
+                  />
+                  <mat-autocomplete
+                    #autoUnit="matAutocomplete"
+                    (optionSelected)="onUnitSelected($event.option.value, i)"
+                  >
+                    <mat-option *ngFor="let unit of filteredUnitsList[i]" [value]="unit.name">
+                      {{ unit.name }}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="detail.get('unit_name')?.hasError('required') && detail.get('unit_name')?.touched">
+                    Please select a unit
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
-            <div class="col-12 col-md-1">
-              <mat-form-field class="w-100">
-                <mat-label>Price/Unit</mat-label>
-                <input matInput type="number" [min]="0" formControlName="price_per_unit" placeholder="Enter Price" />
-                <mat-error *ngIf="detail.get('price_per_unit')?.hasError('required') && detail.get('price_per_unit')?.touched">Price is <strong>required</strong></mat-error>
-                <mat-error *ngIf="detail.get('price_per_unit')?.hasError('negativeValue')">
-                  Price cannot be negative.
-                </mat-error>
-              </mat-form-field>
-            </div>
+              <div class="col-12 col-md-2">
+                <mat-form-field class="w-100">
+                  <mat-label>Price/Unit</mat-label>
+                  <input matInput type="number" [min]="0" formControlName="price_per_unit" placeholder="Enter Price" />
+                  <mat-error
+                    *ngIf="detail.get('price_per_unit')?.hasError('required') && detail.get('price_per_unit')?.touched"
+                    >Price is <strong>required</strong></mat-error
+                  >
+                  <mat-error *ngIf="detail.get('price_per_unit')?.hasError('negativeValue')">
+                    Price cannot be negative.
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
-            <div class="col-12 col-md-2" style="display: flex; flex-direction: row;">
-              <mat-form-field class="w-100" >
-                <mat-label>Discount Amount</mat-label>
-                <input matInput type="number" [min]="0" formControlName="discount_amount" placeholder="Enter Amount" />
-                <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px">
-                  <mat-option [value]="1">₹&nbsp;&nbsp;</mat-option>
-                  <mat-option [value]="2">%</mat-option>
-                </mat-select>
-                <mat-error *ngIf="detail.get('discount_amount')?.hasError('negativeValue')">
-                  Amount cannot be negative.
-                </mat-error>
-              </mat-form-field>
-            </div>
-            
-            <div class="col-12 col-md-2" style="display: flex; flex-direction: row;">
-              <mat-form-field appearance="outline" style="width: 300px;">
-                <mat-label>Tax Rate</mat-label>
-                <mat-select placeholder="Tax Rate" formControlName="tax_rate">
-                  <mat-option [value]="null">None</mat-option>
-                  <mat-option *ngFor="let rate of tax_rates" [value]="rate.id">
-                    {{getFormattedTaxLabel(rate.type, rate.rate)}}
-                  </mat-option>
-                </mat-select>
-                <mat-error *ngIf="detail.get('tax_rate')?.hasError('required') && detail.get('tax_rate')?.touched">Tax Rate is <strong>required</strong></mat-error>
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Tax Amount</mat-label>
-                <input matInput type="number" [min]="0" formControlName="tax_amount" placeholder="Enter Amount" readonly />
-              </mat-form-field>
-            </div>
+              <div class="col-12 col-md-1" style="display: flex; flex-direction: row">
+                <mat-form-field class="w-100">
+                  <mat-label>Discount Amount</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    [min]="0"
+                    formControlName="discount_amount"
+                    placeholder="Enter Amount"
+                  />
+                  <mat-select matSuffix formControlName="discount_type" style="padding-right: 15px">
+                    <mat-option [value]="1">₹&nbsp;&nbsp;</mat-option>
+                    <mat-option [value]="2">%</mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="detail.get('discount_amount')?.hasError('negativeValue')">
+                    Amount cannot be negative.
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
-            <div class="col-12 col-md-1">
-              <mat-form-field class="w-100">
-                <mat-label>Amount</mat-label>
-                <input matInput type="number" [min]="0" formControlName="net" placeholder="Enter Amount" />
-                <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched">Amount is <strong>required</strong></mat-error>
-                <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
-                  Amount cannot be negative.
-                </mat-error>
-              </mat-form-field>
-            </div>
+              <div class="col-12 col-md-2" style="display: flex; flex-direction: row">
+                <!-- <mat-form-field style="width: 300px;">
+                  <mat-label>Tax Rate</mat-label>
+                  <mat-select matSuffix placeholder="Tax Rate" formControlName="tax_rate">
+                    <mat-option [value]="null">None</mat-option>
+                    <mat-option *ngFor="let rate of tax_rates" [value]="rate.id">
+                      {{getFormattedTaxLabel(rate.type, rate.rate)}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="detail.get('tax_rate')?.hasError('required') && detail.get('tax_rate')?.touched">Tax Rate is <strong>required</strong></mat-error>
+                </mat-form-field> -->
+                <mat-form-field>
+                  <mat-label>Tax Amount</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    [min]="0"
+                    formControlName="tax_amount"
+                    placeholder="Enter Amount"
+                    readonly
+                  />
+                  <mat-select matSuffix placeholder="Tax Rate" formControlName="tax_rate" style="padding-right: 15px">
+                    <mat-option [value]="null">None</mat-option>
+                    <mat-option *ngFor="let rate of tax_rates" [value]="rate.id">
+                      {{ getFormattedTaxLabel(rate.type, rate.rate) }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="detail.get('tax_rate')?.hasError('required') && detail.get('tax_rate')?.touched"
+                    >Tax Rate is <strong>required</strong></mat-error
+                  >
+                </mat-form-field>
+              </div>
 
-            <div
-              class="col-12 col-md-1"
-              style="display: flex; justify-content: flex-end; align-items: flex-end; margin-top: -15px"
-            >
-              <button mat-icon-button color="primary" (click)="addSaleDetail()" type="button">
-                <mat-icon>add_circle</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                color="warn"
-                (click)="removeSaleDetail(i)"
-                type="button"
-                [disabled]="saleDetails.length === 1"
+              <!-- <div class="col-12 col-md-1">
+                <mat-form-field class="w-100">
+                  <mat-label>Amount</mat-label>
+                  <input matInput type="number" [min]="0" formControlName="net" placeholder="Enter Amount" />
+                  <mat-error *ngIf="detail.get('amount')?.hasError('required') && detail.get('amount')?.touched"
+                    >Amount is <strong>required</strong></mat-error
+                  >
+                  <mat-error *ngIf="detail.get('amount')?.hasError('negativeValue')">
+                    Amount cannot be negative.
+                  </mat-error>
+                </mat-form-field>
+              </div> -->
+
+              <div
+                class="col-12 col-md-1"
+                style="display: flex; justify-content: flex-end; align-items: flex-end; margin-top: -15px"
               >
-                <mat-icon>remove_circle</mat-icon>
-              </button>
+                <button mat-icon-button color="primary" (click)="addSaleDetail()" type="button">
+                  <mat-icon>add_circle</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removeSaleDetail(i)"
+                  type="button"
+                  [disabled]="saleDetails.length === 1"
+                >
+                  <mat-icon>remove_circle</mat-icon>
+                </button>
+              </div>
             </div>
-          </div>
+            <div class="row justify-content-end">
+              <div class="col-11">
+                <div class="d-flex justify-content-end align-items-center mb-3">
+                  <span class="fs-3 fw-bolder">Sub Total:</span>
+                  <span class="ms-2 text-end fs-2 fw-bolder" style="min-width: 100px"
+                    >₹ {{ detail.get('net')?.value || 0 }}</span
+                  >
+                </div>
+              </div>
+              <div class="col-1"></div>
+            </div>
+          </ng-container>
         </div>
 
         <div class="row" style="border-top: 2px dashed #ccc; padding-bottom: 20px"></div>
@@ -217,7 +261,9 @@
                 <mat-option [value]="1">₹&nbsp;&nbsp;</mat-option>
                 <mat-option [value]="2">%</mat-option>
               </mat-select>
-              <mat-error *ngIf="form.get('discount_amount')?.hasError('required') && form.get('discount_amount')?.touched">
+              <mat-error
+                *ngIf="form.get('discount_amount')?.hasError('required') && form.get('discount_amount')?.touched"
+              >
                 Discount is <strong>required</strong>
               </mat-error>
               <mat-error *ngIf="form.get('discount_amount')?.hasError('exceedsAmount')">
@@ -274,7 +320,6 @@
                 formControlName="cash_amount"
                 placeholder="Cash"
                 autocomplete="off"
-               
               />
               <mat-error *ngIf="form.get('cash_amount')?.hasError('required') && form.get('cash_amount')?.touched">
                 Cash amount is <strong>required</strong>
@@ -295,9 +340,10 @@
                   formControlName="online_amount"
                   placeholder="Online Amount"
                   autocomplete="off"
-                  
                 />
-                <mat-error *ngIf="form.get('online_amount')?.hasError('required') && form.get('online_amount')?.touched">
+                <mat-error
+                  *ngIf="form.get('online_amount')?.hasError('required') && form.get('online_amount')?.touched"
+                >
                   Online amount is <strong>required</strong>
                 </mat-error>
                 <mat-error *ngIf="form.get('online_amount')?.hasError('negativeValue')">
@@ -328,11 +374,9 @@
         </div>
         <div *ngIf="form.get('payment_method')?.value != 2" class="row justify-content-end align-items-end">
           <div class="col-xs-12 col-md-8 col-lg-6 col-xxl-4">
-             <div class="d-flex justify-content-end align-items-center mb-3">
+            <div class="d-flex justify-content-end align-items-center mb-3">
               <span class="fs-3 fw-bolder">Due amount:</span>
-              <span class="ms-2 text-end fs-2 fw-bolder" style="min-width: 100px"
-                >₹ {{ dueAmount || 0 }}</span
-              >
+              <span class="ms-2 text-end fs-2 fw-bolder" style="min-width: 100px">₹ {{ dueAmount || 0 }}</span>
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ class PosController extends Controller
         $parties = Party::select(['id', 'name', 'mobile'])->orderBy('name')->get();
         $products = Product::with([
             'productUnit' => function ($q) {
-                return $q->with('unit', 'taxRate')->select([
+                return $q->with('unit:id,name,status', 'taxRate:id,rate,type,is_active')->select([
                     'product_id',
                     'unit_id',
                     'sale_price',
