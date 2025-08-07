@@ -35,9 +35,9 @@
 
             <mat-select formControlName="sale_price_tax_type" matSuffix disableOptionCentering
               style="width:130px; background-color: rgb(243, 245, 255); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
-              value="0" class="custom-select">
+              value="2" class="custom-select">
               <mat-option [value]="1">With Tax </mat-option>
-              <mat-option [value]="0">Without Tax </mat-option>
+              <mat-option [value]="2">Without Tax </mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -64,9 +64,9 @@
             <input matInput type="number" placeholder="Enter purchase price" formControlName="purchase_price" />
             <mat-select formControlName="purchase_price_tax_type" matSuffix disableOptionCentering
               style="width:130px; background-color:  rgb(243, 245, 255); padding-left: 15px; padding-right: 15px; padding-top: 10px; padding-bottom: 10px; text-align: center; border-radius: 30px; margin-right: 5px;"
-              value="0">
+              value="2">
               <mat-option [value]="1">With Tax</mat-option>
-              <mat-option [value]="0">Without Tax</mat-option>
+              <mat-option [value]="2">Without Tax</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -87,7 +87,7 @@
           <div class="col-md-6 mb-3">
             <mat-form-field class="w-100" appearance="outline">
               <mat-label>Tax Rate</mat-label>
-              <mat-select placeholder="Tax Rate" formControlName="tax_rate">
+              <mat-select placeholder="Tax Rate" formControlName="tax_rate_id">
                 <mat-option [value]="'None'">None</mat-option>
                 <mat-option *ngFor="let rate of rates" [value]="rate.id">
                   {{getFormattedTaxLabel(rate.type, rate.rate)}}
