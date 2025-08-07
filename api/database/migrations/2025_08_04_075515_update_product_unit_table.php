@@ -18,7 +18,12 @@ return new class extends Migration
 
             $table->tinyInteger('purchase_price_tax_type', false, true)->nullable()->after('purchase_price')->comment("1. with tax, 2. without tax");
 
-            $table->decimal('tax_rate', 5, 2)->nullable()->after('purchase_price_tax_type');
+            $table->foreignId('tax_rate_id')
+                ->nullable()
+                ->constrained('tax_rates')
+                ->onDelete('set null')
+                ->after('purchase_price_tax_type')
+                ->index();
         });
     }
 
@@ -33,7 +38,7 @@ return new class extends Migration
                 'sale_price_discount_amount',
                 'sale_price_discount_type',
                 'purchase_price_tax_type',
-                'tax_rate',
+                'tax_rate_id',
             ]);
         });
     }

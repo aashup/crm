@@ -16,7 +16,7 @@ class ProductUnit extends Model
         'sale_price_discount_type', // 'sale_price_discount_type' can be 'fixed' or 'percentage'
         'purchase_price',
         'purchase_price_tax_type', // 'purchase_price_tax_type' can be 'with tax' or 'without tax'
-        'tax_rate',
+        'tax_rate_id',
         'notes',
         'status',
     ];
@@ -47,7 +47,7 @@ class ProductUnit extends Model
             'sale_price_tax_type' => 'string',
             'purchase_price' => 'int',
             'purchase_price_tax_type' => 'int', // 1 for with tax, 2 for without tax
-            'tax_rate' => 'int',
+            'tax_rate_id' => 'int',
             'notes' => 'text',
 
             'id' => 'int',
@@ -87,7 +87,7 @@ class ProductUnit extends Model
             'sale_price_discount_type' => 'required_if:sale_price_discount_amount,!=,0,|in:1,2', // 1 for flat, 2 for percent
             'purchase_price' => '',
             'purchase_price_tax_type' => 'required_if:purchase_price,!=,0,|in:1,2', // 1 for with tax, 2 for without tax
-            'tax_rate' => '',
+            'tax_rate_id' => '',
             'notes' => '',
             'status' => '',
         ];
@@ -108,6 +108,11 @@ class ProductUnit extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');
+    }
+
+    public function taxRate()
+    {
+        return $this->belongsTo(TaxRate::class, 'tax_rate_id');
     }
 
 }
