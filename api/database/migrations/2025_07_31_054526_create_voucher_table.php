@@ -20,7 +20,7 @@ return new class extends Migration
             $table->tinyInteger('voucher_type', false, true)->nullable();
             $table->string('notes')->nullable();
             $table->enum('txn_type', ['Credit', 'Debit'])->default('Credit');
-            $table->tinyText('refence_model')->nullable();
+            $table->tinyText('reference_model')->nullable();
             $table->bigInteger('reference_id', false, true)->nullable();
             $table->decimal('amount', 15, 2)->default(0);
             $table->dateTime('opening_ts')->nullable();

@@ -47,6 +47,7 @@ class ProductUnit extends Model
             'sale_price_tax_type' => 'string',
             'purchase_price' => 'int',
             'purchase_price_tax_type' => 'int', // 1 for with tax, 2 for without tax
+            'tax_rate' => 'int',
             'notes' => 'text',
 
             'id' => 'int',
