@@ -14,7 +14,7 @@ export class ProductUnitModel {
   sale_price_discount_amount:number
   sale_price_discount_type:number;
   purchase_price_tax_type: number;
-  tax_rate: string;
+  tax_rate_id: string|null;
 
   clear() {
       this.status = 1;

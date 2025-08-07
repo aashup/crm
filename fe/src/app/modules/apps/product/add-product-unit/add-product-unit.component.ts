@@ -73,14 +73,14 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
       product_id: [this.data.productId, [Validators.required]],
       unit_id: new FormControl({ value: model.unit_id, disabled: this.isEdit }, [Validators.required]),
       sale_price: [model?.sale_price, [Validators.required]],
-      sale_price_tax_type: [model?.sale_price_tax_type || 0],
+      sale_price_tax_type: [model?.sale_price_tax_type || 2],
       sale_price_discount_amount: [model?.sale_price_discount_amount],
       sale_price_discount_type: [model?.sale_price_discount_type || 1],
       purchase_price: [model.purchase_price],
-      purchase_price_tax_type: [model?.purchase_price_tax_type || 0],
+      purchase_price_tax_type: [model?.purchase_price_tax_type || 2],
       notes: [model.notes],
       status: [model.status],
-      tax_rate: [model?.tax_rate || 'None', [Validators.required]],
+      tax_rate_id: [model?.tax_rate_id || 'None', [Validators.required]],
     });
   }
 
