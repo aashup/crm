@@ -17,7 +17,7 @@
               />
               <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
                 <mat-option *ngFor="let party of filteredParties | async" [value]="party.mobile">
-                  {{ party.mobile }}-[{{ party.name }}]
+                  <span [innerHTML]="party.html"></span>
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="form.get('mobile')?.hasError('required') && form.get('mobile')?.touched"
@@ -40,7 +40,7 @@
               />
               <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="isNameSelected = true">
                 <mat-option *ngFor="let party of filteredParties | async" [value]="party.name">
-                  {{ party.name }} 
+                  <span [innerHTML]="party.html"></span>
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="form.get('partyName')?.hasError('required') && form.get('partyName')?.touched"
@@ -158,16 +158,6 @@
               </div>
 
               <div class="col-12 col-md-2" style="display: flex; flex-direction: row">
-                <!-- <mat-form-field style="width: 300px;">
-                  <mat-label>Tax Rate</mat-label>
-                  <mat-select matSuffix placeholder="Tax Rate" formControlName="tax_rate">
-                    <mat-option [value]="null">None</mat-option>
-                    <mat-option *ngFor="let rate of tax_rates" [value]="rate.id">
-                      {{getFormattedTaxLabel(rate.type, rate.rate)}}
-                    </mat-option>
-                  </mat-select>
-                  <mat-error *ngIf="detail.get('tax_rate')?.hasError('required') && detail.get('tax_rate')?.touched">Tax Rate is <strong>required</strong></mat-error>
-                </mat-form-field> -->
                 <mat-form-field>
                   <mat-label>Tax Amount</mat-label>
                   <input

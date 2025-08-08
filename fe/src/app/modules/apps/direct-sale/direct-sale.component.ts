@@ -58,14 +58,17 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.handlePaymentMethodValidation();
 
     this.filteredParties = combineLatest([
-      this.form.controls.partyName.valueChanges.pipe(startWith('')),
+      this.form.controls.partyName.valueChanges.pipe(),
       this.form.controls.mobile.valueChanges.pipe(),
     ]).pipe(
       map(([partyNameValue, mobileValue]) => {
         const val = (this.form.controls.partyName.value || this.form.controls.mobile.value)?.toLowerCase().trim();
 
         if (!val) {
-          return this.parties;
+          return this.parties.map(party => ({
+            ...party,
+            html: `${party.name} - [${party.mobile}]`
+          }));
         }
 
         const isFilteringByName = !!this.form.controls.partyName.value;
@@ -87,7 +90,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
             } else if (isFilteringByMobile) {
               htmlMobile = value.mobile?.replace(regex, (match: any) => `<strong>${match}</strong>`);
             }
-            value.html = `${htmlName} &nbsp;[${htmlMobile}]`;
+            value.html = `${htmlName} - [${htmlMobile}]`;
             return value;
           });
       })
@@ -206,11 +209,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
             this.tax_rates = res.data;
           } else {
             this.tax_rates = [];
-            console.warn('No tax rates found.');
           }
         },
         error: (error: any) => {
-          console.error('Failed to fetch tax rates:', error);
           this.tax_rates = [];
         },
       });
@@ -364,7 +365,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error fetching products:', err);
       },
     });
   }
@@ -499,6 +499,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   
     let priceAfterDiscountPerUnit = pricePerUnit;
     if (discountType === 1) { 
+      
       priceAfterDiscountPerUnit = pricePerUnit - discountAmount;
     } else if (discountType === 2) {
       priceAfterDiscountPerUnit = pricePerUnit - (pricePerUnit * discountAmount) / 100;
@@ -554,9 +555,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onProductSelected(selectedProduct: any, index: number): void {
-
-    console.log(selectedProduct);
-    
     const group = this.saleDetails.at(index) as FormGroup;
     if (!group || !selectedProduct?.product_unit?.length) {
       return;
@@ -733,14 +731,13 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       const withTax = salePriceTaxType === 1;
       const rateId= detail.tax_rate || null;
       const taxRateObj = this.tax_rates.find((t) => t.id === rateId);
-      console.log('taxRateObj', taxRateObj);
       
       return {
         ...detail,
         rate: detail.amount,
         net: detail.net,
         with_tax: withTax,
-        tax_rate:this.getFormattedTaxLabel(taxRateObj?.type, taxRateObj?.rate),
+        tax_rate: this.getFormattedTaxLabel(taxRateObj?.type, taxRateObj?.rate),
       };
     });
   
@@ -856,10 +853,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     return true;
   }
 
-  // New methods for input validation
   validateNumericInput(event: KeyboardEvent): void {
     const char = event.key;
-    // Allow numbers, backspace, delete, arrow keys, etc.
     const allowedKeys = [
       '0',
       '1',
@@ -885,7 +880,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   validateAlphabeticInput(event: KeyboardEvent): void {
     const char = event.key;
-    // Allow letters (both cases), spaces, backspace, delete, etc.
     const isLetter = /^[a-zA-Z\s]*$/.test(char);
     const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
 
