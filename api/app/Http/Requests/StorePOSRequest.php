@@ -68,48 +68,15 @@ class StorePOSRequest extends FormRequest
 
             $saleDetails = $data['saleDetails'] ?? [];
 
-            // $totalSaleAmount = 0;
+            $totalSaleAmount = 0;
 
-            // foreach ($saleDetails as $index => $detail) {
-            //     $salePrice = (float) ($detail['rate'] ?? 0);
-            //     $quantity = (float) ($detail['quantity'] ?? 0);
-            //     $discountAmount = (float) ($detail['discount_amount'] ?? 0);
-            //     $discountType = (int) ($detail['discount_type'] ?? 0);
-            //     $taxRate = (float) ($detail['tax_rate'] ?? 0);
-            //     $withTax = (bool) ($detail['with_tax'] ?? false);
+            foreach ($saleDetails as $index => $detail) {
+                $totalSaleAmount += $detail['net'] ?? 0;
+            }
 
-            //     if ($discountType === 2) {
-            //         $discountValue = $salePrice * ($discountAmount / 100);
-            //     } else {
-            //         $discountValue = $discountAmount;
-            //     }
-
-            //     if ($withTax) {
-            //         $priceWithoutDiscount = $salePrice - $discountValue;
-            //         $taxOnSalePrice = $salePrice * ($taxRate / 100);
-            //         $taxOnPriceWithoutDiscount = $priceWithoutDiscount * ($taxRate / 100);
-            //         $taxOnDiscount = $discountValue * ($taxRate / 100);
-
-            //         $ratePerUnit = $salePrice + $taxOnSalePrice;
-
-            //         $totalPerItem = (
-            //             ($priceWithoutDiscount + $taxOnPriceWithoutDiscount)
-            //             + $discountValue + $taxOnDiscount
-            //         ) * $quantity;
-            //     } else {
-            //         $priceAfterDiscount = $salePrice - $discountValue;
-            //         $taxOnSalePrice = $salePrice * ($taxRate / 100);
-
-            //         $totalPerItem = ($priceAfterDiscount + $taxOnSalePrice) * $quantity;
-            //     }
-
-            //     $totalSaleAmount += $totalPerItem;
-            // }
-
-            // if (isset($data['amount']) && round($data['amount'], 2) < round($totalSaleAmount, 2)) {
-            //     $validator->errors()->add('amount', 'The overall amount should not be less than the total of sale item amounts.');
-            // }
-
+            if (isset($data['amount']) && $data['amount'] < $totalSaleAmount) {
+                $validator->errors()->add('amount', 'The overall amount should not be greater than the total of sale item amounts.');
+            }
 
             if (isset($data['discount_amount']) && $data['discount_amount'] > $data['amount']) {
                 $validator->errors()->add('discount_amount', 'The discount amount cannot be greater than the amount.');
