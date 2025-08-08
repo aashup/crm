@@ -198,11 +198,14 @@ return new class extends Migration
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('unit_id');
                 $table->integer('quantity')->default(1);
-                $table->decimal('amount')->nullable();
+                $table->decimal('rate')->nullable();
                 $table->decimal('discount_amount')->default(0);
                 $table->tinyInteger('discount_type', false, true)->default(1)
                 ->comment("1. flat, 2. percent");
-                $table->decimal(column: 'net')->nullable();
+                $table->decimal('net', 15, 2)->nullable();
+                $table->decimal('tax_amount', 15, 2)->nullable();
+                $table->text('tax_rate', 30)->nullable();
+                $table->boolean('with_tax')->default(false);
                 $table->timestamps();
                 $table->softDeletes();
 
