@@ -35,7 +35,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   updatingAmountFromCode: boolean = false;
   showCashFields: boolean = true;
   showOnlineFields: boolean = false;
-  searchValue: ""
+  searchValue: '';
   parties: any[] = [];
   tax_rates: any[] = [];
 
@@ -48,7 +48,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     private unitService: UnitService,
     private taxRateService: RateService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.getAllTaxRates();
@@ -59,7 +59,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.filteredParties = combineLatest([
       this.form.controls.partyName.valueChanges.pipe(startWith('')),
-      this.form.controls.mobile.valueChanges.pipe(startWith(''))
+      this.form.controls.mobile.valueChanges.pipe(),
     ]).pipe(
       map(([partyNameValue, mobileValue]) => {
         const val = (this.form.controls.partyName.value || this.form.controls.mobile.value)?.toLowerCase().trim();
@@ -73,9 +73,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         const regex = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
 
         return this.parties
-          .filter((party) =>
-            (isFilteringByName && party.name.toLowerCase().includes(val)) ||
-            (isFilteringByMobile && party.mobile.toLowerCase().includes(val))
+          .filter(
+            (party) =>
+              (isFilteringByName && party.name.toLowerCase().includes(val)) ||
+              (isFilteringByMobile && party.mobile.toLowerCase().includes(val))
           )
           .map<PartiesModel>((value: any) => {
             let htmlName = value.name;
@@ -91,7 +92,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
           });
       })
     );
-
 
     this.form.get('partyName')?.valueChanges.subscribe((value) => {
       const match = this.parties.find((c) => c.name === value);
@@ -126,7 +126,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-
   getFormattedTaxLabel(type: number, rate: number): string {
     const taxTypeMap: { [key: number]: string } = {
       1: 'GST',
@@ -135,11 +134,11 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       4: 'SGST',
       5: 'VAT',
       6: 'Service Tax',
-      7: 'Other'
+      7: 'Other',
     };
 
     const taxName = taxTypeMap[type] || 'Unknown';
-    return `${taxName}@${rate}%`;
+    return `${taxName}@${rate}`;
   }
 
   ngAfterViewInit(): void {
@@ -180,7 +179,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.saleDetails.push(firstSaleDetail);
     this.setupSaleDetailItem(firstSaleDetail, 0);
 
-
     this.form.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNetTotal());
     this.form.get('discount_type')?.valueChanges.subscribe(() => this.calculateNetTotal());
 
@@ -194,25 +192,28 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   getAllUnits() {
     this.unitService.find({ pageSize: 1000 }).subscribe((res: any) => {
-      this.units = res.data
-    })
+      this.units = res.data;
+    });
   }
 
   getAllTaxRates(): void {
-    this.taxRateService.find({ pageSize: 1000 }).pipe(take(1)).subscribe({
-      next: (res: any) => {
-        if (res?.data?.length) {
-          this.tax_rates = res.data;
-        } else {
+    this.taxRateService
+      .find({ pageSize: 1000 })
+      .pipe(take(1))
+      .subscribe({
+        next: (res: any) => {
+          if (res?.data?.length) {
+            this.tax_rates = res.data;
+          } else {
+            this.tax_rates = [];
+            console.warn('No tax rates found.');
+          }
+        },
+        error: (error: any) => {
+          console.error('Failed to fetch tax rates:', error);
           this.tax_rates = [];
-          console.warn('No tax rates found.');
-        }
-      },
-      error: (error: any) => {
-        console.error('Failed to fetch tax rates:', error);
-        this.tax_rates = [];
-      }
-    });
+        },
+      });
   }
 
   handlePaymentMethodValidation(): void {
@@ -236,7 +237,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.showCashFields = false;
         cash?.setValue(0);
         online?.setValue(this.form.get('net_total')?.value || 0);
-
       } else if (type == 3) {
         this.showCashFields = true;
         this.showOnlineFields = true;
@@ -262,14 +262,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       let unitsForProduct = [...this.units];
 
       if (selectedProductId) {
-        const selectedProduct: any = this.products.find(p => p.id === selectedProductId);
+        const selectedProduct: any = this.products.find((p) => p.id === selectedProductId);
         unitsForProduct = selectedProduct?.product_unit?.map((pu: any) => pu.unit) || [];
       }
 
       const searchValue = (group.get('unit_name')?.value || '').toLowerCase();
-      const filtered = unitsForProduct.filter((unit: any) =>
-        unit.name.toLowerCase().includes(searchValue)
-      );
+      const filtered = unitsForProduct.filter((unit: any) => unit.name.toLowerCase().includes(searchValue));
 
       if (!this.filteredUnitsList[currentRowIndex]) {
         this.filteredUnitsList[currentRowIndex] = [];
@@ -288,11 +286,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       quantity: [1, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
       price_per_unit: [0, [Validators.required, this.nonNegativeValidator()]],
       discount_amount: [0, [this.nonNegativeValidator()]],
-      discount_type: [1],
+      sale_price_tax_type: [2], 
+      sale_price_discount_type: [1],
       tax_rate: [null],
       tax_amount: [0],
       amount: [0, [Validators.required, this.nonNegativeValidator()]],
-      net: [{ value: 0, disabled: true }]
+      net: [{ value: 0, disabled: true }],
     });
   }
 
@@ -300,8 +299,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.getAllUnits();
     let list;
     this.searchValue = event.target.value;
-    list = this.units.filter((unit: any) => unit.name.toLowerCase().includes(this.searchValue.toLocaleLowerCase()))
-    this.filteredUnitsList[index] = list
+    list = this.units.filter((unit: any) => unit.name.toLowerCase().includes(this.searchValue.toLocaleLowerCase()));
+    this.filteredUnitsList[index] = list;
   }
 
   get returnAmount(): number {
@@ -376,9 +375,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   onContactBlur(): void {
     const mobileValue = this.form.get('mobile')?.value;
+
     const match = this.parties.find((c) => c.mobile === mobileValue);
+
     if (!match) {
       this.form.patchValue({ partyName: '', party_id: null });
+
       this.isNameSelected = false;
     }
   }
@@ -393,15 +395,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   getSelectedProductIds(): number[] {
-    return this.saleDetails.controls
-      .map((control) => control.get('product_id')?.value)
-      .filter((id) => id !== null);
+    return this.saleDetails.controls.map((control) => control.get('product_id')?.value).filter((id) => id !== null);
   }
 
   updateFilteredProducts(): void {
     const selectedIds = this.getSelectedProductIds();
     this.filteredProductList = [];
-
     this.saleDetails.controls.forEach((group, index) => {
       const currentSelectedProductId = group.get('product_id')?.value;
       const availableProducts = this.products.filter(
@@ -416,13 +415,14 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private setupSaleDetailItem(group: FormGroup, index: number): void {
-    group.get('product_name')?.valueChanges
-      .pipe(
+    group
+      .get('product_name')
+      ?.valueChanges.pipe(
         map((value: any) => {
           const name = typeof value === 'string' ? value.toLowerCase() : value?.name?.toLowerCase() || '';
           return name;
         }),
-        filter(name => name.length > 0 || group.get('product_id')?.value !== null)
+        filter((name) => name.length > 0 || group.get('product_id')?.value !== null)
       )
       .subscribe((name: string) => {
         if (!this.filteredProductList[index]) {
@@ -439,17 +439,18 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.cdr.detectChanges();
       });
 
-    group.get('unit_name')?.valueChanges
-      .pipe(startWith(''))
+    group
+      .get('unit_name')
+      ?.valueChanges.pipe(startWith(''))
       .subscribe(() => {
         this.updateFilteredUnits(index);
       });
-      
+
     group.get('quantity')?.valueChanges.subscribe(() => this.calculateItemNet(index));
     group.get('price_per_unit')?.valueChanges.subscribe(() => this.calculateItemNet(index));
     group.get('tax_rate')?.valueChanges.subscribe(() => this.calculateItemNet(index));
     group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateItemNet(index));
-    group.get('discount_type')?.valueChanges.subscribe(() => this.calculateItemNet(index));
+    group.get('sale_price_discount_type')?.valueChanges.subscribe(() => this.calculateItemNet(index));
 
     this.updateFilteredUnits(index);
   }
@@ -489,39 +490,49 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   calculateItemNet(index: number): void {
     const group = this.saleDetails.at(index);
     const quantity = group.get('quantity')?.value || 0;
-    const pricePerUnit = group.get('price_per_unit')?.value || 0;
+    let pricePerUnit = group.get('price_per_unit')?.value || 0;
     const taxRateControl = group.get('tax_rate');
-    const taxRate = taxRateControl ? this.tax_rates.find(t => t.id === taxRateControl.value)?.rate || 0 : 0;
+    const taxRate = taxRateControl ? this.tax_rates.find((t) => t.id === taxRateControl.value)?.rate || 0 : 0;
     const discountAmount = group.get('discount_amount')?.value || 0;
-    const discountType = group.get('discount_type')?.value;
-
+    const discountType = group.get('sale_price_discount_type')?.value;
+    const taxType = group.get('sale_price_tax_type')?.value || 2; 
+  
     let priceAfterDiscountPerUnit = pricePerUnit;
-
     if (discountType === 1) { 
       priceAfterDiscountPerUnit = pricePerUnit - discountAmount;
-    } else if (discountType === 2) { 
+    } else if (discountType === 2) {
       priceAfterDiscountPerUnit = pricePerUnit - (pricePerUnit * discountAmount) / 100;
     }
     
     priceAfterDiscountPerUnit = Math.max(0, priceAfterDiscountPerUnit);
-
-    const taxPerUnit = (priceAfterDiscountPerUnit * taxRate) / 100;
-    const totalTaxAmount = taxPerUnit ;
-
-    const netPricePerUnit = priceAfterDiscountPerUnit + taxPerUnit;
-    const totalItemAmount = netPricePerUnit ;
+  
+    let netPricePerUnit;
+    let taxPerUnit;
+  
+    if (taxType === 1) { 
+      
+      netPricePerUnit = priceAfterDiscountPerUnit / (1 + taxRate / 100);
+      taxPerUnit = priceAfterDiscountPerUnit - netPricePerUnit;
+    } else { 
+      
+      netPricePerUnit = priceAfterDiscountPerUnit;
+      taxPerUnit = (netPricePerUnit * taxRate) / 100;
+    }
     
-    group.get('tax_amount')?.setValue(parseFloat(totalTaxAmount.toFixed(2))*quantity, { emitEvent: false });
+    const totalTaxAmount = taxPerUnit * quantity;
+    const totalItemAmount = (netPricePerUnit + taxPerUnit) * quantity;
+  
+    group.get('tax_amount')?.setValue(parseFloat(totalTaxAmount.toFixed(2)), { emitEvent: false });
     group.get('amount')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
-    group.get('net')?.setValue(parseFloat(totalItemAmount.toFixed(2))*quantity, { emitEvent: false });
-
+    group.get('net')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
+  
     this.calculateNetTotal();
   }
 
   validateDiscountAmount(): void {
     this.form.get('discount_amount')?.valueChanges.subscribe(() => {
       const discountControl = this.form.get('discount_amount');
-      const type = this.form.get('discount_type')?.value;
+      const type = this.form.get('sale_price_discount_type')?.value;
       const net = this.form.get('amount')?.value || 0;
       const discount = parseFloat(discountControl?.value) || 0;
       if (type === 1 && discount > net) {
@@ -536,13 +547,14 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    this.form.get('discount_type')?.valueChanges.subscribe(() => {
+    this.form.get('sale_price_discount_type')?.valueChanges.subscribe(() => {
       this.form.get('discount_amount')?.updateValueAndValidity();
       this.cdr.detectChanges();
     });
   }
 
   onProductSelected(selectedProduct: any, index: number): void {
+
     console.log(selectedProduct);
     
     const group = this.saleDetails.at(index) as FormGroup;
@@ -552,33 +564,37 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
     const productUnit = selectedProduct.product_unit[0];
     const salePrice = parseFloat(productUnit.sale_price);
-    const taxRateId = productUnit.tax_rate_id ||null;
+    const taxRateId = productUnit.tax_rate_id || null;
     const taxType = productUnit.sale_price_tax_type;
     const discountAmount = parseFloat(productUnit.sale_price_discount_amount) || 0;
     const discountType = productUnit.sale_price_discount_type;
-    
-    const taxRateObj = this.tax_rates.find(t => t.id === taxRateId);
+
+    const taxRateObj = this.tax_rates.find((t) => t.id === taxRateId);
     const taxRatePercentage = taxRateObj ? taxRateObj.rate : 0;
 
     let pricePerUnit: number;
-    
-    if (taxType === 1) { 
+
+    if (taxType === 1) {
       pricePerUnit = salePrice / (1 + taxRatePercentage / 100);
-    } else { 
+    } else {
       pricePerUnit = salePrice;
     }
-    
-    group.patchValue({
-      product_id: selectedProduct.id,
-      product_name: selectedProduct.name,
-      unit_id: productUnit.unit.id,
-      unit_name: productUnit.unit.name,
-      price_per_unit: parseFloat(pricePerUnit.toFixed(2)),
-      discount_amount: discountAmount,
-      discount_type: discountType,
-      tax_rate: taxRateId, // Use the tax rate ID here
-    }, { emitEvent: false });
-    
+
+    group.patchValue(
+      {
+        product_id: selectedProduct.id,
+        product_name: selectedProduct.name,
+        unit_id: productUnit.unit.id,
+        unit_name: productUnit.unit.name,
+        price_per_unit: parseFloat(pricePerUnit.toFixed(2)),
+        discount_amount: discountAmount||0,
+        sale_price_tax_type: taxType,
+        sale_price_discount_type: discountType,
+        tax_rate: taxRateId, 
+      },
+      { emitEvent: false }
+    );
+
     this.calculateItemNet(index);
 
     this.updateFilteredProducts();
@@ -601,7 +617,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
-    const discountType = this.form.get('discount_type')?.value;
+    const discountType = this.form.get('sale_price_discount_type')?.value;
     let netTotal = totalNet;
 
     if (discountType === 1) {
@@ -624,7 +640,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-
   navigateToSale(): void {
     this.router.navigate(['/app/sale']);
   }
@@ -634,7 +649,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       party_id: sale.party_id || null,
       partyName: sale.party ? sale.party.name : '',
       amount: sale.amount || null,
-      discount_amount: sale.discount_amount || null,
+      discount_amount: sale.discount_amount || 0,
       discount_type: sale.discount_type || null,
       notes: sale.notes || '',
       status: sale.status || 1,
@@ -658,12 +673,12 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
           unit_name: detail.unit?.name || null,
           quantity: detail.quantity || 1,
           price_per_unit: detail.price_per_unit,
-          discount_amount: detail.discount_amount,
-          discount_type: detail.discount_type,
+          discount_amount: detail.discount_amount||0,
+          sale_price_discount_type: detail.discount_type,
           tax_rate: detail.tax_rate,
-          tax_amount: detail.tax_amount,
+          tax_amount: detail.tax_amount.toFixed(2),
           amount: detail.amount || 0,
-          net: detail.net || (detail.quantity * detail.amount),
+          net: detail.net || detail.quantity * detail.amount,
         });
         this.saleDetails.push(group);
         this.setupSaleDetailItem(group, index);
@@ -690,28 +705,49 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onSubmit(redirectToPrint: boolean = false): void {
-
     this.commonService.markFormGroupTouched(this.form);
     if (!this.validateData()) {
       return;
     }
-
-    this.saleDetails.controls.forEach(control => {
+  
+    this.saleDetails.controls.forEach((control) => {
       this.commonService.markFormGroupTouched(control as FormGroup);
     });
-
+  
     if (!this.form.valid) {
       this.commonService.toastr.error('Please fix all errors in the form.');
       return;
     }
-
+  
     this.isLoading = true;
     this.spinnerService.show();
     const rawForm = this.form.getRawValue();
     if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
       rawForm.mobile = '+91' + rawForm.mobile.trim();
     }
-    
+  
+    const processedSaleDetails = rawForm.saleDetails.map((detail: any, index: number) => {
+      const saleDetailGroup = this.saleDetails.at(index);
+      const salePriceTaxType = saleDetailGroup?.get('sale_price_tax_type')?.value;
+      
+      const withTax = salePriceTaxType === 1;
+      const rateId= detail.tax_rate || null;
+      const taxRateObj = this.tax_rates.find((t) => t.id === rateId);
+      console.log('taxRateObj', taxRateObj);
+      
+      return {
+        ...detail,
+        rate: detail.amount,
+        net: detail.net,
+        with_tax: withTax,
+        tax_rate:this.getFormattedTaxLabel(taxRateObj?.type, taxRateObj?.rate),
+      };
+    });
+  
+     processedSaleDetails.forEach((details:any)=>{
+      delete details.amount;
+     })
+     
     const payload = {
       ...rawForm,
       name: rawForm.partyName,
@@ -722,22 +758,19 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return_amount: this.returnAmount,
       due_amount: this.dueAmount,
       amount: rawForm.amount,
-      saleDetails: rawForm.saleDetails.map((detail: any) => ({
-        ...detail,
-        amount: detail.amount,
-        net: detail.net
-      }))
+      saleDetails: processedSaleDetails,
     };
-    
+  
     delete payload.partyName;
+    
     this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
       next: (response: any) => {
         this.isLoading = false;
         this.spinnerService.hide();
-
+  
         const createdId = response?.data?.id || response?.data?.sale?.id;
         this.commonService.toastr.success('Sale created successfully.');
-
+  
         if (redirectToPrint && createdId) {
           this.router.navigate([`/app/direct-sale/print/${createdId}`]);
         } else {
@@ -800,8 +833,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     const saleDetailsInvalid = this.saleDetails.controls.some((group) => {
-      return (group.get('quantity')?.hasError('negativeValue') && group.get('quantity')?.value < 0) ||
-        (group.get('amount')?.hasError('negativeValue') && group.get('amount')?.value < 0);
+      return (
+        (group.get('quantity')?.hasError('negativeValue') && group.get('quantity')?.value < 0) ||
+        (group.get('amount')?.hasError('negativeValue') && group.get('amount')?.value < 0)
+      );
     });
 
     if (saleDetailsInvalid) {
@@ -818,15 +853,30 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return false;
     }
 
-
     return true;
   }
-  
+
   // New methods for input validation
   validateNumericInput(event: KeyboardEvent): void {
     const char = event.key;
     // Allow numbers, backspace, delete, arrow keys, etc.
-    const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    const allowedKeys = [
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'Tab',
+    ];
 
     if (!allowedKeys.includes(char) && !event.ctrlKey && !event.metaKey) {
       event.preventDefault();
