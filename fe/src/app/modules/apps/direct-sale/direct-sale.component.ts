@@ -521,9 +521,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  onProductSelected(selectedProduct: any, index: number): void {
-    console.log('Selected Product:', selectedProduct, 'at index:', index);
-    
+  onProductSelected(selectedProduct: any, index: number): void {    
     const group = this.saleDetails.at(index) as FormGroup;
     if (!group || !selectedProduct?.product_unit?.length) {
       return;
@@ -570,27 +568,27 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.saleDetails.controls.forEach((ctrl) => {
       totalNet += ctrl.get('net')?.value || 0;
     });
-
+  
     if (this.isManualAmount) {
       totalNet = parseFloat(this.form.get('amount')?.value) || 0;
     } else {
       this.updatingAmountFromCode = true;
-      this.form.get('amount')?.setValue(totalNet, { emitEvent: false });
+      this.form.get('amount')?.setValue(parseFloat(totalNet.toFixed(2)), { emitEvent: false });
       this.updatingAmountFromCode = false;
     }
-
+  
     const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
-    const discountType = this.form.get('sale_price_discount_type')?.value;
+    const discountType = this.form.get('discount_type')?.value;
     let netTotal = totalNet;
-
+  
     if (discountType === 1) {
       netTotal -= discountAmount;
     } else if (discountType === 2) {
       netTotal -= (totalNet * discountAmount) / 100;
     }
-
+  
     netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
-
+  
     if (this.form.get('payment_method')?.value === 1) {
       this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
       this.form.get('online_amount')?.setValue(0, { emitEvent: false });
@@ -598,7 +596,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       this.form.get('cash_amount')?.setValue(0, { emitEvent: false });
       this.form.get('online_amount')?.setValue(netTotal, { emitEvent: false });
     }
-
+  
     this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
     this.cdr.detectChanges();
   }
