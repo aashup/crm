@@ -476,27 +476,16 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   
     let basePricePerUnit = pricePerUnit;
   
-    if (taxType === 1) {
-      if (discountType === 1) {
-        pricePerUnit -= discountAmount;
-      } else if (discountType === 2) {
-        pricePerUnit -= (pricePerUnit * discountAmount) / 100;
-      }
-      pricePerUnit = Math.max(0, pricePerUnit);
-  
-      basePricePerUnit = pricePerUnit;
-      pricePerUnit = basePricePerUnit * (1 + taxRate / 100);
-    } else if (taxType === 2) {
-      if (discountType === 1) {
-        pricePerUnit -= discountAmount;
-      } else if (discountType === 2) {
-        pricePerUnit -= (pricePerUnit * discountAmount) / 100;
-      }
-      pricePerUnit = Math.max(0, pricePerUnit);
-  
-      basePricePerUnit = pricePerUnit;
-      pricePerUnit = basePricePerUnit * (1 + taxRate / 100);
+    if (discountType === 1) {
+      pricePerUnit -= discountAmount;
+    } else if (discountType === 2) {
+      pricePerUnit -= (pricePerUnit * discountAmount) / 100;
     }
+    
+    pricePerUnit = Math.max(0, pricePerUnit);
+    
+    basePricePerUnit = pricePerUnit;
+    pricePerUnit = basePricePerUnit * (1 + taxRate / 100);
   
     const taxPerUnit = (basePricePerUnit * taxRate) / 100;
     const totalTaxAmount = taxPerUnit * quantity;
