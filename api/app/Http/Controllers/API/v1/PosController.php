@@ -113,6 +113,18 @@ class PosController extends Controller
 
             $sale->saleDetails()->createMany($validated['saleDetails']);
 
+            foreach ($validated['saleDetails'] as $detail) {
+                $productUnit = ProductUnit::where('product_id', $detail['product_id'])
+                    ->where('unit_id', $detail['unit_id'])
+                    ->first();
+
+                if ($productUnit) {
+                    $this->updateInventory($productUnit, $detail);
+                } else {
+                    return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
+                }
+            }
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -149,16 +161,21 @@ class PosController extends Controller
      */
     public function destroy(Inventory $inventory) {}
 
-    private function updateInventory($productUnit, $quantity)
+    private function updateInventory($productUnit, $detail)
     {
-        $inventory = Inventory::where('product_unit_id', $productUnit->id)->first();
+        $inventory = Inventory::where(['product_id' => $productUnit->product_id, 'unit_id' => $productUnit->unit_id])->first();
         if ($inventory) {
-            $inventory->quantity += $quantity;
+            $inventory->rem_qty -= $detail['quantity'];
             $inventory->save();
         } else {
             Inventory::create([
-                'product_unit_id' => $productUnit->id,
-                'quantity' => $quantity,
+                'product_id' => $productUnit->product_id,
+                'unit_id' => $productUnit->unit_id,
+                'rem_qty' => -$detail['quantity'],
+                'quantity' => $detail['quantity'],
+                'created_by' => Auth::id(),
+                'sale_price' => $productUnit->sale_price ?? 0,
+                'purchase_price' => $productUnit->purchase_price ?? 0,
             ]);
         }
     }

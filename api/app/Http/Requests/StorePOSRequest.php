@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Validator;
 
 class StorePOSRequest extends FormRequest
@@ -72,6 +73,19 @@ class StorePOSRequest extends FormRequest
 
             foreach ($saleDetails as $index => $detail) {
                 $totalSaleAmount += $detail['net'] ?? 0;
+                
+                if (!empty($detail['product_id']) && !empty($detail['unit_id'])) {
+                    $availableQty = DB::table('inventories')
+                        ->where('product_id', $detail['product_id'])
+                        ->where('unit_id', $detail['unit_id'])
+                        ->value('rem_qty');
+
+                    if ($availableQty === null) {
+                        $validator->errors()->add("saleDetails.$index.product_id", "Inventory record not found for product.");
+                    } elseif ($detail['quantity'] > $availableQty) {
+                        $validator->errors()->add("saleDetails.$index.quantity", "Only {$availableQty} units available for this product.");
+                    }
+                }
             }
 
             if (isset($data['amount']) && $data['amount'] < $totalSaleAmount) {
