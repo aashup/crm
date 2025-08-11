@@ -14,12 +14,10 @@ export class PartiesModel {
   gst_type: string = '';
   created_at: Date | null = null;
   updated_at: Date | null = null;
-  // Autocomplete functionality ke liye naya property
   html: string = ''; 
 
   constructor(initializer?: Partial<PartiesModel>) {
-    // constructor ko optional "initializer" object accept karne ke liye update kiya gaya hai
-    // isse aap naye instance create karte samay values pass kar sakte hain
+  
     if (initializer) {
       Object.assign(this, initializer);
     }
@@ -41,7 +39,7 @@ export class PartiesModel {
     this.gst_type = '';
     this.created_at = null;
     this.updated_at = null;
-    this.html = ''; // html property ko bhi clear kare
+    this.html = ''; 
     return this;
   }
 }
