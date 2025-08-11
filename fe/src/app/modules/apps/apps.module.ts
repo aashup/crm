@@ -44,6 +44,10 @@ import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-d
         loadChildren: () => import('../apps/parties/add-parties/add-parties.module').then((m) => m.AddPartiesModule),
       },
       {
+        path: 'tax-rates',
+        loadChildren: () => import('./tax-rate/tax-rate.module').then((m) => m.TaxRateModule),
+      },
+      {
         path: 'inventory',
         loadChildren: () => import('./inventory/inventory.module').then((m) =>m.InventoryModule),
       },
