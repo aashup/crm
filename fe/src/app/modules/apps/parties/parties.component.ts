@@ -258,9 +258,8 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   add() {
-
     this.router.navigate(["/app/party"])
-    return
+     return
     this.dialog
       .open(AddPartiesComponent, {
         maxWidth: '1200px',
@@ -272,6 +271,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
           isEdit: false,
         },
       })
+      
       .afterClosed()
       .pipe(
         take(1),

@@ -26,9 +26,9 @@
 
     <!-- Customer Info -->
     <div style="margin-bottom: 6px">
-      <div><strong>Customer:</strong> {{ saleData?.contact?.name }}</div>
-      <div><strong>Phone:</strong> {{ saleData?.contact?.mob1 }}</div>
-      <div>{{ saleData?.contact?.address }}</div>
+      <div><strong>Customer:</strong> {{ saleData?.party?.name }}</div>
+      <div><strong>Phone:</strong> {{ saleData?.party?.mobile }}</div>
+      <div>{{ saleData?.party?.address }}</div>
     </div>
 
     
@@ -49,7 +49,7 @@
     <!-- Product Items -->
     <div *ngFor="let item of saleData?.sale_details" style="padding: 4px 0">
       <div style="display: flex; justify-content: space-between">
-        <div>{{ item.product?.name || item.product_id }}</div>
+        <div>{{ item.product?.name }}</div>
         <div>{{ item.unit?.name || item.unit_id }}</div>
       </div>
       <div style="display: flex; justify-content: space-between">

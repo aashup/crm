@@ -10,9 +10,6 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { ActivatedRoute } from '@angular/router';
 import { SaleDetailsService } from './sale-details-service';
 import { CommonService } from 'src/app/modules/core/common.service';
-import { ProductService } from '../../product/product.service';
-import { AddressService } from 'src/app/modules/settings/address/address.service';
-import { StateService } from 'src/app/modules/settings/state/state.service';
 
 @Component({
   selector: 'app-sale-details',
@@ -28,23 +25,21 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
   address:any[]=[]
   states:any[]=[]
   products:any[]=[]
+  today = new Date();
   constructor(
     private cdr: ChangeDetectorRef,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
     private route: ActivatedRoute,
-    private productService:ProductService,
     private saleDetailsService:SaleDetailsService,
-    private addressService:AddressService,
-    private stateService:StateService,
+   
   ) {}
   ngOnInit(): void {
-    this.getAllProducts()
     this.saleId = this.route.snapshot.paramMap.get('id');
     if (this.saleId) {
       this.saleDetailsService.findById(this.saleId,{
-        "pageSize": 10,
-        "with": ["saleDetails","contact","unit","createdby"],
+        "pageSize": 10000,
+        "with": ["saleDetails.product","party.billingAddress.city.state","saleDetails.unit","createdby"],
         "page": 1,
         "cols": []
     }).subscribe(
@@ -61,23 +56,35 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
       );
     }
   }
-  getAllProducts(){
-    this.productService.find().subscribe((res:any)=>{
-      console.log("products",res.data);
-      
-      this.products=res.data
-    })
-  }
-  getProductByid(id:string){
-    if(id&&this.products.length)
-      return this.products.find(product => product.id === id) ;
-  }
+ 
+
   printInvoice(): void {
     const printContent = document.getElementById('print-section')?.innerHTML;
     if(printContent)
     this.commonService.printHtmlContent(printContent)
   }
   
+  calculatePricePerUnit(qty: number, total: number, taxAmount: number, discountAmount: number): number {
+    if (qty <= 0) throw new Error('Quantity must be greater than zero.');
+  
+    const subtotalAfterDiscount = total - taxAmount;
+    const subtotalBeforeDiscount = subtotalAfterDiscount + discountAmount;
+    const pricePerUnit = subtotalBeforeDiscount / qty;
+  
+    return parseFloat(pricePerUnit.toFixed(2));
+  }
+  
+  calculateDiscountPercentage(total: number, taxAmount: number, discountAmount: number): number {
+    const discountedPrice = total - taxAmount;
+    const originalPrice = discountedPrice + discountAmount;
+    return parseFloat(((discountAmount / originalPrice) * 100).toFixed(2));
+  }
+  
+  calculateTaxPercentage(total: number, taxAmount: number): number {
+    const discountedPrice = total - taxAmount;
+    return parseFloat(((taxAmount / discountedPrice) * 100).toFixed(2));
+  }
+
   ngOnDestroy(): void {}
   ngAfterViewInit(): void {
     this.spinnerService.hide()
