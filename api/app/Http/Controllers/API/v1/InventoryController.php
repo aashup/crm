@@ -44,7 +44,7 @@ class InventoryController extends Controller
     {
         $this->authorize('create', Inventory::class);
         $model = new Inventory();
-        $request->merge(['created_by' => Auth::user()->id]);
+        $request->merge(['created_by' => Auth::user()->id, 'rem_qty' => $request->qty]);
         $model->fill($request->all());
         $model->save();
 
