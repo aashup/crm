@@ -19,8 +19,8 @@ Route::get('/migrate', function () {
 });
 
 Route::get('/dump-autoload', function () {
-    Artisan::call('dump-autoload');
-    return 'Autoload run successfully!';
+    exec('composer dump-autoload');
+    return 'Composer dump-autoload executed successfully!';
 });
 
 Route::get('check-reset-password-link/{token}', [AuthController::class, 'checkResetPasswordLink']);
