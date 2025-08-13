@@ -98,7 +98,11 @@ class PosController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['amount'],
+                        'sale_price' => $item['rate'],
+                        'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
+                        'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
+                        'sale_price_discount_type' => $item['discount_type'] ?? 1,
+                        'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
                         'status' => 1,
                     ]);
 
@@ -174,8 +178,7 @@ class PosController extends Controller
                 'rem_qty' => -$detail['quantity'],
                 'quantity' => $detail['quantity'],
                 'created_by' => Auth::id(),
-                'sale_price' => $productUnit->sale_price ?? 0,
-                'purchase_price' => $productUnit->purchase_price ?? 0,
+                'unit_price' => $detail['rate'] ?? 0,
             ]);
         }
     }

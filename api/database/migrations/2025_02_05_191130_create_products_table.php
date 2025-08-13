@@ -160,8 +160,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('created_by');
                 $table->decimal('qty')->nullable();
                 $table->decimal('rem_qty')->nullable();
-                $table->decimal('purchase_price')->nullable();
-                $table->decimal('sale_price')->nullable();
+                $table->decimal('unit_price')->nullable();
                 $table->string(column: 'notes')->nullable();
                 $table->timestamps();
                 $table->softDeletes();

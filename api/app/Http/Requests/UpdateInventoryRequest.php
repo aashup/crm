@@ -26,8 +26,7 @@ class UpdateInventoryRequest extends FormRequest
             'unit_id' => 'sometimes|required|integer|exists:units,id',
             'qty' => 'sometimes|required|integer|min:0',
             'rem_qty' => 'sometimes|required|integer|min:0',
-            'purchase_price' => 'sometimes|required|numeric|min:0',
-            'sale_price' => 'sometimes|required|numeric|min:0',
+            'unit_price' => 'sometimes|required|numeric|min:0',
             'notes' => 'sometimes|nullable|string|max:255',
             'status' => 'sometimes|required|boolean',
         ];

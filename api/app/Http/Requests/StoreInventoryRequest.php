@@ -26,9 +26,7 @@ class StoreInventoryRequest extends FormRequest
             'product_id' => 'required|integer|exists:products,id',
             'unit_id' => 'required|integer|exists:units,id',
             'qty' => 'required|integer|min:0',
-            'rem_qty' => 'required|integer|min:0',
-            'purchase_price' => 'required|numeric|min:0',
-            'sale_price' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|min:0',
             'notes' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ];
