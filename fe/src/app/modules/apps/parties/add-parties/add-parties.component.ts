@@ -6,6 +6,7 @@ import {
   OnDestroy,
   LOCALE_ID,
   Inject,
+  Optional,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -62,8 +63,8 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     isEdit: boolean;
   }>(MAT_DIALOG_DATA, { optional: true });
   private ngUnsubscribe = new Subject<void>();
-
-  constructor(
+  readonly dialogRef = inject<MatDialogRef<AddPartiesComponent>>(MatDialogRef, { optional: true });
+    constructor(
     private fb: FormBuilder,
     private service: PartiesService,
     private commonService: CommonService,
@@ -73,7 +74,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     private addressService: AddressService,
     private router: Router,
     @Inject(LOCALE_ID) private locale: string,
-    private dialogRef: MatDialogRef<AddPartiesComponent>
+    
 
   ) {}
 
@@ -403,9 +404,9 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.form.reset();
         this.initForm(new PartiesModel().clear());
       } else {
-       
+        if( this.dialogRef)
         this.dialogRef.close(true);
-       
+       else
         this.router.navigate(['/app/parties']);
       }   
     }
