@@ -307,7 +307,7 @@
           <div class="col-xs-12 col-md-8 col-lg-6 col-xxl-4">
             <div class="d-flex justify-content-end align-items-center mb-3">
               <span class="fs-3 fw-bolder">Due amount:</span>
-              <span class="ms-2 text-end fs-2 fw-bolder" style="min-width: 100px">₹ {{ dueAmount?.toFixed(2) || 0 }}</span>
+              <span class="ms-2 text-end fs-2 fw-bolder" style="min-width: 100px">₹ {{ dueAmount|number: '1.2-2'  }}</span>
             </div>
           </div>
         </div>

@@ -56,7 +56,7 @@ export class PrintComponent implements OnInit, AfterViewInit {
     this.spinner.show();
 
     this.saleService.findById(this.saleId + '', {
-      with: ['saleDetails.product', 'contact', 'saleDetails.unit', 'createdby']
+      with: ['saleDetails.product', 'party' , 'saleDetails', 'createdby']
     }).subscribe({
       next: (res: any) => {
         console.log(res);

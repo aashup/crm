@@ -53,70 +53,10 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getAllTaxRates();
-    this.getAllProducts();
     this.initializeForm();
     this.validateDiscountAmount();
     this.handlePaymentMethodValidation();
-
-    this.filteredPartiesByName = this.form.controls.partyName.valueChanges.pipe(
-      startWith(''),
-      map(val => {
-        const value = (typeof val === 'string' ? val : val?.name || '').toLowerCase().trim();
-        const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        return this.parties
-          .filter(party => !value || party.name.toLowerCase().includes(value))
-          .map(party => ({
-            ...party,
-            html: `${party.name.replace(regex, (match: any) => `<strong>${match}</strong>`)} - [${party.mobile}]`
-          }));
-      })
-    );
-
-    this.filteredPartiesByMobile = this.form.controls.mobile.valueChanges.pipe(
-      startWith(''),
-      map(val => {
-        const value = (typeof val === 'string' ? val : val?.mobile || '').toLowerCase().trim();
-        const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        return this.parties
-          .filter(party => !value || party.mobile.toLowerCase().includes(value))
-          .map(party => ({
-            ...party,
-            html: `${party.name} - [${party.mobile.replace(regex, (match: any) => `<strong>${match}</strong>`)}]`
-          }));
-      })
-    );
-
-    this.form.get('partyName')?.valueChanges.subscribe((value) => {
-      const match = this.parties.find((c) => c.name === value);
-      if (match) {
-        this.isNameSelected = true;
-        this.form.patchValue(
-          {
-            mobile: match.mobile,
-            party_id: match.id,
-          },
-          { emitEvent: false }
-        );
-      } else {
-        this.isNameSelected = false;
-      }
-    });
-
-    this.form.get('mobile')?.valueChanges.subscribe((value) => {
-      const match = this.parties.find((c) => c.mobile === value);
-      if (match) {
-        this.isMobileSelected = true;
-        this.form.patchValue(
-          {
-            partyName: match.name,
-            party_id: match.id,
-          },
-          { emitEvent: false }
-        );
-      } else {
-        this.isMobileSelected = false;
-      }
-    });
+    this.getAllProducts();
   }
 
   getFormattedTaxLabel(type: number, rate: number): string {
@@ -342,11 +282,73 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         this.products = data.data.products;
         this.parties = data.data.parties;
         this.units = data.data.units;
+        this.setupDropdowns();
         this.cdr.detectChanges();
       },
       error: (err) => {
-        // Handle error
       },
+    });
+  }
+
+  setupDropdowns(): void {
+    this.filteredPartiesByName = this.form.controls.partyName.valueChanges.pipe(
+      startWith(''),
+      map(val => {
+        const value = (typeof val === 'string' ? val : val?.name || '').toLowerCase().trim();
+        const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        return this.parties
+          .filter(party => !value || party.name.toLowerCase().includes(value))
+          .map(party => ({
+            ...party,
+            html: `${party.name.replace(regex, (match: any) => `<strong>${match}</strong>`)} - [${party.mobile}]`
+          }));
+      })
+    );
+
+    this.filteredPartiesByMobile = this.form.controls.mobile.valueChanges.pipe(
+      startWith(''),
+      map(val => {
+        const value = (typeof val === 'string' ? val : val?.mobile || '').toLowerCase().trim();
+        const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        return this.parties
+          .filter(party => !value || party.mobile.toLowerCase().includes(value))
+          .map(party => ({
+            ...party,
+            html: `${party.name} - [${party.mobile.replace(regex, (match: any) => `<strong>${match}</strong>`)}]`
+          }));
+      })
+    );
+
+    this.form.get('partyName')?.valueChanges.subscribe((value) => {
+      const match = this.parties.find((c) => c.name === value);
+      if (match) {
+        this.isNameSelected = true;
+        this.form.patchValue(
+          {
+            mobile: match.mobile,
+            party_id: match.id,
+          },
+          { emitEvent: false }
+        );
+      } else {
+        this.isNameSelected = false;
+      }
+    });
+
+    this.form.get('mobile')?.valueChanges.subscribe((value) => {
+      const match = this.parties.find((c) => c.mobile === value);
+      if (match) {
+        this.isMobileSelected = true;
+        this.form.patchValue(
+          {
+            partyName: match.name,
+            party_id: match.id,
+          },
+          { emitEvent: false }
+        );
+      } else {
+        this.isMobileSelected = false;
+      }
     });
   }
 
