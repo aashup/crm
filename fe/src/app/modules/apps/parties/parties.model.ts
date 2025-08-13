@@ -3,6 +3,7 @@ export class PartiesModel {
   name: string = '';
   gstin: string = '';
   mobile: string = '';
+  contact_id: string = '';
   opening_balance: number | null = null;
   opening_balance_date: string | null = null;
   credit_limit: boolean = true;
@@ -36,6 +37,7 @@ export class PartiesModel {
     this.shipping_address_id = '';
     this.state_id = '';
     this.email = '';
+    this.contact_id= '';
     this.gst_type = '';
     this.created_at = null;
     this.updated_at = null;
