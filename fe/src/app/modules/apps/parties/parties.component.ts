@@ -74,7 +74,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
       style: { 'max-width': '30px' },
       mutator: (item: any) => item?.id || '--',
     },
-    { ref: 'name', name: 'Name'  , mutator: (item: any) => item?.contact?.name || '--'}, 
+    { ref: 'name', name: 'Name'  , mutator: (item: any) => item?.name || '--'}, 
     {
       ref: 'gstin',
       name: 'GST Number',
@@ -84,7 +84,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       ref: 'mobile',
       name: 'Mobile',
-      mutator: (item: any) => item?.contact?.mob1 ||item?.contact?.mob2|| '--', 
+      mutator: (item: any) => item?.mobile || '--', 
     },
     {
       ref: 'opening_balance',
@@ -198,7 +198,9 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filter.cols = [
       'id',
       'name',
+      'mobile',
       'gstin',
+      'gst_type',
       'contact_id',
       'opening_balance',
       'opening_balance_date',

@@ -3,13 +3,15 @@ import {
   inject,
   OnInit,
   AfterViewInit,
-  ChangeDetectorRef,
   OnDestroy,
+  LOCALE_ID,
+  Inject,
 } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
+  FormControl,
 } from '@angular/forms';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { CommonService } from 'src/app/modules/core/common.service';
@@ -24,7 +26,8 @@ import { AddressService } from 'src/app/modules/settings/address/address.service
 import { Router } from '@angular/router';
 import { AddAddressComponent } from 'src/app/modules/settings/address/add-address/add-address.component';
 import { AddressModel } from 'src/app/modules/settings/address/address.model';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-add-parties',
@@ -38,17 +41,21 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   enableShipping = false;
   addresses: any[] = [];
-  isMobileSelected = false;
   clone: any;
   contacts: any[] = [];
   filteredNames: Observable<ContactModel[]>;
   filteredContacts: Observable<ContactModel[]>;
   billing_address: any[] = [];
   shipping_address: any[] = [];
-  isNameSelected = false;
   states: any = [];
   filteredBillingAddresses!: Observable<any[]>;
   filteredShippingAddresses!: Observable<any[]>;
+  gstTypeOption = [
+    { name: 'Unregistered/Consumer', id: 1 },
+    { name: 'Regular', id: 2 },
+    { name: 'Composition', id: 3 },
+  ];
+
   readonly dialog = inject(MatDialog);
   readonly data = inject<{
     model: PartiesModel;
@@ -62,10 +69,12 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     private commonService: CommonService,
     private spinnerService: SpinnerService,
     private stateService: StateService,
-    private cdr: ChangeDetectorRef,
     private contactService: ContactService,
     private addressService: AddressService,
-    private router: Router
+    private router: Router,
+    @Inject(LOCALE_ID) private locale: string,
+    private dialogRef: MatDialogRef<AddPartiesComponent>
+
   ) {}
 
   ngOnInit(): void {
@@ -75,22 +84,29 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getAddress();
     this.getAllStates();
     this.initForm(this.model);
-
     this.getContacts();
 
-    this.form.get('credit_limit')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((isLimitEnabled: boolean) => {
-      const control = this.form.get('credit_limit_amount');
-      if (isLimitEnabled) {
-        control?.setValidators([
-          Validators.required,
-          Validators.min(0)
-        ]);
-      } else {
-        control?.clearValidators();
-        control?.setValue(0);
-      }
-      control?.updateValueAndValidity();
-    });
+    this.form
+      .get('credit_limit')
+      ?.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe((isLimitEnabled: boolean) => {
+        const control = this.form.get('credit_limit_amount');
+        if (isLimitEnabled) {
+          control?.setValidators([Validators.required, Validators.min(0)]);
+        } else {
+          control?.clearValidators();
+          control?.setValue(0);
+        }
+        control?.updateValueAndValidity();
+      });
+  }
+
+  get billingAddressControl() {
+    return this.form.get('billing_address') as FormControl;
+  }
+
+  get shippingAddressControl() {
+    return this.form.get('shipping_address') as FormControl;
   }
 
   setupContactAutocompletes(): void {
@@ -133,7 +149,6 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.form.get('name')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
       const match = this.contacts.find((c) => c.name === value);
       if (match) {
-        this.isNameSelected = true;
         this.form.patchValue(
           {
             mobile: match.mob1,
@@ -142,14 +157,18 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
           { emitEvent: false }
         );
       } else {
-        this.isNameSelected = false;
+        this.form.patchValue(
+          {
+            contact_id: null,
+          },
+          { emitEvent: false }
+        );
       }
     });
 
     this.form.get('mobile')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
       const match = this.contacts.find((c) => c.mob1 === value);
       if (match) {
-        this.isMobileSelected = true;
         this.form.patchValue(
           {
             name: match.name,
@@ -158,34 +177,43 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
           { emitEvent: false }
         );
       } else {
-        this.isMobileSelected = false;
+        this.form.patchValue(
+          {
+            contact_id: null,
+          },
+          { emitEvent: false }
+        );
       }
     });
   }
-  
+
   setupAddressAutocompletes(): void {
-      this.filteredBillingAddresses = this.form.controls.billing_address.valueChanges.pipe(
-        startWith(''),
-        map((val: string) => {
-          const value = val?.toLowerCase() || '';
-          return this.billing_address.filter((a: any) => a.address.toLowerCase().includes(value));
-        })
-      );
-  
-      this.filteredShippingAddresses = this.form.controls.shipping_address.valueChanges.pipe(
-        startWith(''),
-        map((val: string) => {
-          const value = val?.toLowerCase() || '';
-          return this.shipping_address.filter((a: any) => a.address.toLowerCase().includes(value));
-        })
-      );
-    }
-  
+    this.filteredBillingAddresses = this.billingAddressControl.valueChanges.pipe(
+      startWith(''),
+      map((val: string) => {
+        const value = val?.toLowerCase() || '';
+        return this.billing_address.filter((a: any) =>
+          a.address.toLowerCase().includes(value)
+        );
+      })
+    );
+
+    this.filteredShippingAddresses = this.shippingAddressControl.valueChanges.pipe(
+      startWith(''),
+      map((val: string) => {
+        const value = val?.toLowerCase() || '';
+        return this.shipping_address.filter((a: any) =>
+          a.address.toLowerCase().includes(value)
+        );
+      })
+    );
+  }
+
   onBillingSelect(addressStr: string) {
     const selected = this.billing_address.find((a: any) => a.address === addressStr);
     if (selected) {
       this.form.patchValue({
-        billing_address_id: selected.id
+        billing_address_id: selected.id,
       });
     }
   }
@@ -194,7 +222,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     const selected = this.shipping_address.find((a: any) => a.address === addressStr);
     if (selected) {
       this.form.patchValue({
-        shipping_address_id: selected.id
+        shipping_address_id: selected.id,
       });
     }
   }
@@ -210,7 +238,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       complete: () => {
         this.spinnerService.hide();
-      }
+      },
     });
   }
 
@@ -229,13 +257,6 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  formatToYYYYMMDD(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
   initForm(model: PartiesModel) {
     this.form = this.fb.group({
       id: [model?.id || null],
@@ -247,9 +268,9 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       opening_balance_date: [model?.opening_balance_date || new Date()],
       credit_limit: [model?.credit_limit ?? false],
       credit_limit_amount: [model?.credit_limit_amount || 0],
-      billing_address: ['' , [Validators.required]],
-      shipping_address: [''],
+      billing_address: [''],
       billing_address_id: [model?.billing_address_id || ''],
+      shipping_address: [''],
       shipping_address_id: [model?.shipping_address_id || ''],
       state_id: [model?.state_id || ''],
       gst_type: [model?.gst_type || ''],
@@ -257,6 +278,22 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.clone = this.form.value;
+
+    if (this.isEdit && model.billing_address_id) {
+      this.addressService.find({ id: model.billing_address_id }).pipe(take(1)).subscribe((res: any) => {
+        if (res?.data?.length > 0) {
+          this.form.get('billing_address')?.setValue(res.data[0].address);
+        }
+      });
+    }
+
+    if (this.isEdit && model.shipping_address_id) {
+      this.addressService.find({ id: model.shipping_address_id }).pipe(take(1)).subscribe((res: any) => {
+        if (res?.data?.length > 0) {
+          this.form.get('shipping_address')?.setValue(res.data[0].address);
+        }
+      });
+    }
   }
 
   getAddress(): void {
@@ -274,7 +311,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error fetching addresses:', err);
-      }
+      },
     });
   }
 
@@ -286,7 +323,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error fetching contacts:', err);
-      }
+      },
     });
   }
 
@@ -314,66 +351,75 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  onNameBlur(): void {
-    const nameValue = this.form.get('name')?.value;
-    const match = this.contacts.find((c) => c.name === nameValue);
-    if (!match && this.isMobileSelected) {
-      this.form.patchValue({ mobile: '', contact_id: null });
-      this.isMobileSelected = false;
-    }
-  }
-
-  onContactBlur(): void {
-    const mobileValue = this.form.get('mobile')?.value;
-    const match = this.contacts.find((c) => c.mob1 === mobileValue);
-    if (!match) {
-      this.form.patchValue({ name: '', contact_id: null });
-      this.isNameSelected = false;
-    }
-  }
-
   save(resetAfter: boolean = false) {
     this.commonService.markFormGroupTouched(this.form);
-
+  
     if (this.form.invalid) {
       this.commonService.toastr.error('Please fix all errors.');
       return;
     }
-
+  
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
-
+  
     this.isLoading = true;
     this.spinnerService.show();
-    let date = this.formatToYYYYMMDD(this.form.value.opening_balance_date);
+  
+    let dateToFormat = this.form.value.opening_balance_date;
+    let formattedDate = null;
+  
+    if (dateToFormat) {
+      if (!(dateToFormat instanceof Date)) {
+        dateToFormat = new Date(dateToFormat);
+      }
+      formattedDate = formatDate(dateToFormat, 'yyyy-MM-dd', this.locale);
+    }
+  
+    let mobile = this.form.value.mobile?.toString().trim() || '';
+    if (!mobile.startsWith('+')) {
+      mobile = mobile.replace(/\s|-/g, '');
+      mobile = '+91' + mobile;
+    }
+  
     let payLoad = {
       ...this.form.value,
-      opening_balance_date: date
+      mobile: mobile || null,
+      opening_balance_date: formattedDate,
     };
+  
     const save$ = this.service[this.isEdit ? 'update' : 'create'](payLoad);
-
-    save$.subscribe({
-      next: () => {
-        this.commonService.toastr.success(this.isEdit ? 'Party updated.' : 'Party created.');
-
-        if (resetAfter) {
-          this.form.reset();
-          this.enableShipping = false;
-        } else {
-          this.router.navigate(["/app/parties"]);
-        }
-      },
-      error: (err) => {
-        this.commonService.handleError(err);
-        this.spinnerService.hide();
-        this.isLoading = false;
-      },
-      complete: () => {
-        this.isLoading = false;
-        this.spinnerService.hide();
-      },
-    });
+  
+    
+    save$.subscribe((res:any)=>{
+      this.isLoading = false;
+      this.spinnerService.hide();
+      this.commonService.toastr.success(
+        `Party ${this.isEdit ? 'updated' : 'created'} successfully!`
+      );
+  
+      if (resetAfter) {
+        this.form.reset();
+        this.initForm(new PartiesModel().clear());
+      } else {
+       
+        this.dialogRef.close(true);
+       
+        this.router.navigate(['/app/parties']);
+      }   
+    }
+    , (err: any) => {
+      this.isLoading = false;
+      this.spinnerService.hide();
+      this.commonService.toastr.error(
+        `Failed to ${this.isEdit ? 'update' : 'create'} party. Please try again.`,
+        'Error'
+      );
+    }
+  );
   }
+  
+  
+  
 }

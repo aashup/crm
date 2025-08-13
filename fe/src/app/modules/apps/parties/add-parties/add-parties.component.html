@@ -7,9 +7,9 @@
         <mat-form-field class="w-100">
           <mat-label>Party Name</mat-label>
           <input class="d-none" formControlName="contact_id" />
-          <input matInput formControlName="name" [matAutocomplete]="autoName" (blur)="onNameBlur()"
+          <input matInput formControlName="name" [matAutocomplete]="autoName" 
             placeholder="Search or enter name" />
-          <mat-autocomplete #autoName="matAutocomplete" (optionSelected)="isNameSelected = true">
+          <mat-autocomplete #autoName="matAutocomplete" >
             <mat-option *ngFor="let contact of filteredNames | async" [value]="contact.name">
               <span [innerHTML]="contact.html"></span>
             </mat-option>
@@ -22,9 +22,9 @@
       <div class="col-md-4">
         <mat-form-field class="w-100">
           <mat-label>Mobile</mat-label>
-          <input matInput formControlName="mobile" [matAutocomplete]="autoMob" (blur)="onContactBlur()"
+          <input matInput formControlName="mobile" [matAutocomplete]="autoMob" 
             placeholder="Search or enter mobile" />
-          <mat-autocomplete #autoMob="matAutocomplete" (optionSelected)="isMobileSelected = true">
+          <mat-autocomplete #autoMob="matAutocomplete" >
             <mat-option *ngFor="let contact of filteredContacts | async" [value]="contact.mob1">
               <span [innerHTML]="contact.html"></span>
             </mat-option>
@@ -51,9 +51,7 @@
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>GST Type</mat-label>
                 <mat-select formControlName="gst_type">
-                  <mat-option value="1">Unregistered/Consumer</mat-option>
-                  <mat-option value="2">Regular</mat-option>
-                  <mat-option value="3">Composition</mat-option>
+                  <mat-option *ngFor="let gst of gstTypeOption" [value]="gst.id">{{ gst.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -80,7 +78,7 @@
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Billing Address</mat-label>
                 <input type="text" matInput [matAutocomplete]="autoBilling"
-                       formControlName="billing_address"
+                       [formControl]="billingAddressControl"
                        placeholder="Search or enter billing address" />
                 <mat-autocomplete #autoBilling="matAutocomplete" style="padding: 0px;" >
                   <mat-option  (click)="add('billing')" style="color: blue !important;" class="sticky-option">
@@ -92,7 +90,8 @@
                     {{ item.address }}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="form.get('billing_address')?.hasError('required') && form.get('billing_address')?.touched">
+                <input class="d-none" formControlName="billing_address_id" />
+                <mat-error *ngIf="form.get('billing_address_id')?.hasError('required') && form.get('billing_address_id')?.touched">
                   Billing address is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -107,7 +106,7 @@
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Shipping Address</mat-label>
                 <input type="text" matInput [matAutocomplete]="autoShipping"
-                       formControlName="shipping_address"
+                       [formControl]="shippingAddressControl"
                        placeholder="Search or enter shipping address" />
                 <mat-autocomplete #autoShipping="matAutocomplete">
                   <mat-option  style="color: blue !important;" class="sticky-option">
@@ -119,6 +118,7 @@
                     {{ item.address }}
                   </mat-option>
                 </mat-autocomplete>
+                <input class="d-none" formControlName="shipping_address_id" />
               </mat-form-field>
             </div>
           </div>
@@ -138,7 +138,7 @@
             <div class="col-md-6">
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Opening Balance Date</mat-label>
-                <input matInput [matDatepicker]="balancePicker" formControlName="opening_balance_date" />
+                <input matInput [matDatepicker]="balancePicker" [value]="form.get('opening_balance_date')?.value | date: 'yyyy-MM-dd'" formControlName="opening_balance_date" />
                 <mat-datepicker-toggle matSuffix [for]="balancePicker"></mat-datepicker-toggle>
                 <mat-datepicker #balancePicker></mat-datepicker>
               </mat-form-field>
