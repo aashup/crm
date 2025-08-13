@@ -5,7 +5,7 @@
 
       <form class="form" [formGroup]="form" *ngIf="form">
         <div class="row">
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
               <mat-label>Product</mat-label>
               <input
@@ -32,7 +32,7 @@
           </div>
 
           <!-- Unit Autocomplete -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
               <mat-label>Unit</mat-label>
               <input
@@ -57,7 +57,7 @@
           </div>
 
           <!-- Quantity Input -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
               <mat-label>Quantity</mat-label>
               <input
@@ -74,7 +74,7 @@
           </div>
 
           <!-- Remaining Quantity, Purchase Price, Sale Price, Notes -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile"  *ngIf="isEdit" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
               <mat-label>Remaining Quantity</mat-label>
               <input
@@ -86,33 +86,25 @@
                 step="1"
               />
               <mat-error *ngIf="form.get('rem_qty')?.hasError('min') && form.get('rem_qty')?.touched">Remaining Quantity must be greater than or equal to 0</mat-error>
+              <mat-error *ngIf="form.get('rem_qty')?.hasError('remQtyExceeds') && form.get('rem_qty')?.touched">
+                Remaining Quantity cannot be greater than Quantity
+              </mat-error>              
             </mat-form-field>
           </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          
+          <div class="col-12 kt-margin-bottom-20-mobile" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
-              <mat-label>Purchase Price</mat-label>
+              <mat-label>Unit Price</mat-label>
               <input
                 matInput
                 type="number" 
-                placeholder="Enter Purchase Price"
-                formControlName="purchase_price"
+                placeholder="Enter Unit Price"
+                formControlName="unit_price"
               />
-              <mat-error *ngIf="form.get('purchase_price')?.hasError('min') && form.get('purchase_price')?.touched">Purchase Price must be greater than or equal to 0</mat-error>
+              <mat-error *ngIf="form.get('unit_price')?.hasError('min') && form.get('unit_price')?.touched">Unit Price must be greater than or equal to 0</mat-error>
             </mat-form-field>
           </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
-            <mat-form-field class="w-100">
-              <mat-label>Sale Price</mat-label>
-              <input
-                matInput
-                type="number" 
-                placeholder="Enter Sale Price"
-                formControlName="sale_price"
-              />
-              <mat-error *ngIf="form.get('sale_price')?.hasError('min') && form.get('sale_price')?.touched">Sale Price must be greater than or equal to 0</mat-error>
-            </mat-form-field>
-          </div>
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
               <mat-label>Notes</mat-label>
               <textarea
@@ -124,7 +116,7 @@
           </div>
 
           <!-- Status Dropdown -->
-          <div class="col-12 kt-margin-bottom-20-mobile">
+          <div class="col-12 kt-margin-bottom-20-mobile" style="margin-bottom: 15px;">
             <mat-form-field class="w-100">
               <mat-label>Status</mat-label>
               <mat-select placeholder="Select Status" formControlName="status">

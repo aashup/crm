@@ -84,16 +84,20 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
         );
   
         this.form = this.fb.group({
-          id: [this.model.id, []],
+          id: [this.model.id],
           product_id: [this.model.product_id, Validators.required],
           unit_id: [this.model.unit_id, Validators.required],
           qty: [this.model.qty, [Validators.required, Validators.min(0)]],
           rem_qty: [this.model.rem_qty, [Validators.min(0)]],
-          purchase_price: [this.model.purchase_price, Validators.min(0)],
-          sale_price: [this.model.sale_price, Validators.min(0)],
+          unit_price: [this.model.unit_price, [Validators.required, Validators.min(0)]],
           notes: [this.model.notes],
-          status: [this.model.status, [Validators.required]],
+          status: [this.model.status, Validators.required],
+          productControl: ['', [Validators.required, this.itemNameValidator(this.products)]],
+          unitControl: ['', [Validators.required, this.itemNameValidator(this.units)]]
+        }, {
+          validators: [this.maxRemainingQuantityValidator()]
         });
+        
   
         this.clone = this.form.value;
         this.productControl.valueChanges.pipe(
@@ -225,7 +229,37 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     });
   }
 
+  maxRemainingQuantityValidator(): ValidatorFn {
+    return (group: AbstractControl) => {
+      if (!this.isEdit) return null;
+  
+      const qtyControl = group.get('qty');
+      const remQtyControl = group.get('rem_qty');
+  
+      if (!qtyControl || !remQtyControl) return null;
+  
+      const qty = qtyControl.value;
+      const remQty = remQtyControl.value;
+  
+      if (qty != null && remQty != null && remQty > qty) {
+        remQtyControl.setErrors({ ...remQtyControl.errors, remQtyExceeds: true });
+      } else {
+        if (remQtyControl.errors) {
+          const { remQtyExceeds, ...rest } = remQtyControl.errors;
+          remQtyControl.setErrors(Object.keys(rest).length ? rest : null);
+        }
+      }
+      return null;
+    };
+  }
+  
+  
+
   submit() {
+    
+    let payLoad=this.form.value;
+   
+    
     this.commonService.markFormGroupTouched(this.form);
     this.commonService.markFormGroupTouched(new FormGroup({
       productControl: this.productControl,
@@ -235,18 +269,22 @@ export class AddInventoryComponent implements AfterViewInit, OnInit {
     this.form.value.qty = Number(this.form.value.qty);
     this.form.value.rem_qty = Number(this.form.value.rem_qty);
 
-    if (!this.form.valid || this.productControl.invalid || this.unitControl.invalid) {
-      this.commonService.toastr.error('Please fix all errors.');
-      return;
-    }
+ 
     if (_.isEqual(this.form.value, this.clone)) {
       this.commonService.toastr.error('Nothing changed.');
       return;
     }
+    if(payLoad.qty<payLoad.rem_qty){
+      this.commonService.toastr.error('Remaining Quantity cannot be greater than Quantity.');
+      return
+    }
 
     this.isLoading = true;
     this.spinnerService.show();
-    this.service[this.isEdit ? 'update' : 'create'](this.form.value).subscribe({
+    console.log(payLoad);
+    delete payLoad.productControl;
+    delete payLoad.unitControl;
+    this.service[this.isEdit ? 'update' : 'create'](payLoad).subscribe({
       complete: () => {
         this.commonService.toastr.success(this.isEdit ? 'Inventory has been updated.' : 'Inventory has been created.');
         this.isLoading = false;

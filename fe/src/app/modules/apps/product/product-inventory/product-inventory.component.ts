@@ -62,8 +62,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     'created_by',
     'qty',
     'rem_qty',
-    'purchase_price',
-    'sale_price',
+    'unit_price',
     'notes',
     'status',
     'action',
@@ -80,8 +79,8 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
     { ref: 'created_by', name: 'Created By', mutator: (row: any) => this.getUserName(row.created_by) },
     { ref: 'qty', name: 'Quantity' },
     { ref: 'rem_qty', name: 'Remaining Quantity' },
-    { ref: 'purchase_price', name: 'Purchase Price' },
-    { ref: 'sale_price', name: 'Sale Price' },
+    
+    { ref: 'unit_price', name: 'Unit Price' },
     { ref: 'notes', name: 'Notes' },
 
     { ref: 'status', name: 'Status', mutator: (row: any) => (row.status === 1 ? 'Active' : 'Inactive') },
@@ -152,15 +151,13 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       'created_by',
       'qty',
       'rem_qty',
-      'purchase_price',
-      'sale_price',
+      'unit_price',
       'notes',
       'created_at',
       'updated_at',
       'deleted_at',
       'status',
     ];
-
     this.dataSource.find(_.pickBy(this.filter)).subscribe({
       next: (response: any) => {
         this.form.value.inventoryInfo = response.data;
