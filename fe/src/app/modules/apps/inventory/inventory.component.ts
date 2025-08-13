@@ -18,13 +18,10 @@ import { debounceTime, distinctUntilChanged, fromEvent, merge, take, tap } from 
 import { SubscriptionHandler } from '../../core/subscription.handler';
 import { CommonService } from '../../core/common.service';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
-import { CityService } from '../../settings/city/city.service';
 import { InventoryDatasource } from './inventory.datasource';
 import { InventoryModel } from './inventory.model';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { InventoryService } from './inventory.service';
-import { ProductService } from '../product/product.service';
-import { UnitService } from '../../settings/unit/unit.service';
 import { UsersService } from '../../usermanagement/users/users.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 
@@ -57,8 +54,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     'created_by',
     'qty',
     'rem_qty',
-    'purchase_price',
-    'sale_price',
+    'unit_price',
     'notes',
     'status',
     'action',
@@ -72,14 +68,14 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
     { ref: 'product_id', name: 'Product Name', mutator: (row: any) => row.product?.name || '—' },
 
-    { ref: 'unit_id', name: 'Unit ID'
+    { ref: 'unit_id', name: 'Unit'
       ,mutator: (row: any) => row.unit?.name || '—' 
      },
     { ref: 'created_by', name: 'Created By',mutator: (row: any) => this.getUserName(row.created_by) },
     { ref: 'qty', name: 'Quantity' },
     { ref: 'rem_qty', name: 'Remaining Quantity' },
-    { ref: 'purchase_price', name: 'Purchase Price' },
-    { ref: 'sale_price', name: 'Sale Price' },
+   
+    { ref: 'unit_price', name: 'Unit Price' },
     { ref: 'notes', name: 'Notes' },
    
     { ref: 'status', name: 'Status', mutator: (row: any) => row.status === 1 ? 'Active' : 'Inactive'  },
@@ -159,8 +155,7 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
         'created_by',
         'qty',
         'rem_qty',
-        'purchase_price',
-        'sale_price',
+        'unit_price',
         'notes',
         'created_at',
         'updated_at',

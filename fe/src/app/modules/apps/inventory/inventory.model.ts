@@ -1,12 +1,11 @@
 export class InventoryModel {
   id: number | null;
   product_id: number | null;
+  unit_price: number | null;
   unit_id: number | null;
   created_by: number | null;
   qty: number | null;
   rem_qty: number | null;
-  purchase_price: number | null;
-  sale_price: number | null;
   notes: string | null;
   created_at: Date | null;
   updated_at: Date | null;
@@ -16,12 +15,11 @@ export class InventoryModel {
   constructor() {
     this.id = null;
     this.product_id = null;
+    this.unit_price = null;
     this.unit_id = null;
     this.created_by = null;
     this.qty = null;
     this.rem_qty = null;
-    this.purchase_price = null;
-    this.sale_price = null;
     this.notes = null;
     this.created_at = null;
     this.updated_at = null;
@@ -31,12 +29,11 @@ export class InventoryModel {
 
   clear() {
     this.product_id = null;
+    this.unit_price = null;
     this.unit_id = null;
     this.created_by = null;
     this.qty = null;
     this.rem_qty = null;
-    this.purchase_price = null;
-    this.sale_price = null;
     this.notes = null;
     this.created_at = null;
     this.updated_at = null;
