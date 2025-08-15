@@ -27,7 +27,7 @@ return new class extends Migration
                     'icon' => "element-11",
                     'root' => 1,
                     'status' => 1,
-                    'order_by' => 8,
+                    'order_by' => 7,
                     'children' => [],
                 ],
             ];
