@@ -59,7 +59,7 @@ return new class extends Migration
             'root' => 1,
             'status' => 1,
             'parent_id' => null,
-            'order_by' => 11,
+            'order_by' => 2,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

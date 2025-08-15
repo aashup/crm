@@ -8,8 +8,7 @@ class Customer extends Model
     protected $fillable = [
         "id",
         "name",
-        "contact_id",
-        "address_id",
+        "contact_id"
     ];
 
 
@@ -22,8 +21,7 @@ class Customer extends Model
     {
         return [
             "name",
-            "contact_id",
-            "address_id",
+            "contact_id"
         ];
     }
 
@@ -33,7 +31,6 @@ class Customer extends Model
             'id' => 'int',
             'name' => 'text',
             'contact_id' => 'int',
-            'address_id' => 'int',
             'created_at' => 'text',
             'updated_at' => 'text',
         ];
@@ -45,7 +42,6 @@ class Customer extends Model
             "id",
             "name",
             "contact_id",
-            "address_id",
             'created_at',
             'updated_at',
         ];
@@ -54,10 +50,5 @@ class Customer extends Model
     public function contact()
     {
         return $this->belongsTo(Contact::class);
-    }
-
-    public function address()
-    {
-        return $this->belongsTo(Address::class);
     }
 }

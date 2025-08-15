@@ -136,7 +136,7 @@ export class CustomersComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'address']; 
+      this.filter.with = ['contact']; 
       this.filter.cols = ['id', 'name', 'contact_id', 'address_id', 'created_at', 'updated_at']; 
       this.dataSource.find(_.pickBy(this.filter));
     }
