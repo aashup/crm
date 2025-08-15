@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import _ from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { CommonService } from 'src/app/modules/core/common.service';
@@ -36,7 +36,8 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
     private service: ProductService,
     private commonService: CommonService,
     private ar: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -123,6 +124,9 @@ export class StepperComponent implements AfterViewInit, OnInit, OnDestroy {
     this.currentStep$.next(nextStep);
   }
 
+  backToSale(){
+    this.router.navigate(["/app/sale"])
+  }
   prevStep() {
     const prevStep = this.currentStep$.value - 1;
     if (prevStep === 0) {
