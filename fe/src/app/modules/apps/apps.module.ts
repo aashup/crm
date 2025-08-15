@@ -27,10 +27,7 @@ import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-d
         path: 'product',
         loadChildren: () => import('./product/product.module').then((m) => m.ProductModule),
       },
-      {
-        path: 'customer',
-        loadChildren: () => import('./customer/customers.module').then((m) => m.CustomersModule),
-      },
+      
       {
         path: 'supplier',
         loadChildren: () => import('./vendor/vendor.module').then((m) => m.VendorModule),
