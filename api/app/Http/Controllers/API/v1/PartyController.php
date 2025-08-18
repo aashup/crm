@@ -98,7 +98,10 @@ class PartyController extends Controller
 
             $party->fill($validated);
             $party->save();
+
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->error("Party cannot be updated! : " . $e->getMessage(), 500);
         }
 
