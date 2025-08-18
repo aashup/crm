@@ -1,7 +1,7 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { filter, map, startWith, take } from 'rxjs/operators';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { Router } from '@angular/router';
@@ -13,6 +13,11 @@ import { PurchaseService } from '../purchase.service';
 import { RateService } from '../../product/add-product-unit/rate-service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { DirectSaleService } from '../../direct-sale/direct-sale.service';
+import { PartiesService } from '../../parties/parties.service';
+import { ProductService } from '../../product/product.service';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AddPartiesComponent } from '../../parties/add-parties/add-parties.component';
+import { PurchaseModel } from '../purchase.model';
 
 @Component({
   selector: 'app-add-purchase',
@@ -21,6 +26,15 @@ import { DirectSaleService } from '../../direct-sale/direct-sale.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
+  readonly dialog = inject(MatDialog);
+  model: PurchaseModel
+
+    readonly data = inject<{
+      model: PurchaseModel;
+      isEdit: boolean;
+    }>(MAT_DIALOG_DATA, { optional: true });
+    private ngUnsubscribe = new Subject<void>();
+    readonly dialogRef = inject<MatDialogRef<AddPartiesComponent>>(MatDialogRef, { optional: true });
   subscriptionHandler = new SubscriptionHandler();
   form: FormGroup;
   filteredPartiesByName: Observable<PartiesModel[]>;
@@ -44,21 +58,26 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private service: PurchaseService,
-    private productAndPartyService: DirectSaleService,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
     private router: Router,
     private unitService: UnitService,
     private taxRateService: RateService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private partyService: PartiesService,
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
+    this.model = this.data?.model || new PurchaseModel().clear();
+    this.isEdit = this.data?.isEdit || false;
+    console.log("model",this.model);
     this.getAllTaxRates();
-    this.initializeForm();
+    this.initializeForm(this.model);
     this.validateDiscountAmount();
     this.handlePaymentMethodValidation();
     this.getAllProducts();
+    this.getAllParties();
   }
 
   getFormattedTaxLabel(type: number, rate: number): string {
@@ -90,22 +109,23 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
     this.units = [];
   }
 
-  initializeForm(): void {
+  initializeForm(model:any): void {
     this.form = this.fb.group({
-      party_id: [null],
-      mobile: [null, Validators.required],
-      partyName: [null, Validators.required],
-      unit_id: [null],
-      amount: [0, [Validators.required, this.nonNegativeValidator()]],
-      discount_amount: [0, [this.nonNegativeValidator()]],
-      discount_type: [1],
-      net_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
-      notes: [''],
-      status: [1, Validators.required],
-      payment_method: [1, Validators.required],
-      cash_amount: [null, [Validators.required, Validators.min(0), this.nonNegativeValidator()]],
-      online_amount: [null, this.nonNegativeValidator()],
-      transaction_id: [null],
+      party_id: [model?.party_id||null],
+      mobile: [model?.party?.mobile, Validators.required],
+      name: [model?.party?.name, Validators.required],
+      unit_id: [model?.unit_id,null],
+      amount: [model?.amount|0, [Validators.required, this.nonNegativeValidator()]],
+      discount_amount: [model?.discount_amount|0, [this.nonNegativeValidator()]],
+      discount_type: [model?.discount_type|1],
+      net_total: [model?.net_total|0,{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
+      notes: [model?.notes || ''],
+      status: [model?.status |1, Validators.required],
+      payment_method: [model?.payment_method|1, Validators.required],
+      cash_amount: [model?.cash_amount|0, [Validators.required, Validators.min(0), this.nonNegativeValidator()]],
+      online_amount: [model?.online_amount, this.nonNegativeValidator()],
+      transaction_id: [model?.transaction_id||''],
+      return_amount: [model?.return_amount|0, { value: 0, disabled: true }],
       purchaseDetails: this.fb.array([]),
     });
 
@@ -185,7 +205,8 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   updateFilteredUnits(index?: number): void {
-    const controlsToUpdate = index !== undefined ? [this.purchaseDetails.controls[index]] : this.purchaseDetails.controls;
+    const controlsToUpdate =
+      index !== undefined ? [this.purchaseDetails.controls[index]] : this.purchaseDetails.controls;
     controlsToUpdate.forEach((group, i) => {
       const currentRowIndex = index !== undefined ? index : i;
       const selectedProductId = group.get('product_id')?.value;
@@ -206,6 +227,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   createPurchaseDetailGroup(): FormGroup {
+    
     return this.fb.group({
       product_id: [null],
       product_name: [null, Validators.required],
@@ -279,49 +301,66 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   getAllProducts() {
-    this.subscriptionHandler.subscribe = this.productAndPartyService.find({ pageSize: 10000 }).subscribe({
-      next: (data: any) => {
-        this.products = data.data.products;
-        this.parties = data.data.parties;
-        this.units = data.data.units;
-        this.setupDropdowns();
-        this.cdr.detectChanges();
+    this.productService.find({ pageSize: 1000, with: ['units.unit'] }).subscribe({
+      next: (res: any) => {
+        if (res?.data?.length) {
+          this.products = res.data;
+          this.setupDropdowns();
+        } else {
+          this.products = [];
+        }
       },
-      error: (err) => {
+      error: (error: any) => {
+        this.products = [];
       },
     });
   }
 
+  getAllParties() {
+    this.partyService.find({ pageSize: 1000 }).subscribe({
+      next: (res: any) => {
+        if (res?.data?.length) {
+          this.parties = res.data;
+          this.setupDropdowns();
+        } else {
+          this.parties = [];
+        }
+      },
+      error: (error: any) => {
+        this.parties = [];
+      },
+    });
+  }
   setupDropdowns(): void {
-    this.filteredPartiesByName = this.form.controls.partyName.valueChanges.pipe(
+    this.filteredPartiesByName = this.form.controls.name.valueChanges.pipe(
       startWith(''),
-      map(val => {
+      map((val) => {
         const value = (typeof val === 'string' ? val : val?.name || '').toLowerCase().trim();
         const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
         return this.parties
-          .filter(party => !value || party.name.toLowerCase().includes(value))
-          .map(party => ({
+          .filter((party) => !value || party.name.toLowerCase().includes(value))
+          .map((party) => ({
             ...party,
-            html: `${party.name.replace(regex, (match: any) => `<strong>${match}</strong>`)} - [${party.mobile}]`
+            html: `${party.name.replace(regex, (match: any) => `<strong>${match}</strong>`)} - [${party.mobile}]`,
           }));
       })
     );
 
     this.filteredPartiesByMobile = this.form.controls.mobile.valueChanges.pipe(
       startWith(''),
-      map(val => {
+      map((val) => {
         const value = (typeof val === 'string' ? val : val?.mobile || '').toLowerCase().trim();
         const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
         return this.parties
-          .filter(party => !value || party.mobile.toLowerCase().includes(value))
-          .map(party => ({
+          .filter((party) => !value || party.mobile.toLowerCase().includes(value))
+          .map((party) => ({
             ...party,
-            html: `${party.name} - [${party.mobile.replace(regex, (match: any) => `<strong>${match}</strong>`)}]`
+            html: `${party.name} - [${party.mobile.replace(regex, (match: any) => `<strong>${match}</strong>`)}]`,
           }));
       })
     );
 
-    this.form.get('partyName')?.valueChanges.subscribe((value) => {
+    this.form.get('name')?.valueChanges.subscribe((value) => {
       const match = this.parties.find((c) => c.name === value);
       if (match) {
         this.isNameSelected = true;
@@ -343,7 +382,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isMobileSelected = true;
         this.form.patchValue(
           {
-            partyName: match.name,
+            name: match.name,
             party_id: match.id,
           },
           { emitEvent: false }
@@ -362,13 +401,13 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
     const mobileValue = this.form.get('mobile')?.value;
     const match = this.parties.find((c) => c.mobile === mobileValue);
     if (!match) {
-      this.form.patchValue({ partyName: '', party_id: null });
+      this.form.patchValue({ name: '', party_id: null });
       this.isNameSelected = false;
     }
   }
 
   onNameBlur(): void {
-    const nameValue = this.form.get('partyName')?.value;
+    const nameValue = this.form.get('name')?.value;
     const match = this.parties.find((c) => c.name === nameValue);
     if (!match && this.isMobileSelected) {
       this.form.patchValue({ mobile: '', party_id: null });
@@ -477,24 +516,24 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
     const discountAmount = group.get('discount_amount')?.value || 0;
     const discountType = group.get('purchase_price_discount_type')?.value;
     const taxType = group.get('purchase_price_tax_type')?.value || 2;
-  
+
     let basePricePerUnit = pricePerUnit;
-  
+
     if (discountType === 1) {
       pricePerUnit -= discountAmount;
     } else if (discountType === 2) {
       pricePerUnit -= (pricePerUnit * discountAmount) / 100;
     }
-    
+
     pricePerUnit = Math.max(0, pricePerUnit);
-    
+
     basePricePerUnit = pricePerUnit;
     pricePerUnit = basePricePerUnit * (1 + taxRate / 100);
-  
+
     const taxPerUnit = (basePricePerUnit * taxRate) / 100;
     const totalTaxAmount = taxPerUnit * quantity;
     const totalItemAmount = pricePerUnit * quantity;
-  
+
     group.get('tax_amount')?.setValue(parseFloat(totalTaxAmount.toFixed(2)), { emitEvent: false });
     group.get('amount')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
     group.get('net')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
@@ -525,20 +564,22 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  onProductSelected(selectedProduct: any, index: number): void { 
+  onProductSelected(selectedProduct: any, index: number): void {
     console.log(selectedProduct);
-       
+
     const group = this.purchaseDetails.at(index) as FormGroup;
-    if (!group || !selectedProduct?.product_unit?.length) {
+    if (!group || !selectedProduct?.units?.length) {
       return;
     }
 
-    const productUnit = selectedProduct.product_unit[0];
+    const productUnit = selectedProduct.units[0];
+    console.log("product unit",productUnit);
+    
     const purchasePrice = parseFloat(productUnit.purchase_price);
     const taxRateId = productUnit.tax_rate_id || null;
     const taxType = productUnit.purchase_price_tax_type;
     const discountAmount = parseFloat(productUnit.purchase_price_discount_amount) || 0;
-    const discountType = productUnit.purchase_price_discount_type;
+    const discountType = productUnit.purchase_price_discount_type || 1;
     const taxRateObj = this.tax_rates.find((t) => t.id === taxRateId);
     const taxRatePercentage = taxRateObj ? taxRateObj.rate : 0;
 
@@ -557,7 +598,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
         unit_name: productUnit.unit.name,
         price_per_unit: parseFloat(pricePerUnit.toFixed(2)),
         discount_amount: discountAmount || 0,
-       purchase_price_tax_type: taxType,
+        purchase_price_tax_type: taxType,
         purchase_price_discount_type: discountType,
         tax_rate: taxRateId,
       },
@@ -574,7 +615,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
     this.purchaseDetails.controls.forEach((ctrl) => {
       totalNet += ctrl.get('net')?.value || 0;
     });
-  
+
     if (this.isManualAmount) {
       totalNet = parseFloat(this.form.get('amount')?.value) || 0;
     } else {
@@ -582,19 +623,19 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
       this.form.get('amount')?.setValue(parseFloat(totalNet.toFixed(2)), { emitEvent: false });
       this.updatingAmountFromCode = false;
     }
-  
+
     const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
     const discountType = this.form.get('discount_type')?.value;
     let netTotal = totalNet;
-  
+
     if (discountType === 1) {
       netTotal -= discountAmount;
     } else if (discountType === 2) {
       netTotal -= (totalNet * discountAmount) / 100;
     }
-  
+
     netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
-  
+
     if (this.form.get('payment_method')?.value === 1) {
       this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
       this.form.get('online_amount')?.setValue(0, { emitEvent: false });
@@ -602,7 +643,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
       this.form.get('cash_amount')?.setValue(0, { emitEvent: false });
       this.form.get('online_amount')?.setValue(netTotal, { emitEvent: false });
     }
-  
+
     this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
     this.cdr.detectChanges();
   }
@@ -614,7 +655,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
   patchForm(purchase: any): void {
     this.form.patchValue({
       party_id: purchase.party_id || null,
-      partyName: purchase.party ? purchase.party.name : '',
+      name: purchase.party ? purchase.party.name : '',
       amount: purchase.amount || null,
       discount_amount: purchase.discount_amount || 0,
       discount_type: purchase.discount_type || null,
@@ -714,7 +755,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
 
     const payload = {
       ...rawForm,
-      name: rawForm.partyName,
+     
       payment_method: rawForm.payment_method,
       cash_amount: rawForm.cash_amount || 0,
       online_amount: rawForm.online_amount || 0,
@@ -725,7 +766,6 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
       purchaseDetails: processedpurchaseDetails,
     };
 
-    delete payload.partyName;
 
     this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
       next: (response: any) => {
@@ -818,6 +858,14 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
     return true;
   }
 
+  goBackToListing(){
+    if (this.dialogRef) {
+      this.dialogRef.close();
+      return;
+    }
+    this.router.navigate(['/app/purchase']);
+
+  }
   validateNumericInput(event: KeyboardEvent): void {
     const char = event.key;
     const allowedKeys = [

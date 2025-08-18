@@ -1,94 +1,77 @@
-<div class="purchase-order-container ">
-  <!-- Header Section -->
-  <div class="header-section">
-    <h1 class="title">PURCHASE ORDER</h1>
-    <h2 class="order-number">Purchase Order# PO-0000{{ purchaseDetails?.id }}</h2>
-  </div>
-
+-<div class="sale-details-container ">
   <!-- Print Button -->
   <div class="print-button-container">
     <button class="print-button" (click)="printInvoice()">Print Invoice</button>
   </div>
 
-  <!-- Status Section -->
-  <div class="status-section">
-    <div class="status-item">
-      <strong>Status:</strong>
-      <span class="status-label order-status">{{ purchaseDetails?.status || 'Issued' }}</span>
+  <!-- Header Section -->
+  <div
+    style="border: 1px solid #000; font-family: Arial, sans-serif; width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+
+
+    <div style="border: 1px solid #000; padding: 8px;">
+      <h1 style="margin: 0;">{{purchaseDetails?.party?.name}}</h1>
+      <p style="margin: 0;">Phone: <strong>{{purchaseDetails?.party?.mobile}}</strong></p>
     </div>
-    <div class="status-item">
-      <strong>Receive:</strong>
-      <span class="status-label receive-status">{{ purchaseDetails?.receive_status || 'Received' }}</span>
-    </div>
+
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+      <thead>
+        <tr>
+          <th style="border: 1px solid #000; background: #f2f2f2; padding: 6px; text-align: left;">Bill To:</th>
+          <th style="border: 1px solid #000; background: #f2f2f2; padding: 6px; text-align: left;">Invoice Details:</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border: 1px solid #000; padding: 6px;">
+            <strong>{{purchaseDetails?.party?.billing_address?.address}}</strong><br>
+           {{purchaseDetails?.party?.billing_address?.city?.name}}<br>
+            Contact No: <strong>{{purchaseDetails?.party?.billing_address?.mob1||purchaseDetails?.party?.billing_address?.mob2}}</strong><br>
+            State: <strong>{{purchaseDetails?.party?.billing_address?.city.state?.name}}</strong>
+          </td>
+          <td style="border: 1px solid #000; padding: 6px;">
+            No: <strong>{{purchaseDetails?.id}}</strong><br>
+            Date: <strong>{{purchaseDetails?.created_at  | date:'dd/MM/yyyy'}}</strong><br>
+            Place Of Supply: <strong>{{purchaseDetails?.party?.billing_address?.city.state?.name}}</strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- Details Section -->
-  <div class="details-section">
-    <div class="details-column">
-      <p><strong>Reference#:</strong> {{ purchaseDetails?.notes || 'Test' }}</p>
-      <p><strong>Order Date:</strong> {{ purchaseDetails?.created_at | date: 'dd/MM/yyyy' }}</p>
-      <p><strong>Delivery Date:</strong> {{ purchaseDetails?.created_at | date: 'dd/MM/yyyy' }}</p>
-      <p><strong>Payment Terms:</strong> {{ purchaseDetails?.payment_terms || 'Due on Receipt' }}</p>
-    </div>
-    <div class="details-column">
-      <p>
-        <strong>Supplier Address:</strong><br />
-        {{ purchaseDetails?.supplier?.name }}<br />
-        <span *ngIf="purchaseDetails?.supplier?.billing_address_id && address.length > 0 && states.length > 0">
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.address }},
-          <br />
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.mob1 }},{{
-            getAddressById(purchaseDetails?.supplier?.billing_address_id)?.mob2
-          }},
-
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city?.name }},
-
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city?.state_id)?.name }},
-
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city?.state_id)?.country.name }}
-          {{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.pin }}
-        </span>
-      </p>
-      <p>
-        <strong>Delivery Address:</strong>
-        <span *ngIf="purchaseDetails?.supplier?.shipping_address_id && address.length > 0 && states.length > 0">
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.address }},
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob1 }},{{
-            getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob2
-          }}
-
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.name }},
-
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.name }},
-
-          {{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.country.name }},
-
-          {{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.pin }}
-        </span>
-      </p>
-    </div>
-  </div>
 
   <!-- Items Section -->
   <div class="items-section">
     <h3>Items & Description</h3>
     <table class="items-table">
-      <thead>
+      <thead style="background-color: #ccc;">
         <tr>
+          <th>#</th>
           <th>Item Name</th>
-          <th>Ordered</th>
-          <th>Status</th>
-          <th>Rate ₹</th>
+          <th>HSN/ SAC</th>
+
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Price/Unit(₹)</th>
+          <th>Discount(₹)</th>
+          <th>Tax</th>
           <th>Amount</th>
         </tr>
       </thead>
-      <tbody *ngIf="products.length > 0">
-        <tr *ngFor="let item of purchaseDetails?.purchase_details">
-          <td>{{ getProductByid(item.product_id)?.name }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.status || 'Billed' }}</td>
-          <td>{{ item.amount | number: '1.2-2' }}</td>
-          <td>{{ item.amount*item.quantity | number: '1.2-2' }}</td>
+      <tbody>
+        <tr *ngFor="let item of purchaseDetails?.purchase_details index as i">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item?.product?.name }}</td>
+          <td>{{ item?.product?.hsn || 'N/A' }}</td>
+          <td>{{ item?.quantity }}</td>
+          <td>{{ item?.unit?.name || 'N/A' }}</td>
+          <td>₹{{calculatePricePerUnit(item?.quantity,item?.rate,item?.tax_amount,item.discount_amount*item?.quantity)}}
+          </td>
+          <td>₹{{item.discount_amount*item?.quantity|number: '1.2-2' }},&nbsp;&nbsp;({{
+            calculateDiscountPercentage(item?.rate,item?.tax_amount,item.discount_amount*item?.quantity) }}%)</td>
+          <td>{{ item?.tax_amount | number: '1.2-2' }},&nbsp;&nbsp;( {{calculateTaxPercentage(item?.rate,
+            item?.tax_amount)}}% )</td>
+          <td>₹{{item?.rate | number: '1.2-2' }}</td>
         </tr>
       </tbody>
     </table>
@@ -98,126 +81,109 @@
   <div class="summary-section">
     <div class="summary-item">
       <strong>Sub Total:</strong>
-      <span>₹{{ purchaseDetails?.sub_total || '1,200.00' }}</span>
+      <span>₹{{ purchaseDetails?.amount }}</span>
     </div>
     <div class="summary-item">
       <strong>Discount:</strong>
-      <span>₹{{ purchaseDetails?.discount || '0.00' }}</span>
+      <span>₹{{ purchaseDetails?.discount_amount || '0.00' }}</span>
     </div>
     <div class="summary-item">
-      <strong>Total:</strong>
-      <span>₹{{ purchaseDetails?.total || '1,200.00' }}</span>
+      <strong>Due Amount:</strong>
+      <span>₹{{ purchaseDetails?.due_amont || 0.00 }}</span>
     </div>
-  </div>
-  <div
-    id="invoice-section"
-    style="
-      padding: 16px;
-      font-family: Arial, sans-serif;
-      border: 1px solid #ccc;
-      max-width: 800px;
-      margin: auto;
-      display: none;
-    "
-  >
-    <h1 style="text-align: center; font-size: 24px; margin-bottom: 16px">XYZ ENTERPRISES</h1>
-    <p style="text-align: center; margin: 0">123 MARKET ROAD, MUMBAI, INDIA</p>
-    <p style="text-align: center; margin: 0">+91-9876543210 | xyz&#64;company.com</p>
-    <h2 style="text-align: center; margin-top: 16px">PURCHASE INVOICE</h2>
+    <div class="summary-item">
+      <strong>Return  Amount:</strong>
+      <span>₹{{ purchaseDetails?.return_amount || 0.00 }}</span>
+    </div>
 
-    <!-- Invoice Details -->
-    <div style="margin-top: 16px">
-      <table style="width: 100%; border-collapse: collapse">
-        <tr>
-          <td><strong>Invoice No:</strong> PO-0000{{ purchaseDetails?.id }}</td>
-          <td><strong>Invoice Date:</strong> {{ purchaseDetails?.created_at | date: 'dd-MMMM-yyyy' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Supplier Name:</strong> {{ purchaseDetails?.supplier?.name }}</td>
-          <td><strong>Supplier GSTIN:</strong> {{ purchaseDetails?.supplier?.gst || '27AAAAA0000A1Z5' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Purchase Type:</strong> Taxable</td>
-        </tr>
+    <div class="summary-item">
+      <strong>Total:</strong>
+      <span>₹{{ purchaseDetails?.net_total || 0.00 }}</span>
+    </div>
+    
+  </div>
+  <!--enovice-->
+  <div id="print-section" style="display: none;">
+    <h1 style="text-align: center;">PURCHASE INVOICE</h1>
+    <!-- Invoice Header Section -->
+    <div
+      style="border: 1px solid #000; font-family: Arial, sans-serif; width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+      <div style="border: 1px solid #000; padding: 8px;">
+        <h1 style="margin: 0;">{{purchaseDetails?.party?.name}}</h1>
+        <p style="margin: 0;">Phone: <strong>{{purchaseDetails?.party?.mobile}}</strong></p>
+        <p style="margin: 0;">Email: info&#64;company.com</p>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; margin-top: 8px;">
+        <thead>
+          <tr>
+            <th style="border: 1px solid #000; background: #f2f2f2; padding: 6px; text-align: left;">Bill To:</th>
+            <th style="border: 1px solid #000; background: #f2f2f2; padding: 6px; text-align: left;">Invoice Details:
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #000; padding: 6px;">
+              <strong>{{ purchaseDetails?.party?.name || 'N/A' }}</strong><br>
+              {{purchaseDetails?.party?.billing_address?.address}}<br>
+              Contact No: <strong>{{ purchaseDetails?.party?.mobile || 'N/A' }}</strong><br>
+              State: <strong>{{purchaseDetails?.party?.billing_address?.city.state?.name}}</strong>
+            </td>
+            <td style="border: 1px solid #000; padding: 6px;">
+              No: <strong>{{ purchaseDetails?.id || 'N/A' }}</strong><br>
+              Date: <strong>{{ purchaseDetails?.created_at | date:'dd/MM/yyyy' }}</strong><br>
+              Place Of Supply: <strong>{{purchaseDetails?.party?.billing_address?.city.state?.name}}</strong>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
-    <!--address-->
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px">
-      <tr>
-        <td style="width: 50%; padding: 10px; border: 1px solid #000">
-          <strong>Bill To:</strong><br />
-          {{ purchaseDetails?.supplier?.name }}<br />
-          <span *ngIf="purchaseDetails?.supplier?.billing_address_id && address.length > 0 && states.length > 0">
-            <strong>Address Name : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.address }}
-            <br />
-            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.mob1 }},{{
-              getAddressById(purchaseDetails?.supplier?.billing_address_id).mob2
-            }}
-            <br />
-            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.city.name }} <br />
-            <strong>State : </strong
-            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id)?.name }} <br />
-            <strong>Country : </strong
-            >{{
-              getStateById(getAddressById(purchaseDetails?.supplier?.billing_address_id).city.state_id)?.country.name
-            }}
-            <br />
-            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.billing_address_id)?.pin }} <br />
-          </span>
-        </td>
-        <td style="width: 50%; padding: 10px; border: 1px solid #000">
-          <strong>Shipping To:</strong><br />
-          <span *ngIf="purchaseDetails?.supplier?.shipping_address_id && address.length > 0 && states.length > 0">
-            <strong>Address Name : </strong
-            >{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.address }} <br />
-            <strong>Contact : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob1 }},{{
-              getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.mob2
-            }}
-            <br />
-            <strong>City : </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.name }}
-            <br />
-            <strong>State : </strong
-            >{{ getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.name }}
-            <br />
-            <strong>Country : </strong
-            >{{
-              getStateById(getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.city.state_id)?.country.name
-            }}
-            <br />
-            <strong>Zip Code: </strong>{{ getAddressById(purchaseDetails?.supplier?.shipping_address_id)?.pin }} <br />
-          </span>
-        </td>
-      </tr>
-    </table>
-    <!-- Items Purchased -->
-    <h3 style="margin-top: 16px">Items Purchased</h3>
-    <table border="1" style="width: 100%; border-collapse: collapse; text-align: left">
+
+    <h3>Items & Description</h3>
+
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
       <thead>
         <tr>
-          <th style="padding: 8px">S No</th>
-          <th style="padding: 8px">Item Name</th>
-          <th style="padding: 8px">HSN Code</th>
-          <th style="padding: 8px">Quantity</th>
-          <th style="padding: 8px">Rate ₹</th>
-          <th style="padding: 8px">Tax %</th>
-          <th style="padding: 8px">Total ₹</th>
+          <th style="border: 1px solid #000; padding: 5px;">#</th>
+          <th style="border: 1px solid #000; padding: 5px;">Item Name</th>
+          <th style="border: 1px solid #000; padding: 5px;">HSN/SAC</th>
+          <th style="border: 1px solid #000; padding: 5px;">Qty</th>
+          <th style="border: 1px solid #000; padding: 5px;">Unit</th>
+          <th style="border: 1px solid #000; padding: 5px;">Price/Unit (₹)</th>
+          <th style="border: 1px solid #000; padding: 5px;">Discount (₹ / %)</th>
+          <th style="border: 1px solid #000; padding: 5px;">Tax (₹ / %)</th>
+          <th style="border: 1px solid #000; padding: 5px;">Amount (₹)</th>
         </tr>
       </thead>
-      <tbody *ngIf="products.length > 0">
+      <tbody>
         <tr *ngFor="let item of purchaseDetails?.purchase_details; let i = index">
-          <td style="padding: 8px">{{ i + 1 }}</td>
-          <td style="padding: 8px">{{ getProductByid(item.product_id).name }}</td>
-          <td style="padding: 8px">8471</td>
-          <td style="padding: 8px">{{ item.quantity }}</td>
-          <td style="padding: 8px">{{ item.amount }}</td>
-          <td style="padding: 8px">18%</td>
-          <td style="padding: 8px">{{ item.amount | number: '1.2-2' }}</td>
-        </tr>
-        <tr>
-          <td colspan="6" style="padding: 8px; text-align: right"><strong>Total</strong></td>
-          <td style="padding: 8px">{{ purchaseDetails?.amount }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ i + 1 }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item?.product?.name }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item?.product?.hsn || 'N/A' }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item?.quantity }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item?.unit?.name || 'N/A' }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{
+            calculatePricePerUnit(item?.quantity,item?.rate,item?.tax_amount,item.discount_amount*item?.quantity) }}
+          </td>
+          <td style="border: 1px solid #000; padding: 5px;">
+            ₹{{ item.discount_amount*item?.quantity | number:'1.2-2' }},
+            ({{ calculateDiscountPercentage(item?.rate,item?.tax_amount,item.discount_amount*item?.quantity) }}%)
+          </td>
+          <td style="border: 1px solid #000; padding: 5px;">
+            ₹{{ item?.tax_amount | number:'1.2-2' }},
+            ({{ calculateTaxPercentage(item?.rate, item?.tax_amount) }}%)
+          </td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{ item?.rate | number:'1.2-2' }}</td>
         </tr>
       </tbody>
     </table>
+
+    <p style="text-align: right;"><strong>Subtotal:</strong> ₹{{ purchaseDetails?.amount }}</p>
+    <p style="text-align: right;"><strong>Discount:</strong> ₹{{ purchaseDetails?.discount_amount }}</p>
+    <p style="text-align: right;"><strong>Due Amount:</strong> ₹{{ purchaseDetails?.due_amount|| 0.00 }}</p>
+    <p style="text-align: right;"><strong>Return Amount:</strong> ₹{{ purchaseDetails?.return_amount||0.00 }}</p>
+    <p style="text-align: right;"><strong>Grand Total:</strong> ₹{{ purchaseDetails?.net_total }}</p>
+    <p style="text-align: center;">Thank you for your business!</p>
   </div>
 </div>
