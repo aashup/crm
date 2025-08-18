@@ -125,6 +125,7 @@ class PosController extends Controller
                 if ($productUnit) {
                     $this->updateInventory($productUnit, $detail);
                 } else {
+                    DB::rollBack();
                     return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
                 }
             }
@@ -176,7 +177,7 @@ class PosController extends Controller
                 'product_id' => $productUnit->product_id,
                 'unit_id' => $productUnit->unit_id,
                 'rem_qty' => -$detail['quantity'],
-                'quantity' => $detail['quantity'],
+                'qty' => $detail['quantity'],
                 'created_by' => Auth::id(),
                 'unit_price' => $detail['rate'] ?? 0,
             ]);

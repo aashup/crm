@@ -8,7 +8,14 @@ class PurchaseDetail extends Model
         "purchase_id",
         "product_id",
         "unit_id",
-        "amount",
+        'quantity',
+        'rate',
+        'discount_amount',
+        'discount_type',
+        'tax_amount',
+        'tax_rate',
+        'with_tax',
+        'net',
     ];
 
 
@@ -24,7 +31,14 @@ class PurchaseDetail extends Model
             "purchase_id",
             "product_id",
             "unit_id",
-            "amount",
+            'quantity',
+            'rate',
+            'discount_amount',
+            'discount_type',
+            'tax_amount',
+            'tax_rate',
+            'with_tax',
+            'net'
         ];
     }
 
@@ -35,7 +49,14 @@ class PurchaseDetail extends Model
             'purchase_id' => 'int',
             'product_id' => 'int',
             'unit_id' => 'int',
-            'amount' => 'int',
+            'quantity' => 'int',
+            'rate' => 'int',
+            'discount_amount' => 'int',
+            'discount_type' => 'int',
+            'tax_amount' => 'int',
+            'tax_rate' => 'int',
+            'with_tax' => 'int',
+            'net' => 'int',
             'created_at' => 'text',
             'updated_at' => 'text',
         ];
@@ -48,7 +69,14 @@ class PurchaseDetail extends Model
             "purchase_id",
             "product_id",
             "unit_id",
-            "amount",
+            'quantity',
+            'rate',
+            'discount_amount',
+            'discount_type',
+            'tax_amount',
+            'tax_rate',
+            'with_tax',
+            'net',
             'created_at',
             'updated_at',
         ];

@@ -44,6 +44,10 @@ return new class extends Migration
             $table->foreign('party_id')->references('id')->on('parties')->onDelete('cascade');
         });
 
+        Schema::table('purchases', function (Blueprint $table) {
+            $table->foreign('party_id')->references('id')->on('parties')->onDelete('cascade');
+        });
+
         $permisions = [
             "view any",
             "show",
