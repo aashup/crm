@@ -61,7 +61,7 @@ return new class extends Migration
                 $table->string('mob1', 20)->nullable();
                 $table->string('mob2', 20)->nullable();
                 $table->tinyInteger('type', false, true)
-                ->default(1)->comment('1-billing, 2-shipping');
+                    ->default(1)->comment('1-billing, 2-shipping');
                 $table->unsignedBigInteger('city_id');
                 $table->boolean('status')->default(true);
                 $table->unsignedBigInteger('created_by');
@@ -78,7 +78,7 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
             });
-            
+
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -99,7 +99,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('product_id');
                 $table->timestamps();
                 $table->softDeletes();
-                
+
                 $table->foreign('product_id')->references('id')->on('products');
             });
 
@@ -111,13 +111,13 @@ return new class extends Migration
                 $table->unsignedBigInteger('billing_address_id')->nullable();
                 $table->unsignedBigInteger('shipping_address_id')->nullable();
                 $table->string(column: 'notes')->nullable();
-                $table->tinyInteger( 'type', false, true)->default(1);
-                $table->tinyInteger( 'level', false, true)->default(1);
+                $table->tinyInteger('type', false, true)->default(1);
+                $table->tinyInteger('level', false, true)->default(1);
 
                 $table->boolean(column: 'status')->default(true);
                 $table->timestamps();
                 $table->softDeletes();
-                
+
                 $table->foreign('contact_id')->references('id')->on('contacts');
             });
 
@@ -128,7 +128,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('unit_id');
                 $table->decimal('price')->nullable();
                 $table->string(column: 'notes')->nullable();
-                $table->tinyInteger( 'type', false, true)->default(1);
+                $table->tinyInteger('type', false, true)->default(1);
                 $table->timestamps();
                 $table->softDeletes();
 
@@ -179,7 +179,7 @@ return new class extends Migration
                 $table->decimal('amount')->nullable();
                 $table->decimal('discount_amount')->default(0);
                 $table->tinyInteger('discount_type', false, true)->default(1)
-                ->comment("1. flat, 2. percent");
+                    ->comment("1. flat, 2. percent");
                 $table->decimal(column: 'net_total')->nullable();
                 $table->string(column: 'notes')->nullable();
                 $table->timestamps();
@@ -200,7 +200,7 @@ return new class extends Migration
                 $table->decimal('rate')->nullable();
                 $table->decimal('discount_amount')->default(0);
                 $table->tinyInteger('discount_type', false, true)->default(1)
-                ->comment("1. flat, 2. percent");
+                    ->comment("1. flat, 2. percent");
                 $table->decimal('net', 15, 2)->nullable();
                 $table->decimal('tax_amount', 15, 2)->nullable();
                 $table->text('tax_rate', 30)->nullable();
@@ -215,18 +215,23 @@ return new class extends Migration
 
             Schema::create('purchases', callback: function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger( 'contact_id');
-                $table->unsignedBigInteger('unit_id');
-                $table->unsignedBigInteger('supplier_id');
+                $table->unsignedBigInteger('party_id');
                 $table->unsignedBigInteger('created_by');
                 $table->decimal('amount')->nullable();
+                $table->decimal('discount_amount')->default(0);
+                $table->tinyInteger('discount_type', false, true)->default(1)
+                    ->comment("1. flat, 2. percent");
+                $table->decimal('net_total')->nullable();
                 $table->string(column: 'notes')->nullable();
+                $table->decimal('due_amount')->nullable();
+                $table->integer('payment_method')->default(1)->comment("1: Cash, 2: Online, 3: Split Payment");
+                $table->decimal('cash_amount')->nullable('pending');
+                $table->decimal('online_amount')->nullable('pending');
+                $table->decimal('return_amount')->default(0)->comment('Amount returned to customer, default is 0');
+                $table->text('transaction_id')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('contact_id')->references('id')->on('contacts');
-                $table->foreign('unit_id')->references('id')->on('units');
-                $table->foreign('supplier_id')->references('id')->on('suppliers');
                 $table->foreign('created_by')->references('id')->on('users');
             });
 
@@ -236,15 +241,22 @@ return new class extends Migration
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('unit_id');
                 $table->integer('quantity')->default(1);
-                $table->decimal('amount')->nullable();
+                $table->decimal('rate')->nullable();
+                $table->decimal('discount_amount')->default(0);
+                $table->tinyInteger('discount_type', false, true)->default(1)
+                    ->comment("1. flat, 2. percent");
+                $table->decimal('net', 15, 2)->nullable();
+                $table->decimal('tax_amount', 15, 2)->nullable();
+                $table->text('tax_rate', 30)->nullable();
+                $table->boolean('with_tax')->default(false);
                 $table->timestamps();
                 $table->softDeletes();
-                
+
                 $table->foreign('purchase_id')->references('id')->on('purchases');
                 $table->foreign('unit_id')->references('id')->on('units');
                 $table->foreign('product_id')->references('id')->on('products');
             });
-            
+
             Schema::create('payments', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('created_by');
@@ -254,13 +266,13 @@ return new class extends Migration
                 $table->unsignedBigInteger('supplier_id')->nullable();
                 $table->decimal('amount')->nullable();
                 $table->tinyInteger('type', false, true)
-                ->comment('1-sale, 2-purchase')
-                ->default(1);
+                    ->comment('1-sale, 2-purchase')
+                    ->default(1);
                 $table->timestamps();
                 $table->softDeletes();
 
                 $table->index('payment_id');
-                
+
                 $table->foreign('contact_id')->references('id')->on('contacts');
                 $table->foreign('supplier_id')->references('id')->on('suppliers');
                 $table->foreign('created_by')->references('id')->on('users');
@@ -269,7 +281,6 @@ return new class extends Migration
             $this->down();
             throw $e;
         }
-
     }
 
     /**
