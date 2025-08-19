@@ -179,6 +179,16 @@ class PurchaseController extends Controller
             }
             $validated['purchaseDetails'] = $purchaseDetails;
 
+            foreach ($purchase->purchaseDetails as $oldDetail) {
+                $productUnit = ProductUnit::where('product_id', $oldDetail->product_id)
+                    ->where('unit_id', $oldDetail->unit_id)
+                    ->first();
+
+                if ($productUnit) {
+                    $this->reverseInventory($productUnit, $oldDetail);
+                }
+            }
+
             $purchase->fill($validated);
             $purchase->save();
 
@@ -237,6 +247,20 @@ class PurchaseController extends Controller
                 'created_by' => Auth::id(),
                 'unit_price' => $detail['rate'] ?? 0,
             ]);
+        }
+    }
+
+    private function reverseInventory($productUnit, $detail)
+    {
+        $inventory = Inventory::where([
+            'product_id' => $productUnit->product_id,
+            'unit_id' => $productUnit->unit_id
+        ])->first();
+
+        if ($inventory) {
+            $inventory->qty = max(0, $inventory->qty - $detail['quantity']);
+            $inventory->rem_qty = max(0, $inventory->rem_qty - $detail['quantity']);
+            $inventory->save();
         }
     }
 }

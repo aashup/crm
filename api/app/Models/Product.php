@@ -21,7 +21,8 @@ class Product extends Model
     ];
 
     protected $relations = [
-        'units'
+        'units',
+        'inventory'
     ];
 
     public function searchableColumns()
@@ -92,5 +93,10 @@ class Product extends Model
     public function productUnit()
     {
         return $this->hasMany(ProductUnit::class, 'product_id', 'id');
+    }
+
+    public function inventory()
+    {
+        return $this->hasMany(Inventory::class, 'product_id');
     }
 }
