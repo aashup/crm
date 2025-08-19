@@ -1,421 +1,902 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, FormControl, AbstractControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import _ from 'lodash';
-
-import { PurchaseModel } from '../purchase.model';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
+import { filter, map, startWith, take } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import { CommonService } from 'src/app/modules/core/common.service';
-import { UnitService } from 'src/app/modules/settings/unit/unit.service';
-import { ProductService } from '../../product/product.service';
-import { ContactService } from 'src/app/modules/settings/contact/contact.service';
-import { PurchaseService } from '../purchase.service';
-import { VendorService } from '../../vendor/vendor.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
-import { forkJoin, map, startWith } from 'rxjs';
+import { Router } from '@angular/router';
+import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
+import { PartiesModel } from '../../parties/parties.model';
+import { ProductModel } from '../../product/product.model';
+import { UnitModel } from 'src/app/modules/settings/unit/unit.model';
+import { PurchaseService } from '../purchase.service';
+import { RateService } from '../../product/add-product-unit/rate-service';
+import { UnitService } from 'src/app/modules/settings/unit/unit.service';
+import { DirectSaleService } from '../../direct-sale/direct-sale.service';
+import { PartiesService } from '../../parties/parties.service';
+import { ProductService } from '../../product/product.service';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AddPartiesComponent } from '../../parties/add-parties/add-parties.component';
+import { PurchaseModel } from '../purchase.model';
 
 @Component({
   selector: 'app-add-purchase',
-  templateUrl: '././add-purchase.component.html',
-  styleUrl: '././add-purchase.component.scss',
-  standalone: false,
+  templateUrl: './add-purchase.component.html',
+  styleUrls: ['./add-purchase.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddPurchaseComponent implements AfterViewInit, OnInit {
+export class AddPurchaseComponent implements AfterViewInit, OnInit, OnDestroy {
+  readonly dialog = inject(MatDialog);
+  model: PurchaseModel
+
+    readonly data = inject<{
+      model: PurchaseModel;
+      isEdit: boolean;
+    }>(MAT_DIALOG_DATA, { optional: true });
+    private ngUnsubscribe = new Subject<void>();
+    readonly dialogRef = inject<MatDialogRef<AddPartiesComponent>>(MatDialogRef, { optional: true });
+  subscriptionHandler = new SubscriptionHandler();
   form: FormGroup;
-  contacts: any = [];
-  units: any = [];
-  suppliers: any = [];
-  products: any = [];
-  contactControl = new FormControl('', [Validators.required, this.autocompleteObjectValidator()]);
-  filteredContacts: any[] = [];
-
-  unitControl = new FormControl('', [Validators.required, this.autocompleteObjectValidator()]);
-  // Use a map or object to store filtered options for each row index
-  filteredProductOptions: { [key: number]: any[] } = {};
-  filteredUnitOptions: { [key: number]: any[] } = {};
-
-  filteredUnits: any[] = [];
-  isEdit = false;
+  filteredPartiesByName: Observable<PartiesModel[]>;
+  filteredPartiesByMobile: Observable<PartiesModel[]>;
+  products: ProductModel[] = [];
+  filteredProductList: ProductModel[][] = [];
+  units: UnitModel[] = [];
+  filteredUnitsList: any[][] = [];
+  isNameSelected = false;
+  isMobileSelected = false;
   isLoading = false;
-  readonly _ = _;
-  readonly dialogRef = inject(MatDialogRef<AddPurchaseComponent>);
-  readonly data = inject<{
-    model: PurchaseModel;
-    isEdit: boolean;
-  }>(MAT_DIALOG_DATA);
-
-  purchaseItems: PurchaseModel[] = [];
+  isEdit = false;
+  isManualAmount: boolean = false;
+  updatingAmountFromCode: boolean = false;
+  showCashFields: boolean = true;
+  showOnlineFields: boolean = false;
+  searchValue: '';
+  parties: any[] = [];
+  tax_rates: any[] = [];
 
   constructor(
     private fb: FormBuilder,
+    private service: PurchaseService,
     private commonService: CommonService,
+    private spinnerService: SpinnerService,
+    private router: Router,
     private unitService: UnitService,
-    private productService: ProductService,
-    private contactService: ContactService,
-    private purchaseService: PurchaseService,
-    private supplierService: VendorService,
-    private spinnerService: SpinnerService
+    private taxRateService: RateService,
+    private cdr: ChangeDetectorRef,
+    private partyService: PartiesService,
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
-    this.isEdit = this.data.isEdit;
+    this.model = this.data?.model || new PurchaseModel().clear();
+    this.isEdit = this.data?.isEdit || false;
+    console.log("model",this.model);
+    this.getAllTaxRates();
+    this.initializeForm(this.model);
+    this.validateDiscountAmount();
+    this.handlePaymentMethodValidation();
+    this.getAllProducts();
+    this.getAllParties();
+  }
 
+  getFormattedTaxLabel(type: number, rate: number): string {
+    const taxTypeMap: { [key: number]: string } = {
+      1: 'GST',
+      2: 'IGST',
+      3: 'CGST',
+      4: 'SGST',
+      5: 'VAT',
+      6: 'Service Tax',
+      7: 'Other',
+    };
+    const taxName = taxTypeMap[type] || 'Unknown';
+    return `${taxName}@${rate}`;
+  }
+
+  ngAfterViewInit(): void {
+    this.isLoading = false;
+    this.spinnerService.hide();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptionHandler.unsubscribe();
+    this.form.reset();
+    this.filteredUnitsList = [];
+    this.filteredProductList = [];
+    this.parties = [];
+    this.products = [];
+    this.units = [];
+  }
+
+  initializeForm(model:any): void {
     this.form = this.fb.group({
-      contact_id: [null, Validators.required],
-      unit_id: [null, Validators.required],
-      supplier_id: [null, Validators.required],
-      amount: [null, [Validators.required, Validators.min(1)]],
-      notes: [''],
-      purchaseDetails: this.fb.array([]), // Initialize as empty array
+      party_id: [model?.party_id||null],
+      mobile: [model?.party?.mobile, Validators.required],
+      name: [model?.party?.name, Validators.required],
+      unit_id: [model?.unit_id,null],
+      amount: [model?.amount|0, [Validators.required, this.nonNegativeValidator()]],
+      discount_amount: [model?.discount_amount|0, [this.nonNegativeValidator()]],
+      discount_type: [model?.discount_type|1],
+      net_total: [model?.net_total|0,{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
+      notes: [model?.notes || ''],
+      status: [model?.status |1, Validators.required],
+      payment_method: [model?.payment_method|1, Validators.required],
+      cash_amount: [model?.cash_amount|0, [Validators.required, Validators.min(0), this.nonNegativeValidator()]],
+      online_amount: [model?.online_amount, this.nonNegativeValidator()],
+      transaction_id: [model?.transaction_id||''],
+      return_amount: [model?.return_amount|0, { value: 0, disabled: true }],
+      purchaseDetails: this.fb.array([]),
     });
 
-    forkJoin([
-      this.unitService.find({ pageSize: 1000 }),
-      this.supplierService.find({}),
-      this.contactService.find({}),
-      this.productService.find({}),
-    ]).subscribe(([unitsRes, suppliersRes, contactsRes, productsRes]: any[]) => {
-      this.units = unitsRes.data;
-      this.suppliers = suppliersRes.data;
-      this.contacts = contactsRes.data;
-      this.products = productsRes.data;
+    const firstPurchaseDetails = this.createPurchaseDetailGroup();
+    this.purchaseDetails.push(firstPurchaseDetails);
+    this.setupPurchaseDetailItem(firstPurchaseDetails, 0);
 
-      if (this.isEdit && this.data.model) {
-        this.patchForm(this.data.model);
-      } else {
-        // For 'Create' mode, add one default purchase detail row
-        this.addPurchaseDetail();
-      }
-    });
-
-    // --- Main Form Controls Autocomplete Logic ---
-    this.contactControl.valueChanges
-      .pipe(
-        startWith(''), // Ensure it emits on initialization for filtering
-        map((value: any) => (typeof value === 'string' ? value : value?.name)),
-        map((name) =>
-          name ? this.contacts.filter((c: any) => c.name.toLowerCase().includes(name.toLowerCase())) : this.contacts
-        )
-      )
-      .subscribe((filtered) => (this.filteredContacts = filtered));
-
-    this.unitControl.valueChanges
-      .pipe(
-        startWith(''),
-        map((value: any) => (typeof value === 'string' ? value : value?.name)),
-        map((name) =>
-          name ? this.units.filter((u: any) => u.name.toLowerCase().includes(name.toLowerCase())) : this.units
-        )
-      )
-      .subscribe((filtered) => (this.filteredUnits = filtered));
-
-    this.contactControl.valueChanges.subscribe((val: any) => {
-      // Ensure the value is an object with an 'id' property before setting
-      if (val && typeof val === 'object' && val.id) {
-        this.form.get('contact_id')?.setValue(val.id);
-      } else {
-        this.form.get('contact_id')?.setValue(null); // Clear if not a valid selection
-      }
-    });
-
-    this.unitControl.valueChanges.subscribe((val: any) => {
-      // Ensure the value is an object with an 'id' property before setting
-      if (val && typeof val === 'object' && val.id) {
-        this.form.get('unit_id')?.setValue(val.id);
-      } else {
-        this.form.get('unit_id')?.setValue(null); // Clear if not a valid selection
+    this.form.get('discount_amount')?.valueChanges.subscribe(() => this.calculateNetTotal());
+    this.form.get('discount_type')?.valueChanges.subscribe(() => this.calculateNetTotal());
+    this.form.get('amount')?.valueChanges.subscribe(() => {
+      if (!this.updatingAmountFromCode) {
+        this.isManualAmount = true;
+        this.calculateNetTotal();
       }
     });
   }
 
-  // --- Autocomplete Validation Functions ---
-  autocompleteObjectValidator() {
-    return (control: AbstractControl) => {
-      const value = control.value;
-      if (value && typeof value === 'object' && value.id) {
-        return null;
+  getAllUnits() {
+    this.unitService.find({ pageSize: 1000 }).subscribe((res: any) => {
+      this.units = res.data;
+    });
+  }
+
+  getAllTaxRates(): void {
+    this.taxRateService
+      .find({ pageSize: 1000 })
+      .pipe(take(1))
+      .subscribe({
+        next: (res: any) => {
+          if (res?.data?.length) {
+            this.tax_rates = res.data;
+          } else {
+            this.tax_rates = [];
+          }
+        },
+        error: (error: any) => {
+          this.tax_rates = [];
+        },
+      });
+  }
+
+  handlePaymentMethodValidation(): void {
+    this.form.get('payment_method')?.valueChanges.subscribe((type) => {
+      const cash = this.form.get('cash_amount');
+      const online = this.form.get('online_amount');
+      const txn = this.form.get('transaction_id');
+
+      cash?.clearValidators();
+      online?.clearValidators();
+      txn?.clearValidators();
+
+      if (type == 1) {
+        this.showCashFields = true;
+        this.showOnlineFields = false;
+        online?.setValue(0);
+        txn?.setValue('');
+        cash?.setValue(this.form.get('net_total')?.value || 0);
+        cash?.setValidators([Validators.required, Validators.min(0)]);
+      } else if (type == 2) {
+        this.showOnlineFields = false;
+        this.showCashFields = false;
+        cash?.setValue(0);
+        online?.setValue(this.form.get('net_total')?.value || 0);
+      } else if (type == 3) {
+        this.showCashFields = true;
+        this.showOnlineFields = true;
+        cash?.setValue(0);
+        online?.setValue(0);
+        cash?.setValidators([Validators.required, Validators.min(0)]);
+        online?.setValidators([Validators.required, Validators.min(0)]);
       }
-      return { invalidSelection: true };
+
+      cash?.updateValueAndValidity();
+      online?.updateValueAndValidity();
+      txn?.updateValueAndValidity();
+    });
+  }
+
+  updateFilteredUnits(index?: number): void {
+    const controlsToUpdate =
+      index !== undefined ? [this.purchaseDetails.controls[index]] : this.purchaseDetails.controls;
+    controlsToUpdate.forEach((group, i) => {
+      const currentRowIndex = index !== undefined ? index : i;
+      const selectedProductId = group.get('product_id')?.value;
+      let unitsForProduct = [...this.units];
+      if (selectedProductId) {
+        const selectedProduct: any = this.products.find((p) => p.id === selectedProductId);
+        unitsForProduct = selectedProduct?.product_unit?.map((pu: any) => pu.unit) || [];
+      }
+      const searchValue = (group.get('unit_name')?.value || '').toLowerCase();
+      const filtered = unitsForProduct.filter((unit: any) => unit.name.toLowerCase().includes(searchValue));
+
+      if (!this.filteredUnitsList[currentRowIndex]) {
+        this.filteredUnitsList[currentRowIndex] = [];
+      }
+      this.filteredUnitsList[currentRowIndex] = [...filtered];
+      this.cdr.detectChanges();
+    });
+  }
+
+  createPurchaseDetailGroup(): FormGroup {
+    
+    return this.fb.group({
+      product_id: [null],
+      product_name: [null, Validators.required],
+      unit_id: [null, Validators.required],
+      unit_name: [null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1), this.nonNegativeValidator()]],
+      price_per_unit: [0, [Validators.required, this.nonNegativeValidator()]],
+      discount_amount: [0, [this.nonNegativeValidator()]],
+      purchase_price_tax_type: [2],
+      purchase_price_discount_type: [1],
+      tax_rate: [null],
+      tax_amount: [0],
+      amount: [0, [Validators.required, this.nonNegativeValidator()]],
+      net: [{ value: 0, disabled: true }],
+    });
+  }
+
+  searchUnit(event: any, index: number) {
+    this.getAllUnits();
+    let list;
+    this.searchValue = event.target.value;
+    list = this.units.filter((unit: any) => unit.name.toLowerCase().includes(this.searchValue.toLocaleLowerCase()));
+    this.filteredUnitsList[index] = list;
+  }
+
+  get returnAmount(): number {
+    const net = this.form.get('net_total')?.value || 0;
+    const cash = parseFloat(this.form.get('cash_amount')?.value) || 0;
+    const online = parseFloat(this.form.get('online_amount')?.value) || 0;
+    const type = this.form.get('payment_method')?.value;
+    let returnAmt = 0;
+    if (type === 1) {
+      returnAmt = cash - net;
+    } else if (type === 2) {
+      returnAmt = online - net;
+    } else if (type === 3) {
+      returnAmt = cash + online - net;
+    }
+    return returnAmt > 0 ? parseFloat(returnAmt.toFixed(2)) : 0;
+  }
+
+  get dueAmount(): number {
+    const net = +this.form.get('net_total')?.value || 0;
+    const cash = +this.form.get('cash_amount')?.value || 0;
+    const online = +this.form.get('online_amount')?.value || 0;
+    const type = this.form.get('payment_method')?.value;
+    let paid = 0;
+    switch (type) {
+      case 1:
+        paid = cash;
+        break;
+      case 2:
+        paid = online;
+        break;
+      case 3:
+        paid = cash + online;
+        break;
+      default:
+        paid = 0;
+    }
+    const dueAmt = Math.max(0, net - paid);
+    return dueAmt;
+  }
+
+  nonNegativeValidator() {
+    return (control: AbstractControl) => {
+      const value = parseFloat(control.value);
+      if (isNaN(value)) return null;
+      return value < 0 ? { negativeValue: true } : null;
     };
   }
 
-  validateUnitControl(): void {
-    const value: any = this.unitControl.value;
-    if (!value || typeof value !== 'object' || !value.id) {
-      this.unitControl.setErrors({ invalidSelection: true });
-    } else {
-      this.unitControl.setErrors(null);
-    }
-    this.unitControl.markAsTouched();
+  getAllProducts() {
+    this.productService.find({ pageSize: 1000, with: ['units.unit'] }).subscribe({
+      next: (res: any) => {
+        if (res?.data?.length) {
+          this.products = res.data;
+          this.setupDropdowns();
+        } else {
+          this.products = [];
+        }
+      },
+      error: (error: any) => {
+        this.products = [];
+      },
+    });
   }
 
-  validateContactControl(): void {
-    const value: any = this.contactControl.value;
-    if (!value || typeof value !== 'object' || !value.id) {
-      this.contactControl.setErrors({ invalidSelection: true });
-    } else {
-      this.contactControl.setErrors(null);
-    }
-    this.contactControl.markAsTouched();
+  getAllParties() {
+    this.partyService.find({ pageSize: 1000 }).subscribe({
+      next: (res: any) => {
+        if (res?.data?.length) {
+          this.parties = res.data;
+          this.setupDropdowns();
+        } else {
+          this.parties = [];
+        }
+      },
+      error: (error: any) => {
+        this.parties = [];
+      },
+    });
+  }
+  setupDropdowns(): void {
+    this.filteredPartiesByName = this.form.controls.name.valueChanges.pipe(
+      startWith(''),
+      map((val) => {
+        const value = (typeof val === 'string' ? val : val?.name || '').toLowerCase().trim();
+        const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        return this.parties
+          .filter((party) => !value || party.name.toLowerCase().includes(value))
+          .map((party) => ({
+            ...party,
+            html: `${party.name.replace(regex, (match: any) => `<strong>${match}</strong>`)} - [${party.mobile}]`,
+          }));
+      })
+    );
+
+    this.filteredPartiesByMobile = this.form.controls.mobile.valueChanges.pipe(
+      startWith(''),
+      map((val) => {
+        const value = (typeof val === 'string' ? val : val?.mobile || '').toLowerCase().trim();
+        const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        return this.parties
+          .filter((party) => !value || party.mobile.toLowerCase().includes(value))
+          .map((party) => ({
+            ...party,
+            html: `${party.name} - [${party.mobile.replace(regex, (match: any) => `<strong>${match}</strong>`)}]`,
+          }));
+      })
+    );
+
+    this.form.get('name')?.valueChanges.subscribe((value) => {
+      const match = this.parties.find((c) => c.name === value);
+      if (match) {
+        this.isNameSelected = true;
+        this.form.patchValue(
+          {
+            mobile: match.mobile,
+            party_id: match.id,
+          },
+          { emitEvent: false }
+        );
+      } else {
+        this.isNameSelected = false;
+      }
+    });
+
+    this.form.get('mobile')?.valueChanges.subscribe((value) => {
+      const match = this.parties.find((c) => c.mobile === value);
+      if (match) {
+        this.isMobileSelected = true;
+        this.form.patchValue(
+          {
+            name: match.name,
+            party_id: match.id,
+          },
+          { emitEvent: false }
+        );
+      } else {
+        this.isMobileSelected = false;
+      }
+    });
   }
 
-  // --- Display Functions for Autocomplete ---
-  displayContact(contact: any): string {
-    return contact ? `${contact.name}` : '';
-  }
-
-  displayUnit(unit: any): string {
-    return unit ? unit.name : '';
-  }
-
-  getProductName(product: any): string {
-    return product?.name || '';
-  }
-
-  getUnitName(unit: any): string {
-    return unit?.name || '';
-  }
-
-  // --- Form Array (Purchase Details) Functions ---
   get purchaseDetails(): FormArray {
     return this.form.get('purchaseDetails') as FormArray;
   }
 
-  createPurchaseDetail(): FormGroup {
-    const group = this.fb.group({
-      // These will hold the full object for autocomplete display, but we'll extract the ID for submission
-      product_id: [null, [Validators.required, this.autocompleteObjectValidator()]],
-      unit_id: [null, [Validators.required, this.autocompleteObjectValidator()]],
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      amount: [null, Validators.required],
+  onContactBlur(): void {
+    const mobileValue = this.form.get('mobile')?.value;
+    const match = this.parties.find((c) => c.mobile === mobileValue);
+    if (!match) {
+      this.form.patchValue({ name: '', party_id: null });
+      this.isNameSelected = false;
+    }
+  }
+
+  onNameBlur(): void {
+    const nameValue = this.form.get('name')?.value;
+    const match = this.parties.find((c) => c.name === nameValue);
+    if (!match && this.isMobileSelected) {
+      this.form.patchValue({ mobile: '', party_id: null });
+      this.isMobileSelected = false;
+    }
+  }
+
+  getSelectedProductIds(): number[] {
+    return this.purchaseDetails.controls.map((control) => control.get('product_id')?.value).filter((id) => id !== null);
+  }
+
+  updateFilteredProducts(): void {
+    const selectedIds = this.getSelectedProductIds();
+    this.filteredProductList = [];
+    this.purchaseDetails.controls.forEach((group, index) => {
+      const currentSelectedProductId = group.get('product_id')?.value;
+      const availableProducts = this.products.filter(
+        (product) => !selectedIds.includes(product.id) || product.id === currentSelectedProductId
+      );
+      if (!this.filteredProductList[index]) {
+        this.filteredProductList[index] = [];
+      }
+      this.filteredProductList[index] = availableProducts;
     });
-    return group;
+    this.cdr.detectChanges();
+  }
+
+  private setupPurchaseDetailItem(group: FormGroup, index: number): void {
+    group
+      .get('product_name')
+      ?.valueChanges.pipe(
+        map((value: any) => {
+          const name = typeof value === 'string' ? value.toLowerCase() : value?.name?.toLowerCase() || '';
+          return name;
+        }),
+        filter((name) => name.length > 0 || group.get('product_id')?.value !== null)
+      )
+      .subscribe((name: string) => {
+        if (!this.filteredProductList[index]) {
+          this.filteredProductList[index] = [];
+        }
+        const selectedIds = this.getSelectedProductIds();
+        const availableProducts = this.products.filter(
+          (product) => !selectedIds.includes(product.id) || product.id === group.get('product_id')?.value
+        );
+        this.filteredProductList[index] = availableProducts.filter((product: any) =>
+          product.name.toLowerCase().includes(name)
+        );
+        this.cdr.detectChanges();
+      });
+
+    group
+      .get('unit_name')
+      ?.valueChanges.pipe(startWith(''))
+      .subscribe(() => {
+        this.updateFilteredUnits(index);
+      });
+
+    group.get('quantity')?.valueChanges.subscribe(() => this.calculateItemNet(index));
+    group.get('price_per_unit')?.valueChanges.subscribe(() => this.calculateItemNet(index));
+    group.get('tax_rate')?.valueChanges.subscribe(() => this.calculateItemNet(index));
+    group.get('discount_amount')?.valueChanges.subscribe(() => this.calculateItemNet(index));
+    group.get('purchase_price_discount_type')?.valueChanges.subscribe(() => this.calculateItemNet(index));
+
+    this.updateFilteredUnits(index);
   }
 
   addPurchaseDetail(): void {
-    const detailGroup = this.createPurchaseDetail();
-    this.purchaseDetails.push(detailGroup);
+    const group = this.createPurchaseDetailGroup();
+    this.purchaseDetails.push(group);
     const index = this.purchaseDetails.length - 1;
+    this.setupPurchaseDetailItem(group, index);
+    this.cdr.detectChanges();
+  }
 
-    // Initialize filtered arrays for the new row
-    this.filteredProductOptions[index] = this.products;
-    this.filteredUnitOptions[index] = this.units;
+  displayProductName(product: ProductModel | string): string {
+    return (product as ProductModel)?.name || (product as string);
+  }
 
-    const productCtrl = detailGroup.get('product_id');
-    const unitCtrl = detailGroup.get('unit_id');
-
-    // Setup autocomplete filtering for product for this specific row
-    productCtrl?.valueChanges
-      .pipe(
-        startWith(''), // Emit an empty string initially to show all options
-        map(value => {
-          // If value is an object (selected from dropdown), return its name for filtering.
-          // If value is a string (being typed), return the string itself.
-          return typeof value === 'string' ? value : (value?.name || '');
-        }),
-        map(name => {
-          const filtered = name ? this.products.filter((p: any) => p.name.toLowerCase().includes(name.toLowerCase())) : this.products;
-          // Important: If the input is a string that doesn't match any object,
-          // or if the user types something invalid, ensure the control's value reflects this.
-          // This part is for validation and setting the actual model value later.
-          // We don't change the control's value here; it will be an object on selection.
-          return filtered;
-        })
-      )
-      .subscribe(filtered => {
-        this.filteredProductOptions = { ...this.filteredProductOptions, [index]: filtered };
-      });
-
-    // Setup autocomplete filtering for unit for this specific row
-    unitCtrl?.valueChanges
-      .pipe(
-        startWith(''), // Emit an empty string initially to show all options
-        map(value => {
-          return typeof value === 'string' ? value : (value?.name || '');
-        }),
-        map(name => {
-          const filtered = name ? this.units.filter((u: any) => u.name.toLowerCase().includes(name.toLowerCase())) : this.units;
-          return filtered;
-        })
-      )
-      .subscribe(filtered => {
-        this.filteredUnitOptions = { ...this.filteredUnitOptions, [index]: filtered };
-      });
+  onUnitSelected(selectedUnitName: string, index: number): void {
+    const group = this.purchaseDetails.at(index);
+    const selectedUnit = this.filteredUnitsList[index].find((u: UnitModel) => u.name === selectedUnitName);
+    if (selectedUnit) {
+      group.get('unit_id')?.setValue(selectedUnit.id);
+    }
   }
 
   removePurchaseDetail(index: number): void {
     if (this.purchaseDetails.length > 1) {
       this.purchaseDetails.removeAt(index);
-      // Clean up the filtered options for the removed index
-      delete this.filteredProductOptions[index];
-      delete this.filteredUnitOptions[index];
+      this.filteredUnitsList.splice(index, 1);
+      this.filteredProductList.splice(index, 1);
+      this.calculateNetTotal();
+      this.updateFilteredProducts();
+      this.isManualAmount = false;
+      this.cdr.detectChanges();
     }
   }
 
-  // --- Patch Form for Edit Mode ---
+  calculateItemNet(index: number): void {
+    const group = this.purchaseDetails.at(index);
+    const quantity = group.get('quantity')?.value || 0;
+    let pricePerUnit = group.get('price_per_unit')?.value || 0;
+    const taxRateControl = group.get('tax_rate');
+    const taxRate = taxRateControl ? this.tax_rates.find((t) => t.id === taxRateControl.value)?.rate || 0 : 0;
+    const discountAmount = group.get('discount_amount')?.value || 0;
+    const discountType = group.get('purchase_price_discount_type')?.value;
+    const taxType = group.get('purchase_price_tax_type')?.value || 2;
+
+    let basePricePerUnit = pricePerUnit;
+
+    if (discountType === 1) {
+      pricePerUnit -= discountAmount;
+    } else if (discountType === 2) {
+      pricePerUnit -= (pricePerUnit * discountAmount) / 100;
+    }
+
+    pricePerUnit = Math.max(0, pricePerUnit);
+
+    basePricePerUnit = pricePerUnit;
+    pricePerUnit = basePricePerUnit * (1 + taxRate / 100);
+
+    const taxPerUnit = (basePricePerUnit * taxRate) / 100;
+    const totalTaxAmount = taxPerUnit * quantity;
+    const totalItemAmount = pricePerUnit * quantity;
+
+    group.get('tax_amount')?.setValue(parseFloat(totalTaxAmount.toFixed(2)), { emitEvent: false });
+    group.get('amount')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
+    group.get('net')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
+    this.calculateNetTotal();
+  }
+
+  validateDiscountAmount(): void {
+    this.form.get('discount_amount')?.valueChanges.subscribe(() => {
+      const discountControl = this.form.get('discount_amount');
+      const type = this.form.get('purchase_price_discount_type')?.value;
+      const net = this.form.get('amount')?.value || 0;
+      const discount = parseFloat(discountControl?.value) || 0;
+
+      if (type === 1 && discount > net) {
+        discountControl?.setErrors({ exceedsAmount: true });
+      } else if (type === 2 && discount > 100) {
+        discountControl?.setErrors({ exceedsPercent: true });
+      } else {
+        if (discountControl?.hasError('exceedsAmount') || discountControl?.hasError('exceedsPercent')) {
+          discountControl.setErrors(null);
+        }
+      }
+      this.cdr.detectChanges();
+    });
+    this.form.get('purchase_price_discount_type')?.valueChanges.subscribe(() => {
+      this.form.get('discount_amount')?.updateValueAndValidity();
+      this.cdr.detectChanges();
+    });
+  }
+
+  onProductSelected(selectedProduct: any, index: number): void {
+    console.log(selectedProduct);
+
+    const group = this.purchaseDetails.at(index) as FormGroup;
+    if (!group || !selectedProduct?.units?.length) {
+      return;
+    }
+
+    const productUnit = selectedProduct.units[0];
+    console.log("product unit",productUnit);
+    
+    const purchasePrice = parseFloat(productUnit.purchase_price);
+    const taxRateId = productUnit.tax_rate_id || null;
+    const taxType = productUnit.purchase_price_tax_type;
+    const discountAmount = parseFloat(productUnit.purchase_price_discount_amount) || 0;
+    const discountType = productUnit.purchase_price_discount_type || 1;
+    const taxRateObj = this.tax_rates.find((t) => t.id === taxRateId);
+    const taxRatePercentage = taxRateObj ? taxRateObj.rate : 0;
+
+    let pricePerUnit: number;
+    if (taxType === 1) {
+      pricePerUnit = purchasePrice / (1 + taxRatePercentage / 100);
+    } else {
+      pricePerUnit = purchasePrice;
+    }
+
+    group.patchValue(
+      {
+        product_id: selectedProduct.id,
+        product_name: selectedProduct.name,
+        unit_id: productUnit.unit.id,
+        unit_name: productUnit.unit.name,
+        price_per_unit: parseFloat(pricePerUnit.toFixed(2)),
+        discount_amount: discountAmount || 0,
+        purchase_price_tax_type: taxType,
+        purchase_price_discount_type: discountType,
+        tax_rate: taxRateId,
+      },
+      { emitEvent: false }
+    );
+    this.calculateItemNet(index);
+    this.updateFilteredProducts();
+    this.updateFilteredUnits(index);
+    this.cdr.detectChanges();
+  }
+
+  calculateNetTotal(): void {
+    let totalNet = 0;
+    this.purchaseDetails.controls.forEach((ctrl) => {
+      totalNet += ctrl.get('net')?.value || 0;
+    });
+
+    if (this.isManualAmount) {
+      totalNet = parseFloat(this.form.get('amount')?.value) || 0;
+    } else {
+      this.updatingAmountFromCode = true;
+      this.form.get('amount')?.setValue(parseFloat(totalNet.toFixed(2)), { emitEvent: false });
+      this.updatingAmountFromCode = false;
+    }
+
+    const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
+    const discountType = this.form.get('discount_type')?.value;
+    let netTotal = totalNet;
+
+    if (discountType === 1) {
+      netTotal -= discountAmount;
+    } else if (discountType === 2) {
+      netTotal -= (totalNet * discountAmount) / 100;
+    }
+
+    netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
+
+    if (this.form.get('payment_method')?.value === 1) {
+      this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
+      this.form.get('online_amount')?.setValue(0, { emitEvent: false });
+    } else if (this.form.get('payment_method')?.value === 2) {
+      this.form.get('cash_amount')?.setValue(0, { emitEvent: false });
+      this.form.get('online_amount')?.setValue(netTotal, { emitEvent: false });
+    }
+
+    this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
+    this.cdr.detectChanges();
+  }
+
+  navigateToPurchase(): void {
+    this.router.navigate(['/app/purchase']);
+  }
+
   patchForm(purchase: any): void {
-    // Patch main form controls
-    this.form.patchValue(purchase);
+    this.form.patchValue({
+      party_id: purchase.party_id || null,
+      name: purchase.party ? purchase.party.name : '',
+      amount: purchase.amount || null,
+      discount_amount: purchase.discount_amount || 0,
+      discount_type: purchase.discount_type || null,
+      notes: purchase.notes || '',
+      status: purchase.status || 1,
+      payment_method: purchase.payment_method || 1,
+      cash_amount: purchase.cash_amount || null,
+      online_amount: purchase.online_amount || null,
+      transaction_id: purchase.transaction_id || null,
+    });
 
-    // Set value for contact and unit autocomplete controls
-    const selectedContact = this.contacts.find((c: any) => c.id === purchase.contact_id);
-    const selectedUnit = this.units.find((u: any) => u.id === purchase.unit_id);
-    if (selectedContact) {
-      this.contactControl.setValue(selectedContact);
-    }
-    if (selectedUnit) {
-      this.unitControl.setValue(selectedUnit);
-    }
-
-    // Clear existing purchase details and repopulate
     this.purchaseDetails.clear();
-    purchase.purchase_details.forEach((detail: any, i: number) => {
-      const product = this.products.find((p: any) => p.id === detail.product_id);
-      const unit = this.units.find((u: any) => u.id === detail.unit_id);
+    this.filteredUnitsList = [];
+    this.filteredProductList = [];
 
-      const detailGroup = this.createPurchaseDetail();
-      detailGroup.patchValue({
-        product_id: product, // Set the full object for display
-        unit_id: unit,       // Set the full object for display
-        quantity: detail.quantity || 1,
-        amount: detail.amount,
+    if (Array.isArray(purchase.purchase_details)) {
+      purchase.purchase_details.forEach((detail: any, index: number) => {
+        const group = this.createPurchaseDetailGroup();
+        group.patchValue({
+          product_id: detail.product_id || null,
+          product_name: detail.product?.name || null,
+          unit_id: detail.unit_id || null,
+          unit_name: detail.unit?.name || null,
+          quantity: detail.quantity || 1,
+          price_per_unit: detail.price_per_unit,
+          discount_amount: detail.discount_amount || 0,
+          purchase_price_discount_type: detail.discount_type,
+          tax_rate: detail.tax_rate,
+          tax_amount: detail.tax_amount.toFixed(2),
+          amount: detail.amount || 0,
+          net: detail.net || detail.quantity * detail.amount,
+        });
+        this.purchaseDetails.push(group);
+        this.setupPurchaseDetailItem(group, index);
       });
+    }
 
-      this.purchaseDetails.push(detailGroup);
-
-      // Now set up the autocomplete subscriptions for this specific patched row
-      this.filteredProductOptions[i] = this.products;
-      this.filteredUnitOptions[i] = this.units;
-
-      const productCtrl = detailGroup.get('product_id');
-      const unitCtrl = detailGroup.get('unit_id');
-
-      productCtrl?.valueChanges
-        .pipe(
-          startWith(product), // Start with the pre-filled value (object)
-          map(value => {
-            return typeof value === 'string' ? value : (value?.name || '');
-          }),
-          map(name => {
-            const filtered = name ? this.products.filter((p: any) => p.name.toLowerCase().includes(name.toLowerCase())) : this.products;
-            return filtered;
-          })
-        )
-        .subscribe(filtered => {
-          this.filteredProductOptions = { ...this.filteredProductOptions, [i]: filtered };
-        });
-
-      unitCtrl?.valueChanges
-        .pipe(
-          startWith(unit), // Start with the pre-filled value (object)
-          map(value => {
-            return typeof value === 'string' ? value : (value?.name || '');
-          }),
-          map(name => {
-            const filtered = name ? this.units.filter((u: any) => u.name.toLowerCase().includes(name.toLowerCase())) : this.units;
-            return filtered;
-          })
-        )
-        .subscribe(filtered => {
-          this.filteredUnitOptions = { ...this.filteredUnitOptions, [i]: filtered };
-        });
-    });
+    this.calculateNetTotal();
+    this.updateFilteredProducts();
+    this.cdr.detectChanges();
   }
 
+  onUnitBlur(index: number) {
+    const group = this.purchaseDetails.at(index);
+    const unitId = group.get('unit_id')?.value;
+    const unitName = group.get('unit_name')?.value;
 
-  ngAfterViewInit(): void {
-    this.isLoading = false;
-    this.spinnerService.hide();
-
-    this.dialogRef.afterClosed().subscribe(() => {
-      this.isLoading = false;
-      this.spinnerService.hide();
-    });
+    if (!unitId || !unitName) {
+      group.get('unit_name')?.setErrors({ required: true });
+      group.get('unit_name')?.markAsTouched();
+    } else {
+      group.get('unit_name')?.setErrors(null);
+    }
+    this.cdr.detectChanges();
   }
 
-  onSubmit(): void {
+  onSubmit(redirectToPrint: boolean = false): void {
     this.commonService.markFormGroupTouched(this.form);
-
-    // Validate main autocomplete controls
-    this.validateContactControl();
-    this.validateUnitControl();
-
-    // Validate each purchase detail autocomplete control
-    this.purchaseDetails.controls.forEach((group: AbstractControl) => {
-      const productCtrl = group.get('product_id');
-      const unitCtrl = group.get('unit_id');
-
-      // Manually trigger validation if needed, especially if a value was typed but not selected
-      if (productCtrl?.value && typeof productCtrl.value !== 'object') {
-          productCtrl.setErrors({ 'invalidSelection': true });
-      } else if (!productCtrl?.value?.id) { // Check if a valid ID exists for selected object
-          productCtrl?.setErrors({ 'required': true });
-      } else {
-          productCtrl?.setErrors(null);
-      }
-      productCtrl?.markAsTouched();
-
-
-      if (unitCtrl?.value && typeof unitCtrl.value !== 'object') {
-          unitCtrl.setErrors({ 'invalidSelection': true });
-      } else if (!unitCtrl?.value?.id) { // Check if a valid ID exists for selected object
-          unitCtrl?.setErrors({ 'required': true });
-      } else {
-          unitCtrl?.setErrors(null);
-      }
-      unitCtrl?.markAsTouched();
+    if (!this.validateData()) {
+      return;
+    }
+    this.purchaseDetails.controls.forEach((control) => {
+      this.commonService.markFormGroupTouched(control as FormGroup);
     });
 
     if (!this.form.valid) {
-      this.commonService.toastr.error('Please fix all errors.');
+      this.commonService.toastr.error('Please fix all errors in the form.');
       return;
     }
 
     this.isLoading = true;
     this.spinnerService.show();
-    const payload = { ...this.form.value };
-    let contact:any=this.contactControl.value
-    payload.contact_id = contact.id;
-    let unit:any=this.unitControl.value
-    payload.unit_id = unit.id;
+    const rawForm = this.form.getRawValue();
 
-    payload.purchaseDetails = payload.purchaseDetails.map((detail: any) => ({
-      ...detail,
-      product_id: detail.product_id.id,
-      unit_id: detail.unit_id.id,
-    }));
-
-
-    if (this.isEdit && this.data.model) {
-      payload.id = this.data.model.id;
-
-      this.purchaseService.update(payload).subscribe({
-        complete: () => {
-          this.commonService.toastr.success('Purchase Updated');
-          this.dialogRef.close(true); // Indicate success for the dialog opener
-          this.isLoading = false;
-          this.spinnerService.hide();
-        },
-        error: (err) => {
-          this.commonService.handleError(err);
-          this.isLoading = false;
-          this.spinnerService.hide();
-        },
-      });
-      return;
+    if (rawForm.mobile && !rawForm.mobile.startsWith('+')) {
+      rawForm.mobile = '+91' + rawForm.mobile.trim();
     }
 
-    this.purchaseService.create(payload).subscribe({
-      complete: () => {
-        this.commonService.toastr.success('Purchase Item Created');
-        this.dialogRef.close(true); // Indicate success for the dialog opener
+    const processedpurchaseDetails = rawForm.purchaseDetails.map((detail: any, index: number) => {
+      const purchaseDetailGroup = this.purchaseDetails.at(index);
+      const purchasePriceTaxType = purchaseDetailGroup?.get('purchase_price_tax_type')?.value;
+      const withTax = purchasePriceTaxType === 1;
+      const rateId = detail.tax_rate || null;
+      const taxRateObj = this.tax_rates.find((t) => t.id === rateId);
+      return {
+        ...detail,
+        rate: detail.amount,
+        net: detail.net,
+        with_tax: withTax,
+        tax_rate: this.getFormattedTaxLabel(taxRateObj?.type, taxRateObj?.rate),
+      };
+    });
+
+    processedpurchaseDetails.forEach((details: any) => {
+      delete details.amount;
+    });
+
+    const payload = {
+      ...rawForm,
+     
+      payment_method: rawForm.payment_method,
+      cash_amount: rawForm.cash_amount || 0,
+      online_amount: rawForm.online_amount || 0,
+      transaction_id: rawForm.transaction_id || '',
+      return_amount: this.returnAmount,
+      due_amount: this.dueAmount,
+      amount: rawForm.amount,
+      purchaseDetails: processedpurchaseDetails,
+    };
+
+
+    this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
+      next: (response: any) => {
         this.isLoading = false;
         this.spinnerService.hide();
+        const createdId = response?.data?.id || response?.data?.purchase?.id;
+        this.commonService.toastr.success('Purchase created successfully.');
+        if (redirectToPrint && createdId) {
+          this.router.navigate([`/app/direct-sale/print/${createdId}`]);
+        } else {
+          this.form.reset();
+          this.purchaseDetails.clear();
+          this.filteredUnitsList = [];
+          this.filteredProductList = [];
+          const newfirstPurchaseDetails = this.createPurchaseDetailGroup();
+          this.purchaseDetails.push(newfirstPurchaseDetails);
+          this.setupPurchaseDetailItem(newfirstPurchaseDetails, 0);
+          this.isManualAmount = false;
+          this.cdr.detectChanges();
+          this.router.navigate(['/app/purchase']);
+        }
       },
-      error: (err) => {
-        this.commonService.handleError(err);
+      error: (error) => {
         this.isLoading = false;
         this.spinnerService.hide();
+        this.cdr.detectChanges();
+        this.commonService.toastr.error(error.error?.message || 'Failed to create Purchase. Please try again.');
       },
     });
+  }
+
+  validateData() {
+    const netTotal = this.form.get('net_total')?.value || 0;
+    const cash = parseFloat(this.form.get('cash_amount')?.value) || 0;
+    const online = parseFloat(this.form.get('online_amount')?.value) || 0;
+    const method = this.form.get('payment_method')?.value;
+    const returnAmt = this.returnAmount;
+
+    if (returnAmt < 0) {
+      this.commonService.toastr.error('Return amount cannot be negative.');
+      return false;
+    }
+
+    if (method === 1 && cash + this.dueAmount < netTotal) {
+      this.commonService.toastr.error('Cash + due Amount must be greater than or equal to Net Total.');
+      return false;
+    }
+
+    if (method === 2 && online + this.dueAmount < netTotal) {
+      this.commonService.toastr.error('Online + due Amount must be greater than or equal to Net Total.');
+      return false;
+    }
+
+    if (method === 3 && cash + online + this.dueAmount < netTotal) {
+      this.commonService.toastr.error('Combined Cash and Online amount must cover Net Total.');
+      return false;
+    }
+
+    const invalidFields = ['amount', 'discount_amount', 'cash_amount', 'online_amount'].filter((field) => {
+      const control = this.form.get(field);
+      return control?.hasError('negativeValue');
+    });
+
+    if (invalidFields.length > 0) {
+      this.commonService.toastr.error('Negative values are not allowed in any amount fields.');
+      return false;
+    }
+
+    const purchaseDetailsInvalid = this.purchaseDetails.controls.some((group) => {
+      return (
+        (group.get('quantity')?.hasError('negativeValue') && group.get('quantity')?.value < 0) ||
+        (group.get('amount')?.hasError('negativeValue') && group.get('amount')?.value < 0)
+      );
+    });
+
+    if (purchaseDetailsInvalid) {
+      this.commonService.toastr.error('Negative values are not allowed in purchase item fields (Quantity or amount).');
+      return false;
+    }
+
+    const missingUnit = this.purchaseDetails.controls.some((group) => {
+      return !group.get('unit_id')?.value;
+    });
+
+    if (missingUnit) {
+      this.commonService.toastr.error('Please select a unit for all purchase items.');
+      return false;
+    }
+
+    return true;
+  }
+
+  goBackToListing(){
+    if (this.dialogRef) {
+      this.dialogRef.close();
+      return;
+    }
+    this.router.navigate(['/app/purchase']);
+
+  }
+  validateNumericInput(event: KeyboardEvent): void {
+    const char = event.key;
+    const allowedKeys = [
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'Tab',
+    ];
+
+    if (!allowedKeys.includes(char) && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+    }
+  }
+
+  validateAlphabeticInput(event: KeyboardEvent): void {
+    const char = event.key;
+    const isLetter = /^[a-zA-Z\s]*$/.test(char);
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (!isLetter && !allowedKeys.includes(char) && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+    }
   }
 }

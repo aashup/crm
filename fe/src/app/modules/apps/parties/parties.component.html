@@ -11,7 +11,7 @@
     </div>
     <div class="card-toolbar">
       <div class="d-flex justify-content-end">
-        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['suppliers.create']">
+        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['parties.create']">
           Add New
         </button>
         <button mat-icon-button (click)="loadData()">
@@ -107,10 +107,10 @@
               {{ cols.name }}
             </th>
             <td mat-cell *matCellDef="let item" [ngStyle]="cols.style || {}">
-              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['suppliers.update']">
+              <button mat-icon-button class="text-info blod" (click)="edit(item)" *ngxPermissionsOnly="['parties.update']">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['suppliers.delete']">
+              <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['parties.delete']">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>

@@ -26,6 +26,7 @@ import { PurchaseService } from './purchase.service';
 import { AddPurchaseComponent } from './add-purchase/add-purchase.component';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-purchase',
@@ -47,12 +48,15 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   displayableCol = [
     'select',
     'id',
+    'party_id',
+    'due_amount',
+    'return_amount',
     'amount',
+    'discount_amount',
+    'discount_type',
+    'net_total',
     'notes',
-    'unit',
-    'supplier',
-    'created_at',
-    'action'
+    'action',
   ];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
@@ -61,24 +65,16 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
+    { ref: 'party_id', name: 'Party', mutator: (item: any) => item?.party?.name || 'N/A' },
+    { ref: 'due_amount', name: 'Due Amount' }, 
+    { ref: 'return_amount', name: 'Return Amount'}, 
     { ref: 'amount', name: 'Amount' },
-    { ref: 'notes', name: 'Notes' },
-    {
-      ref: 'unit',
-      name: 'Unit',
-      mutator: (item: any) => item?.unit?.name || item.unit_id,
-    },
-    {
-      ref: 'supplier',
-      name: 'Supplier',
-      mutator: (item: any) => item?.supplier?.name || item.supplier_id,
-    },
-    {
-      ref: 'created_at',
-      name: 'Created At',
-      mutator: (item: any) =>
-        this.datePipe.transform(item.created_at, 'mediumDate'),
-    },
+    { ref: 'discount_amount', name: 'Discount Amount' },
+    { ref: 'discount_type', name: 'Discount Type', mutator: (item: any) => item.discount_type === 1 ? 'Flat' : 'Percentage' },
+    { ref: 'net_total', name: 'Net Total' },
+    { ref: 'notes', name: 'Notes', mutator: (item: any) => item.notes || '--' },
+    { ref: 'created_at', name: 'Created At' },
+    { ref: 'updated_at', name: 'Updated At' },
     { ref: 'action', name: 'Actions' },
   ];
 
@@ -88,7 +84,8 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     private commonService: CommonService,
     private authService: AuthService,
     private spinnerService: SpinnerService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private router: Router 
   ) {
     this.dataSource = new PurchaseDatasource(this.service);
   }
@@ -135,14 +132,24 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with = ['contact', 'unit', 'supplier','purchaseDetails'];  // Added `unit`, `supplier`
+      this.filter.with= ["purchaseDetails","purchaseDetails.product","purchaseDetails.unit","party","unit","createdby"],
       this.filter.cols = [
         'id',
-        'amount',
-        'notes',
-        'contact_id',
+        'party_id',
+        'due_amount',
         'unit_id',
-        'supplier_id',
+        'return_amount',
+        'amount',
+        'discount_amount',
+        'billinng_address_id',
+        'discount_type',
+        'net_total',
+        'notes',
+        'payment_method',
+        'cash_amount',
+        'online_amount',
+        'transaction_id',
+        'purchaseDetails',
         'created_at',
         'updated_at',
       ]; 
@@ -206,6 +213,9 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   add() {
+
+    this.router.navigate(['app/purchase/direct-purchase']);
+    return
     this.dialog
       .open(AddPurchaseComponent, {
         height: 'auto',

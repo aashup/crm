@@ -65,6 +65,10 @@ import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-d
         loadChildren: () => import('./direct-sale/direct-sale.module').then((m) =>m.DirectSaleModule),
       },
       {
+        path: 'direct-purchase',
+        loadChildren: () => import('./purchase/purchase.module').then((m) =>m.PurchaseModule),
+      },
+      {
         path: 'sale/:id',
         loadChildren: () => import('./sale/sale.module').then((m) =>m.SaleModule),
       },

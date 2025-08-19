@@ -22,6 +22,7 @@ import { MatTableModule } from '@angular/material/table';
     RouterModule.forChild([
       { path: '', component: PurchaseComponent },
       { path: 'add', component: AddPurchaseComponent },
+      { path: 'direct-purchase', component: AddPurchaseComponent },
       { path: ':id', component: PurchaseDetailsComponent },
     ]),
     NgxPermissionsModule.forChild(),
