@@ -104,9 +104,7 @@ class PartyController extends Controller
             DB::rollBack();
             return $this->error("Party cannot be updated! : " . $e->getMessage(), 500);
         }
-
-
-
+        
         return $this->success("Party updated successfully!", $party);
     }
 

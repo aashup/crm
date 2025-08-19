@@ -137,16 +137,73 @@ class PurchaseController extends Controller
 
         try {
             DB::beginTransaction();
-            $purchase->fill($request->all());
+
+            $validated = $request->validated();
+
+            if (!$validated['party_id']) {
+                $partyExists = Party::where('name', $validated['name'])->exists();
+                if ($partyExists) {
+                    return $this->error("Party with this name already exists");
+                }
+
+                $party = Party::create([
+                    'name' => $validated['name'],
+                    'mobile' => $validated['mobile'],
+                ]);
+
+                $validated['party_id'] = $party->id;
+            }
+
+            $purchaseDetails = $validated['purchaseDetails'];
+            foreach ($purchaseDetails as &$item) {
+                if (empty($item['product_id']) && !empty($item['product_name'])) {
+                    $product = Product::create([
+                        'name' => $item['product_name'],
+                        'unit_id' => $item['unit_id'],
+                        'status' => 1,
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    $product->units()->create([
+                        'unit_id' => $item['unit_id'],
+                        'sale_price' => $item['rate'],
+                        'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
+                        'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
+                        'sale_price_discount_type' => $item['discount_type'] ?? 1,
+                        'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
+                        'status' => 1,
+                    ]);
+
+                    $item['product_id'] = $product->id;
+                }
+            }
+            $validated['purchaseDetails'] = $purchaseDetails;
+
+            $purchase->fill($validated);
             $purchase->save();
+
             $purchase->purchaseDetails()->delete();
             $purchase->purchaseDetails()->createMany($request->purchaseDetails);
+
+            foreach ($validated['purchaseDetails'] as $detail) {
+                $productUnit = ProductUnit::where('product_id', $detail['product_id'])
+                    ->where('unit_id', $detail['unit_id'])
+                    ->first();
+
+                if ($productUnit) {
+                    $this->updateInventory($productUnit, $detail);
+                } else {
+                    DB::rollBack();
+                    return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
+                }
+            }
+
             DB::commit();
-            return $this->success("Purchase updated successfully", $purchase);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error("Unable to delete purchase details");
         }
+        return $this->success("Purchase updated successfully", $purchase);
     }
 
     /**
