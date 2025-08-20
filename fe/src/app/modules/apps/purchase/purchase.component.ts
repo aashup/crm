@@ -260,7 +260,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   edit(item: PurchaseModel) {
     this.dialog
       .open(AddPurchaseComponent, {
-        height: 'auto',
+        height: '90vh',
         width: '80%',
         maxWidth:"100%",
         data: {

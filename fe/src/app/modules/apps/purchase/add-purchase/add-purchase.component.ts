@@ -533,7 +533,6 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
 
   setupDropdowns(): void {
     this.filteredPartiesByName = this.form.controls.name.valueChanges.pipe(
-      startWith(''),
       map((val) => {
         const value = (typeof val === 'string' ? val : val?.name || '').toLowerCase().trim();
         const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
@@ -547,7 +546,6 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     );
 
     this.filteredPartiesByMobile = this.form.controls.mobile.valueChanges.pipe(
-      startWith(''),
       map((val) => {
         const value = (typeof val === 'string' ? val : val?.mobile || '').toLowerCase().trim();
         const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
@@ -766,11 +764,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
   onSubmit(): void {
     this.commonService.markFormGroupTouched(this.form);
 
-    if (!this.form.valid) {
-      this.commonService.toastr.error('Please fix all errors.');
-      return;
-    }
-
+    
     this.isLoading = true;
     this.spinnerService.show();
     const rawForm = this.form.getRawValue();

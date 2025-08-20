@@ -50,7 +50,8 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
   searchValue: '';
   parties: any[] = [];
   tax_rates: any[] = [];
-
+  showNotes = false;
+  
   constructor(
     private fb: FormBuilder,
     private service: PurchaseService,
@@ -136,6 +137,10 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
     });
   }
 
+  toggleNotes() {
+    this.showNotes = !this.showNotes;
+  }
+  
   getAllUnits() {
     this.unitService.find({ pageSize: 1000 }).subscribe((res: any) => {
       this.units = res.data;

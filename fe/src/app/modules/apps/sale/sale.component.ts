@@ -29,6 +29,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { Router } from '@angular/router';
+import { TaxRateService } from '../tax-rate/tax-rate.service';
 
 @Component({
     selector: 'app-sale',
@@ -47,6 +48,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoading = false;
   search: any = { all: '' };
   filter: any = {};
+  tax_rates: any = [];
   displayableCol = [
     'select',
     'id',
@@ -91,11 +93,13 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     private cityService: CityService,
     private authService: AuthService,
     private spinnerService: SpinnerService,
-    private router:Router
+    private router:Router,
+    private taxRateService:TaxRateService
   ) {
     this.dataSource = new SaleDatasource(this.service);
   }
   ngOnInit(): void {
+    this.getAllTaxRates()
     this.getAllCities()
     this.loadData();
     this.checkPermissions()
@@ -112,6 +116,24 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
         })
       )
       .subscribe();
+  }
+  getAllTaxRates(): void {
+    this.taxRateService
+      .find({ pageSize: 1000 })
+      .pipe(take(1))
+      .subscribe({
+        next: (res: any) => {
+          if (res?.data?.length) {
+            this.tax_rates = res.data;
+          } else {
+            this.tax_rates = [];
+          }
+        },
+        error: (error: any) => {
+          this.tax_rates = [];
+        },
+      });
+      this.cdr.detectChanges();
   }
   getAllCities() {
     this.cityService.find({}).subscribe((res:any) => {
@@ -151,12 +173,11 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with= ["saleDetails","party","unit","createdby"],
+      this.filter.with= ["saleDetails.product.units","party","createdby"],
       this.filter.cols = [
         'id',
         'party_id',
         'due_amount',
-        'unit_id',
         'return_amount',
         'amount',
         'discount_amount',
@@ -267,12 +288,13 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   edit(item: SaleModel) {
     this.dialog
       .open(AddSaleComponent, {
-        height: 'auto',
+        height: '80%',
         width: '80%',
         maxWidth:"100%",
         data: {
           model: item,
           isEdit: true,
+          tax_rates:this.tax_rates
         },
       })
       .afterClosed()

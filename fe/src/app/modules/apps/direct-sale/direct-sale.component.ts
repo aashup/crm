@@ -39,7 +39,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   searchValue: '';
   parties: any[] = [];
   tax_rates: any[] = [];
-
+  showNotes = false;
   constructor(
     private fb: FormBuilder,
     private service: DirectSaleService,
@@ -144,7 +144,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         },
       });
   }
-
+  toggleNotes() {
+    this.showNotes = !this.showNotes;
+  }
   handlePaymentMethodValidation(): void {
     this.form.get('payment_method')?.valueChanges.subscribe((type) => {
       const cash = this.form.get('cash_amount');
