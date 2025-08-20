@@ -6,6 +6,7 @@ use App\Http\Controllers\API\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInventoryRequest;
 use App\Http\Requests\StorePOSRequest;
+use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateInventoryRequest;
 use App\Models\Contact;
 use App\Models\Inventory;
@@ -63,7 +64,7 @@ class PosController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePOSRequest $request)
+    public function store(StoreSaleRequest $request)
     {
         try {
             DB::beginTransaction();

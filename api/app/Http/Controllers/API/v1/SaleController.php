@@ -3,12 +3,18 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePurchaseRequest;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
+use App\Models\Inventory;
+use App\Models\Party;
+use App\Models\Product;
+use App\Models\ProductUnit;
 use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SaleController extends Controller
 {
@@ -35,24 +41,82 @@ class SaleController extends Controller
      */
     public function store(StoreSaleRequest $request)
     {
-        $this->authorize('create', Sale::class);
-
         try {
             DB::beginTransaction();
-            $purchase = new Sale();
-            $request->merge([
-                'created_by' => Auth::id(),
-            ]);
-            $purchase->fill($request->all());
-            $purchase->save();
-            $purchase->saleDetails()->createMany($request->saleDetails);
+
+            $validated = $request->validated();
+
+            if (!$validated['party_id']) {
+                $partyExists = Party::where('name', $validated['name'])->exists();
+                if ($partyExists) {
+                    return $this->error("Party with this name already exists");
+                }
+
+                $party = Party::create([
+                    'name' => $validated['name'],
+                    'mobile' => $validated['mobile'],
+                ]);
+
+                $validated['party_id'] = $party->id;
+            }
+
+            $validated['created_by'] = Auth::id();
+
+            $salesDetails = $validated['saleDetails'];
+            foreach ($salesDetails as &$item) {
+                if (empty($item['product_id']) && !empty($item['product_name'])) {
+                    $product = Product::create([
+                        'name' => $item['product_name'],
+                        'unit_id' => $item['unit_id'],
+                        'status' => 1,
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    $product->units()->create([
+                        'unit_id' => $item['unit_id'],
+                        'sale_price' => $item['rate'],
+                        'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
+                        'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
+                        'sale_price_discount_type' => $item['discount_type'] ?? 1,
+                        'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
+                        'status' => 1,
+                    ]);
+
+                    $item['product_id'] = $product->id;
+                }
+            }
+            $validated['saleDetails'] = $salesDetails;
+
+            $sale = new Sale();
+            $sale->fill($validated);
+            $sale->save();
+
+            $sale->saleDetails()->createMany($validated['saleDetails']);
+
+            foreach ($validated['saleDetails'] as $detail) {
+                $productUnit = ProductUnit::where('product_id', $detail['product_id'])
+                    ->where('unit_id', $detail['unit_id'])
+                    ->first();
+
+                if ($productUnit) {
+                    $this->updateInventory($productUnit, $detail);
+                } else {
+                    DB::rollBack();
+                    return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
+                }
+            }
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Sale Creation Failed: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
             return $this->error("Unable to create Sale");
         }
 
-        return $this->success("Sale created successfully", $purchase);
+        return $this->success("Sale created successfully", $sale);
     }
 
     /**
@@ -72,20 +136,90 @@ class SaleController extends Controller
      */
     public function update(UpdateSaleRequest $request, Sale $sale)
     {
-        $this->authorize('update', $sale);
-
         try {
             DB::beginTransaction();
-            $sale->fill($request->all());
+
+            $validated = $request->validated();
+
+            if (!$validated['party_id']) {
+                $partyExists = Party::where('name', $validated['name'])->exists();
+                if ($partyExists) {
+                    return $this->error("Party with this name already exists");
+                }
+
+                $party = Party::create([
+                    'name' => $validated['name'],
+                    'mobile' => $validated['mobile'],
+                ]);
+
+                $validated['party_id'] = $party->id;
+            }
+
+            $salesDetails = $validated['saleDetails'];
+            foreach ($salesDetails as &$item) {
+                if (empty($item['product_id']) && !empty($item['product_name'])) {
+                    $product = Product::create([
+                        'name' => $item['product_name'],
+                        'unit_id' => $item['unit_id'],
+                        'status' => 1,
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    $product->units()->create([
+                        'unit_id' => $item['unit_id'],
+                        'sale_price' => $item['rate'],
+                        'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
+                        'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
+                        'sale_price_discount_type' => $item['discount_type'] ?? 1,
+                        'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
+                        'status' => 1,
+                    ]);
+
+                    $item['product_id'] = $product->id;
+                }
+            }
+            $validated['saleDetails'] = $salesDetails;
+
+            $sale->fill($validated);
             $sale->save();
-            $sale->saleDetails()->delete();
-            $sale->saleDetails()->createMany($request->saleDetails);
+
+            foreach ($sale->saleDetails as $oldDetail) {
+                $productUnit = ProductUnit::where('product_id', $oldDetail->product_id)
+                    ->where('unit_id', $oldDetail->unit_id)
+                    ->first();
+
+                if ($productUnit) {
+                    $this->restoreInventory($productUnit, $oldDetail);
+                }
+            }
+
+            $sale->saleDetails()->delete(); // Clear existing details
+            $sale->saleDetails()->createMany($validated['saleDetails']);
+
+            foreach ($validated['saleDetails'] as $detail) {
+                $productUnit = ProductUnit::where('product_id', $detail['product_id'])
+                    ->where('unit_id', $detail['unit_id'])
+                    ->first();
+
+                if ($productUnit) {
+                    $this->updateInventory($productUnit, $detail);
+                } else {
+                    DB::rollBack();
+                    return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
+                }
+            }
+
             DB::commit();
-            return $this->success("Sale updated successfully", $sale);
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->error("Unable to delete purchase details");
+            Log::error('Sale Creation Failed: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
+            return $this->error("Unable to create Sale");
         }
+
+        return $this->success("Sale updated successfully", $sale);
     }
 
     /**
@@ -100,6 +234,37 @@ class SaleController extends Controller
             return $this->success("Sale deleted successfully");
         } catch (\Exception $e) {
             return $this->error("Unable to delete sale details");
+        }
+    }
+
+    private function updateInventory($productUnit, $detail)
+    {
+        $inventory = Inventory::where(['product_id' => $productUnit->product_id, 'unit_id' => $productUnit->unit_id])->first();
+        if ($inventory) {
+            $inventory->rem_qty -= $detail['quantity'];
+            $inventory->save();
+        } else {
+            Inventory::create([
+                'product_id' => $productUnit->product_id,
+                'unit_id' => $productUnit->unit_id,
+                'rem_qty' => -$detail['quantity'],
+                'qty' => $detail['quantity'],
+                'created_by' => Auth::id(),
+                'unit_price' => $detail['rate'] ?? 0,
+            ]);
+        }
+    }
+
+    private function restoreInventory($productUnit, $detail)
+    {
+        $inventory = Inventory::where([
+            'product_id' => $productUnit->product_id,
+            'unit_id' => $productUnit->unit_id
+        ])->first();
+
+        if ($inventory) {
+            $inventory->rem_qty += $detail->quantity; // restore back
+            $inventory->save();
         }
     }
 }
