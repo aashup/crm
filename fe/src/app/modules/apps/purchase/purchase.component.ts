@@ -27,6 +27,7 @@ import { AddPurchaseComponent } from './add-purchase/add-purchase.component';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { TaxRateService } from '../tax-rate/tax-rate.service';
 
 @Component({
     selector: 'app-purchase',
@@ -42,6 +43,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionHandler = new SubscriptionHandler();
   readonly dialog = inject(MatDialog);
   cities: any = [];
+  tax_rates: any = [];
   isLoading = false;
   search: any = { all: '' };
   filter: any = {};
@@ -85,11 +87,13 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
     private authService: AuthService,
     private spinnerService: SpinnerService,
     private datePipe: DatePipe,
+    private taxRateService: TaxRateService,
     private router: Router 
   ) {
     this.dataSource = new PurchaseDatasource(this.service);
   }
   ngOnInit(): void {
+    this.getAllTaxRates();
     this.loadData();
     this.checkPermissions()
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
@@ -108,7 +112,24 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
- 
+ getAllTaxRates(): void {
+     this.taxRateService
+       .find({ pageSize: 1000 })
+       .pipe(take(1))
+       .subscribe({
+         next: (res: any) => {
+           if (res?.data?.length) {
+             this.tax_rates = res.data;
+           } else {
+             this.tax_rates = [];
+           }
+         },
+         error: (error: any) => {
+           this.tax_rates = [];
+         },
+       });
+       this.cdr.detectChanges();
+   }
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
@@ -132,7 +153,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with= ["purchaseDetails","purchaseDetails.product","purchaseDetails.unit","party","unit","createdby"],
+      this.filter.with= ["purchaseDetails","purchaseDetails.product.units","purchaseDetails.unit","party","unit","createdby"],
       this.filter.cols = [
         'id',
         'party_id',
@@ -214,7 +235,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
   add() {
 
-    this.router.navigate(['app/purchase/direct-purchase']);
+    this.router.navigate(['app/direct-purchase']);
     return
     this.dialog
       .open(AddPurchaseComponent, {
@@ -245,6 +266,7 @@ export class PurchaseComponent implements OnInit, OnDestroy, AfterViewInit {
         data: {
           model: item,
           isEdit: true,
+          tax_rates: this.tax_rates,
         },
       })
       .afterClosed()
