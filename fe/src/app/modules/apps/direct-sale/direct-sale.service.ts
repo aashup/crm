@@ -7,7 +7,7 @@ import { HttpUtils } from '../../core/http-util';
   providedIn: 'root',
 })
 export class DirectSaleService {
-  readonly endpoint = 'pos';
+  readonly endpoint = 'sale';
 
   constructor(private http: HttpClient) {}
 

@@ -12,6 +12,8 @@ import { UnitModel } from '../../settings/unit/unit.model';
 import { UnitService } from '../../settings/unit/unit.service';
 import { PartiesModel } from '../parties/parties.model';
 import { RateService } from '../product/add-product-unit/rate-service';
+import { ProductService } from '../product/product.service';
+import { PartiesService } from '../parties/parties.service';
 
 @Component({
   selector: 'app-direct-sale',
@@ -46,6 +48,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     private commonService: CommonService,
     private spinnerService: SpinnerService,
     private router: Router,
+    private productService:ProductService,
+    private partyService:PartiesService,
     private unitService: UnitService,
     private taxRateService: RateService,
     private cdr: ChangeDetectorRef
@@ -56,7 +60,8 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     this.initializeForm();
     this.validateDiscountAmount();
     this.handlePaymentMethodValidation();
-    this.getAllProducts();
+    // this.getAllProducts();
+    this.getProductsPartiesAndUnits()
   }
 
   getFormattedTaxLabel(type: number, rate: number): string {
@@ -120,6 +125,50 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
   }
+
+  getProductsPartiesAndUnits(): void {
+    this.productService.find({ pageSize: 1000 ,with:["units.unit"]}).subscribe({
+      next: (res: any) => {
+        this.products = res?.data ?? [];
+      },
+      error: (err) => {
+        console.error('Error while fetching products:', err);
+      },
+      complete: () => {
+        console.log('Product fetch completed.');
+      }
+    });
+
+
+    this.partyService.find({ pageSize: 1000}).subscribe({
+      next: (res: any) => {
+        this.parties = res?.data ?? [];
+      },
+      error: (err) => {
+        console.error('Error while fetching parties:', err);
+      },
+      complete: () => {
+        console.log('parties fetch completed.');
+      }
+    });
+
+
+    this.unitService.find({ pageSize: 1000 }).subscribe({
+      next: (res: any) => {
+        this.units = res?.data ?? [];
+      },
+      error: (err) => {
+        console.error('Error while fetching unit:', err);
+      },
+      complete: () => {
+        console.log('unit fetch completed.');
+      }
+    });
+
+    this.setupDropdowns();
+    this.cdr.detectChanges();
+  }
+  
 
   getAllUnits() {
     this.unitService.find({ pageSize: 1000 }).subscribe((res: any) => {
@@ -278,19 +327,19 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     };
   }
 
-  getAllProducts() {
-    this.subscriptionHandler.subscribe = this.service.find({ pageSize: 10000 }).subscribe({
-      next: (data: any) => {
-        this.products = data.data.products;
-        this.parties = data.data.parties;
-        this.units = data.data.units;
-        this.setupDropdowns();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-      },
-    });
-  }
+  // getAllProducts() {
+  //   this.subscriptionHandler.subscribe = this.service.find({ pageSize: 10000 }).subscribe({
+  //     next: (data: any) => {
+  //       // this.products = data.data.products;
+  //       this.parties = data.data.parties;
+  //       this.units = data.data.units;
+  //       this.setupDropdowns();
+  //       this.cdr.detectChanges();
+  //     },
+  //     error: (err) => {
+  //     },
+  //   });
+  // }
 
   setupDropdowns(): void {
     this.filteredPartiesByName = this.form.controls.partyName.valueChanges.pipe(
@@ -525,13 +574,16 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  onProductSelected(selectedProduct: any, index: number): void {    
+  onProductSelected(selectedProduct: any, index: number): void {  
+    console.log(selectedProduct);
+    debugger
+      
     const group = this.saleDetails.at(index) as FormGroup;
-    if (!group || !selectedProduct?.product_unit?.length) {
+    if (!group || !selectedProduct?.units?.length) {
       return;
     }
 
-    const productUnit = selectedProduct.product_unit[0];
+    const productUnit = selectedProduct.units[0];
     const salePrice = parseFloat(productUnit.sale_price);
     const taxRateId = productUnit.tax_rate_id || null;
     const taxType = productUnit.sale_price_tax_type;
