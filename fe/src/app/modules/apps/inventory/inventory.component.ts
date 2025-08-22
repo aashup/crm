@@ -202,25 +202,29 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
-        this.isLoading = true; 
-        this.spinnerService.show();
         if (res) {
+          this.isLoading = true;
+          this.spinnerService.show();
           this.service.delete(item).subscribe({
             complete: () => {
               this.commonService.toastr.success('Inventory has been deleted.');
               this.loadData();
-              this.isLoading = false; 
+              this.isLoading = false;
               this.spinnerService.hide();
             },
-            error: (err:any) => {
+            error: (err: any) => {
               this.commonService.handleError(err);
-              this.isLoading = false; 
+              this.isLoading = false;
               this.spinnerService.hide();
             },
           });
+        } else {
+          this.isLoading = false;
+          this.spinnerService.hide();
         }
       });
   }
+  
 
   add() {
     this.dialog

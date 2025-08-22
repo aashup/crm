@@ -57,7 +57,6 @@ export class CompleteComponent implements AfterViewInit, OnInit, OnDestroy {
 
   
   ngOnInit(): void {
-    console.log('final details', this.form.value);
    
     this.getAllUnits();
     this.productInfo = this.form.value.productInfo;
@@ -65,7 +64,6 @@ export class CompleteComponent implements AfterViewInit, OnInit, OnDestroy {
     this.inventoryInfo = this.form.value.inventoryInfo;
     this.sellerInfo = this.form.value.sellerInfo;
     this.unitConversionInfo = this.form.value.unitConversionInfo;
-    console.log('Product Info:', this.productInfo);
     this.cdr.detectChanges();
   }
 
@@ -78,11 +76,6 @@ export class CompleteComponent implements AfterViewInit, OnInit, OnDestroy {
     if (printContents) {
       this.commonService.printHtmlContent(printContents)
     }
-  
-    console.log('Product Details:', this.form.value.productInfo);
-    console.log('Unit Details:', this.form.value.unitInfo);
-    console.log('Inventory Details:', this.form.value.inventoryInfo);
-    console.log('Seller Details:', this.form.value.sellerInfo);
   }
   ngAfterViewInit(): void {}
 

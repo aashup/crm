@@ -45,7 +45,6 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     }).subscribe(
         (data:any) => {
           this.saleDetails = data.data;
-          console.log('Sale Details:', this.saleDetails);
           this.cdr.detectChanges();
           this.spinnerService.hide()
         },

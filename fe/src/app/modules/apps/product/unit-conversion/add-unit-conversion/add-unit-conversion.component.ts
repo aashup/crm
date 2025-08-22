@@ -52,7 +52,6 @@ export class AddUnitConversionComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('pid', this.data.productId);
     this.model = this.data.model;
     this.isEdit = this.data.isEdit;
     

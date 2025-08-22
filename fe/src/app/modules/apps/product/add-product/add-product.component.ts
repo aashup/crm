@@ -65,8 +65,6 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
   loadProductDetails(productId: string) {
     this.subscriptionHandler.subscribe = this.service.get({ id: productId, with: '' }).subscribe({
       next: (product: any) => {
-        console.log('Product details:', product);
-
         this.productInfoForm.patchValue({
           id: product.data.id,
           name: product.data.name,
@@ -99,7 +97,6 @@ export class AddProductComponent implements AfterViewInit, OnInit, OnDestroy {
         this.commonService.toastr.success(
           this.productId ? 'Prouduct updated successfully' : 'Product created successfully'
         );
-        console.log(res);
         this.productId = res.data.id;
         this.form.value.productInfo = res.data;
         this.isProductCreated = true;

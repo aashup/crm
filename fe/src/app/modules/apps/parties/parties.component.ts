@@ -250,9 +250,7 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
             error: (err) => {
               this.isLoading = false;
               this.spinnerService.hide();
-              console.log('err', err.error.message);
               this.commonService.toastr.error(err.error.message || 'Some error occurred.');
-              // this.commonService.handleError(err.error.message);
             },
           });
         }

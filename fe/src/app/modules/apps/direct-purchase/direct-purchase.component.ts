@@ -562,7 +562,6 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
   }
 
   onProductSelected(selectedProduct: any, index: number): void {
-    console.log(selectedProduct);
 
     const group = this.purchaseDetails.at(index) as FormGroup;
     if (!group || !selectedProduct?.units?.length) {
@@ -570,7 +569,6 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
     }
 
     const productUnit = selectedProduct.units[0];
-    console.log('product unit', productUnit);
 
     const purchasePrice = parseFloat(productUnit.purchase_price);
     const taxRateId = productUnit.tax_rate_id || null;

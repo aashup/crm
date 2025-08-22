@@ -135,7 +135,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         console.error('Error while fetching products:', err);
       },
       complete: () => {
-        console.log('Product fetch completed.');
       }
     });
 
@@ -148,7 +147,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         console.error('Error while fetching parties:', err);
       },
       complete: () => {
-        console.log('parties fetch completed.');
       }
     });
 
@@ -161,7 +159,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
         console.error('Error while fetching unit:', err);
       },
       complete: () => {
-        console.log('unit fetch completed.');
       }
     });
 
@@ -483,8 +480,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onUnitSelected(selectedUnitName: string, index: number): void {
+    debugger
     const group = this.saleDetails.at(index);
-    const selectedUnit = this.filteredUnitsList[index].find((u: UnitModel) => u.name === selectedUnitName);
+    const selectedUnit = this.units.find((u: UnitModel) => u.name === selectedUnitName);
     if (selectedUnit) {
       group.get('unit_id')?.setValue(selectedUnit.id);
     }
@@ -559,12 +557,13 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  onProductSelected(selectedProduct: any, index: number): void {  
-    console.log(selectedProduct);
-    debugger
-      
+  onProductSelected(selectedProduct: any, index: number): void {     
     const group = this.saleDetails.at(index) as FormGroup;
     if (!group || !selectedProduct?.units?.length) {
+      group.patchValue({
+        product_id: selectedProduct.id,
+        product_name: selectedProduct.name,
+      })
       return;
     }
 
