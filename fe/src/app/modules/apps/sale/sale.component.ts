@@ -173,7 +173,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filter.page = this.paginator.pageIndex + 1;
       this.filter.pageSize = this.paginator.pageSize || 20;
       this.filter.filter = JSON.stringify(_.pickBy(this.search));
-      this.filter.with= ["saleDetails.product.units","party","createdby"],
+      this.filter.with= ["saleDetails.product.units","party","saleDetails.unit"],
       this.filter.cols = [
         'id',
         'party_id',

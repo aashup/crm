@@ -31,7 +31,9 @@ export class ProductDetailsComponent implements OnInit, OnDestroy, AfterViewInit
     this.getAllUnits();
     this.productId = this.route.snapshot.paramMap.get('id');
     if (this.productId) {
+      this.spinnerService.show()
       this.productService.findById(this.productId, { with: ['units.unit', 'inventory', 'unitConversion'] }).subscribe(
+        
         (data: any) => {
           this.product = data.data;
           this.cdr.detectChanges();
@@ -41,6 +43,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy, AfterViewInit
           console.error('Error fetching Product details:', error);
           this.spinnerService.hide();
         }
+        
       );
     }
   }
