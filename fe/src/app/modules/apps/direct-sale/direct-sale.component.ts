@@ -326,21 +326,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       return value < 0 ? { negativeValue: true } : null;
     };
   }
-
-  // getAllProducts() {
-  //   this.subscriptionHandler.subscribe = this.service.find({ pageSize: 10000 }).subscribe({
-  //     next: (data: any) => {
-  //       // this.products = data.data.products;
-  //       this.parties = data.data.parties;
-  //       this.units = data.data.units;
-  //       this.setupDropdowns();
-  //       this.cdr.detectChanges();
-  //     },
-  //     error: (err) => {
-  //     },
-  //   });
-  // }
-
   setupDropdowns(): void {
     this.filteredPartiesByName = this.form.controls.partyName.valueChanges.pipe(
       startWith(''),

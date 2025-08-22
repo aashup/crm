@@ -388,31 +388,29 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
   }
 
   calculateNetTotal(): void {
-    let totalNet = 0;
+    let total = 0;
     this.purchaseDetails.controls.forEach((ctrl) => {
-      totalNet += parseFloat(ctrl.get('net')?.value || 0);
+      total += parseFloat(ctrl.get('net')?.value || 0);
     });
-
-    if (this.isManualAmount) {
-      totalNet = parseFloat(this.form.get('amount')?.value) || 0;
-    } else {
-      this.updatingAmountFromCode = true;
-      this.form.get('amount')?.setValue(parseFloat(totalNet.toFixed(2)), { emitEvent: false });
-      this.updatingAmountFromCode = false;
-    }
-
+  
+    this.updatingAmountFromCode = true;
+    this.form.get('amount')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
+    this.updatingAmountFromCode = false;
+  
     const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
     const discountType = this.form.get('discount_type')?.value;
-    let netTotal = totalNet;
-
+    let netTotal = total;
+  
     if (discountType === 1) {
       netTotal -= discountAmount;
     } else if (discountType === 2) {
-      netTotal -= (totalNet * discountAmount) / 100;
+      netTotal -= (total * discountAmount) / 100;
     }
-
+  
     netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
-
+  
+    this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
+  
     if (this.form.get('payment_method')?.value === 1) {
       this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
       this.form.get('online_amount')?.setValue(0, { emitEvent: false });
@@ -420,11 +418,10 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
       this.form.get('cash_amount')?.setValue(0, { emitEvent: false });
       this.form.get('online_amount')?.setValue(netTotal, { emitEvent: false });
     }
-
-    this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
+  
     this.cdr.detectChanges();
   }
-
+  
   patchForm(purchase: any): void {
     this.form.patchValue({
       ...purchase,

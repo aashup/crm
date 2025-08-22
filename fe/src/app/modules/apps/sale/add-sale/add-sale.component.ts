@@ -353,62 +353,56 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   calculateItemNet(index: number): void {
     const group = this.saleDetails.at(index);
     const quantity = parseFloat(group.get('quantity')?.value || 0);
-    let pricePerUnit = parseFloat(group.get('price_per_unit')?.value || 0);
-    const taxRateControl = group.get('tax_rate');
-    const taxRate = taxRateControl ? this.tax_rates.find((t: any) => t.id === taxRateControl.value)?.rate || 0 : 0;
+    const pricePerUnit = parseFloat(group.get('price_per_unit')?.value || 0);
     const discountAmount = parseFloat(group.get('discount_amount')?.value || 0);
     const discountType = group.get('sale_price_discount_type')?.value;
-    const taxType = group.get('sale_price_tax_type')?.value || 2;
-
-    let basePricePerUnit = pricePerUnit;
-
+    const taxRateControl = group.get('tax_rate');
+    const taxRate = taxRateControl ? this.tax_rates.find((t: any) => t.id === taxRateControl.value)?.rate || 0 : 0;
+  
+    let grossAmount = quantity * pricePerUnit;
+    let discountedAmount = grossAmount;
+  
     if (discountType === 1) {
-      pricePerUnit -= discountAmount;
+      discountedAmount = grossAmount - discountAmount;
     } else if (discountType === 2) {
-      pricePerUnit -= (pricePerUnit * discountAmount) / 100;
+      discountedAmount = grossAmount - (grossAmount * discountAmount) / 100;
     }
-
-    pricePerUnit = Math.max(0, pricePerUnit);
-
-    basePricePerUnit = pricePerUnit;
-    pricePerUnit = basePricePerUnit * (1 + taxRate / 100);
-
-    const taxPerUnit = (basePricePerUnit * taxRate) / 100;
-    const totalTaxAmount = taxPerUnit * quantity;
-    const totalItemAmount = pricePerUnit * quantity;
-
-    group.get('tax_amount')?.setValue(parseFloat(totalTaxAmount.toFixed(2)), { emitEvent: false });
-    group.get('amount')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
-    group.get('net')?.setValue(parseFloat(totalItemAmount.toFixed(2)), { emitEvent: false });
+  
+    discountedAmount = Math.max(0, discountedAmount);
+  
+    const tax = (discountedAmount * taxRate) / 100;
+    const net = discountedAmount + tax;
+  
+    group.get('tax_amount')?.setValue(parseFloat(tax.toFixed(2)), { emitEvent: false });
+    group.get('amount')?.setValue(parseFloat(grossAmount.toFixed(2)), { emitEvent: false });
+    group.get('net')?.setValue(parseFloat(net.toFixed(2)), { emitEvent: false });
+  
     this.calculateNetTotal();
   }
-
   calculateNetTotal(): void {
-    let totalNet = 0;
+    let total = 0;
     this.saleDetails.controls.forEach((ctrl) => {
-      totalNet += parseFloat(ctrl.get('net')?.value || 0);
+      total += parseFloat(ctrl.get('net')?.value || 0);
     });
-
-    if (this.isManualAmount) {
-      totalNet = parseFloat(this.form.get('amount')?.value) || 0;
-    } else {
-      this.updatingAmountFromCode = true;
-      this.form.get('amount')?.setValue(parseFloat(totalNet.toFixed(2)), { emitEvent: false });
-      this.updatingAmountFromCode = false;
-    }
-
+  
+    this.updatingAmountFromCode = true;
+    this.form.get('amount')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
+    this.updatingAmountFromCode = false;
+  
     const discountAmount = parseFloat(this.form.get('discount_amount')?.value) || 0;
     const discountType = this.form.get('discount_type')?.value;
-    let netTotal = totalNet;
-
+    let netTotal = total;
+  
     if (discountType === 1) {
       netTotal -= discountAmount;
     } else if (discountType === 2) {
-      netTotal -= (totalNet * discountAmount) / 100;
+      netTotal -= (total * discountAmount) / 100;
     }
-
+  
     netTotal = Math.max(0, parseFloat(netTotal.toFixed(2)));
-
+  
+    this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
+  
     if (this.form.get('payment_method')?.value === 1) {
       this.form.get('cash_amount')?.setValue(netTotal, { emitEvent: false });
       this.form.get('online_amount')?.setValue(0, { emitEvent: false });
@@ -416,8 +410,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
       this.form.get('cash_amount')?.setValue(0, { emitEvent: false });
       this.form.get('online_amount')?.setValue(netTotal, { emitEvent: false });
     }
-
-    this.form.get('net_total')?.setValue(netTotal, { emitEvent: false });
+  
     this.cdr.detectChanges();
   }
 
