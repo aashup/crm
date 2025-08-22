@@ -83,7 +83,7 @@ class StoreSaleRequest extends FormRequest
 
                     if ($availableQty) {
                         if ($detail['quantity'] > $availableQty) {
-                            $validator->errors()->add("saleDetails.$index.quantity", "Only {$availableQty} units available for this product.");
+                            $validator->errors()->add("saleDetails.$index.quantity", "Only {$availableQty} quantity available for this product.");
                         }
                     }
                 }

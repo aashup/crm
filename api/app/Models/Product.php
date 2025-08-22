@@ -22,7 +22,9 @@ class Product extends Model
 
     protected $relations = [
         'units',
-        'inventory'
+        'inventory',
+        'productUnit',
+        'unitConversion'
     ];
 
     public function searchableColumns()
@@ -98,5 +100,10 @@ class Product extends Model
     public function inventory()
     {
         return $this->hasMany(Inventory::class, 'product_id');
+    }
+
+    public function unitConversion()
+    {
+        return $this->hasMany(UnitConversion::class, 'product_id');
     }
 }
