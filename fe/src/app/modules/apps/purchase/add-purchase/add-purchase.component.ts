@@ -777,7 +777,6 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
       const withTax = purchasePriceTaxType === 1;
       const rateId = detail.tax_rate || null;
       const taxRateObj = this.tax_rates.find((t) => t.id === rateId);
-      debugger
       return {
         ...detail,
         net: detail.net,
