@@ -92,6 +92,10 @@ export class ProductComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
+  redirectToview(item:any){
+    this.router.navigate([`/app/product/${item.id}`])
+  }
+
   loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;

@@ -341,14 +341,5 @@ background-color: #ffffff;box-shadow: 2px 2px 5px -2px gray;">
     </ng-container>
   </button>
 
-  <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="onSubmit(true)"
-    (keyup.enter)="onSubmit(true)">
-    <ng-container *ngIf="!isLoading">Save and Print</ng-container>
-    <ng-container *ngIf="isLoading">
-      <span class="indicator-progress" style="display: block">
-        Please wait...
-        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-      </span>
-    </ng-container>
-  </button>
+ 
 </div>
