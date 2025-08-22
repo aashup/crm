@@ -1,0 +1,124 @@
+<div style="background-color: #ffffff; min-height: 100vh; padding: 16px;">
+  <mat-card style="background-color: #ffffff;" class="mat-elevation-z2 rounded-lg max-w-4xl mx-auto" *ngIf="product">
+    <mat-card-content>
+      <h3 class="text-xl font-semibold mb-3">Product Info</h3>
+      <table mat-table [dataSource]="[product]" class="mat-elevation-z0 w-100">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let p"> {{ p.name }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="item_code">
+          <th mat-header-cell *matHeaderCellDef> Item Code </th>
+          <td mat-cell *matCellDef="let p"> {{ p.item_code }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="hsn">
+          <th mat-header-cell *matHeaderCellDef> HSN </th>
+          <td mat-cell *matCellDef="let p"> {{ p.hsn }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let p"> {{ p.id }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let p">
+            <mat-chip [color]="p.status === 1 ? 'primary' : 'warn'" selected>
+              {{ p.status === 1 ? 'Active' : 'Inactive' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['name','item_code','hsn','id','status']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['name','item_code','hsn','id','status']"></tr>
+      </table>
+
+      <mat-divider class="my-5"></mat-divider>
+
+      <h3 class="text-xl font-semibold mb-3">Units</h3>
+      <table mat-table [dataSource]="product.units" class="mat-elevation-z0 w-100">
+        <ng-container matColumnDef="unit">
+          <th mat-header-cell *matHeaderCellDef> Unit </th>
+          <td mat-cell *matCellDef="let u"> {{ u.unit.name }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sale_price">
+          <th mat-header-cell *matHeaderCellDef> Sale Price </th>
+          <td mat-cell *matCellDef="let u"> ₹{{ u.sale_price }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="purchase_price">
+          <th mat-header-cell *matHeaderCellDef> Purchase Price </th>
+          <td mat-cell *matCellDef="let u"> ₹{{ u.purchase_price }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="discount">
+          <th mat-header-cell *matHeaderCellDef> Discount </th>
+          <td mat-cell *matCellDef="let u"> ₹{{ u.sale_price_discount_amount }} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['unit','sale_price','purchase_price','discount']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['unit','sale_price','purchase_price','discount']"></tr>
+      </table>
+
+      <mat-divider class="my-5"></mat-divider>
+
+      <h3 class="text-xl font-semibold mb-3">Inventory</h3>
+      <table mat-table [dataSource]="product.inventory" class="mat-elevation-z0 w-100">
+        <ng-container matColumnDef="qty">
+          <th mat-header-cell *matHeaderCellDef> Total Qty </th>
+          <td mat-cell *matCellDef="let inv"> {{ inv.qty }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="rem_qty">
+          <th mat-header-cell *matHeaderCellDef> Remaining Qty </th>
+          <td mat-cell *matCellDef="let inv"> {{ inv.rem_qty }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="unit_price">
+          <th mat-header-cell *matHeaderCellDef> Unit Price </th>
+          <td mat-cell *matCellDef="let inv"> ₹{{ inv.unit_price }} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['qty','rem_qty','unit_price']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['qty','rem_qty','unit_price']"></tr>
+      </table>
+
+      <mat-divider class="my-5"></mat-divider>
+
+      <h3 class="text-xl font-semibold mb-3">Unit Conversion</h3>
+      <table mat-table [dataSource]="product.unit_conversion" class="mat-elevation-z0 w-100">
+        <ng-container matColumnDef="from">
+          <th mat-header-cell *matHeaderCellDef> From Unit </th>
+          <td mat-cell *matCellDef="let c"> {{ getUnitNameById(c.from_unit_id) }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="to">
+          <th mat-header-cell *matHeaderCellDef> To Unit </th>
+          <td mat-cell *matCellDef="let c"> {{ getUnitNameById(c.to_unit_id) }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="factor">
+          <th mat-header-cell *matHeaderCellDef> Factor </th>
+          <td mat-cell *matCellDef="let c"> {{ c.conversion_factor | number:'1.2-2' }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef> Description </th>
+          <td mat-cell *matCellDef="let c"> {{ c.description }} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['from','to','factor','description']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['from','to','factor','description']"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+  
+  <div style="text-align: center; margin-top: 20px;" *ngIf="!product">
+    <mat-spinner></mat-spinner>
+    <p style="margin-top: 12px;">Loading product details...</p>
+  </div>
+</div>

@@ -18,7 +18,13 @@ import { ProductInventoryComponent } from './product-inventory/product-inventory
 import { AddProductInventoryComponent } from './product-inventory/add-product-inventory/add-product-inventory.component';
 import { ProductSellerComponent } from './product-seller/product-seller.component';
 import { AddProductSellerComponent } from './product-seller/add-product-seller/add-product-seller.component';
-
+import { ProductDetailsComponent } from './product-details/product-details.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 @NgModule({
   declarations: [
     ProductComponent,
@@ -33,6 +39,7 @@ import { AddProductSellerComponent } from './product-seller/add-product-seller/a
     ProductSellerComponent,
     AddProductSellerComponent,
     CompleteComponent,
+    ProductDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -41,9 +48,16 @@ import { AddProductSellerComponent } from './product-seller/add-product-seller/a
       { path: '', component: ProductComponent },
       { path: 'add', component: StepperComponent },
       { path: 'add/:id', component: StepperComponent },
+      {path:':id',component:ProductDetailsComponent}
     ]),
     NgxPermissionsModule.forChild(),
     SharedModule,
+    MatCardModule,
+    MatIconModule,
+    MatDividerModule,
+    MatTableModule,
+    MatChipsModule,
+    MatButtonModule,
   ],
 })
 export class ProductModule {}

@@ -22,103 +22,58 @@
   </div>
   <div class="card-body">
     <div class="table-responsive">
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="dataSource.loading$ | async"
-      ></mat-progress-bar>
-      <table
-        #table
-        cdk-table
-        [dataSource]="dataSource"
-        matSort
-        #sort1="matSort"
-        matSortActive="id"
-        matSortDirection="desc"
-        matSortDisableClear
-        class="table table-row-dashed table-row-gray-300 align-middle gs-0"
-      >
+      <mat-progress-bar mode="indeterminate" *ngIf="dataSource.loading$ | async"></mat-progress-bar>
+      <table #table cdk-table [dataSource]="dataSource" matSort #sort1="matSort" matSortActive="id"
+        matSortDirection="desc" matSortDisableClear class="table table-row-dashed table-row-gray-300 align-middle gs-0">
         <ng-container *ngFor="let cols of tableColumns; let i = index">
           <!-- Checkbox Column -->
           <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'select'">
-            <th
-              cdk-header-cell
-              *matHeaderCellDef
-              [ngStyle]="cols.style || {}"
-              [attr.aria-label]="'Select all'"
-            >
-              <mat-checkbox
-                [attr.aria-label]="'Select all'"
-                (change)="$event ? masterToggle() : null"
+            <th cdk-header-cell *matHeaderCellDef [ngStyle]="cols.style || {}" [attr.aria-label]="'Select all'">
+              <mat-checkbox [attr.aria-label]="'Select all'" (change)="$event ? masterToggle() : null"
                 [checked]="selection.hasValue() && isAllSelected()"
-                [indeterminate]="selection.hasValue() && !isAllSelected()"
-              >
+                [indeterminate]="selection.hasValue() && !isAllSelected()">
               </mat-checkbox>
             </th>
             <td cdk-cell *matCellDef="let row" [ngStyle]="cols.style || {}">
-              <mat-checkbox
-                (click)="$event.stopPropagation()"
-                (change)="$event ? selection.toggle(row) : null"
-                [checked]="selection.isSelected(row)"
-              >
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)">
               </mat-checkbox>
             </td>
           </ng-container>
 
-          <ng-container
-          [matColumnDef]="cols.ref"
-          *ngIf="['action', 'select'].indexOf(cols.ref) == -1"
-        >
-          <th
-            cdk-header-cell
-            [mat-sort-header]="cols.doNotSort ? null : cols.ref"
-            [disabled]="cols.doNotSort ? true : false"
-            *matHeaderCellDef
-            [class]="cols.class || ''"
-            [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }"
-          >
-            {{ cols.name }}
-          </th>
-          <td
-            cdk-cell
-            *matCellDef="let row"
-            [ngStyle]="{ 'text-align': 'left', 'justify-content': 'center' }"
-          >
-            {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
-          </td>
-        </ng-container>
-        
-        <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
-          <th
-            cdk-header-cell
-            [attr.aria-label]="cols.name"
-            *matHeaderCellDef
-            [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }"
-          >
-            {{ cols.name }}
-          </th>
-          <td
-            cdk-cell
-            *matCellDef="let item"
-            [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }"
-          >
-            <button
-              mat-icon-button
-              class="text-info blod"
-              (click)="edit(item)"
-              *ngxPermissionsOnly="['products.update']"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              class="text-danger"
-              (click)="delete(item)"
-              *ngxPermissionsOnly="['products.delete']"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+          <ng-container [matColumnDef]="cols.ref" *ngIf="['action', 'select'].indexOf(cols.ref) == -1">
+            <th cdk-header-cell [mat-sort-header]="cols.doNotSort ? null : cols.ref"
+              [disabled]="cols.doNotSort ? true : false" *matHeaderCellDef [class]="cols.class || ''"
+              [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }">
+              {{ cols.name }}
+            </th>
+            <td cdk-cell *matCellDef="let row" [ngStyle]="{ 'text-align': 'left', 'justify-content': 'center' }">
+              {{ cols.mutator ? cols.mutator(row) : _.get(row, cols.ref, '') }}
+            </td>
+          </ng-container>
+
+          <ng-container [matColumnDef]="cols.ref" *ngIf="cols.ref == 'action'">
+            <th cdk-header-cell [attr.aria-label]="cols.name" *matHeaderCellDef
+              [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }">
+              {{ cols.name }}
+            </th>
+            <td cdk-cell *matCellDef="let item" [ngStyle]="{ 'text-align': 'center', 'justify-content': 'center' }">
+              <button mat-icon-button class="text-info blod" (click)="edit(item)"
+                *ngxPermissionsOnly="['products.update']">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="text-danger" (click)="delete(item)"
+                *ngxPermissionsOnly="['products.delete']">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              <button mat-icon-button class="text-info"
+                (click)="redirectToview(item)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+            </td>
+          </ng-container>
         </ng-container>
 
         <tr cdk-header-row *cdkHeaderRowDef="displayableCol"></tr>
@@ -131,14 +86,9 @@
     </div>
 
     <div class="pt-5">
-      <mat-spinner
-        [diameter]="20"
-        *ngIf="dataSource.loading$ | async"
-      ></mat-spinner>
-      <mat-paginator
-        [pageSizeOptions]="[5, 10, 20, 50, 100]"
-        [length]="dataSource.paginatorTotal$ | async"
-      ></mat-paginator>
+      <mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20, 50, 100]"
+        [length]="dataSource.paginatorTotal$ | async"></mat-paginator>
 
       <div class="mat-table__floating-modal" *ngIf="selection.selected.length">
         <div class="floating-modal">
