@@ -44,18 +44,18 @@ class ExpenseController extends Controller
         $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
             ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
 
-        // Handle interval filters
-        if ($filter['expenseInterval'] && isset($this->mapInterval[$filter['expenseInterval']])) {
+        if (isset($filter['expenseInterval']) && $filter['expenseInterval'] && isset($this->mapInterval[$filter['expenseInterval']])) {
             $raw = $this->mapInterval[$request->expenseInterval];
             $model = $model->whereRaw($raw);
         }
 
-        // Handle custom range filter
-        if ($filter['start_date'] && $filter['end_date']) {
-            $start = Carbon::parse($request->start_date)->startOfDay();
-            $end   = Carbon::parse($request->end_date)->endOfDay();
-
-            $model = $model->whereBetween('created_at', [$start, $end]);
+        if (!empty($filter['start_date'])) {
+            $from_date = Carbon::parse($filter['start_date'])->setTimeZone('UTC');
+            $model->where('created_at', '>=', $from_date);
+        } 
+        if (!empty($filter['end_date'])) {
+            $to_date = Carbon::parse($filter['end_date'])->setTimeZone('UTC')->addDay();
+            $model->where('created_at', '<', $to_date);
         }
 
         return $model->paginate($pageSize, ['*'], 'page', $request->page);
