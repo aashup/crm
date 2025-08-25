@@ -8,25 +8,49 @@
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Date Range</mat-label>
-          <mat-date-range-input [rangePicker]="picker" separator="to">
-            <input
-              matStartDate
-              placeholder="Start date"
-              [(ngModel)]="search.start_date"
-              (dateChange)="onDateChange()"
-            />
-            <input
-              matEndDate
-              placeholder="End date"
-              [(ngModel)]="search.end_date"
-              (dateChange)="onDateChange()"
-            />
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker></mat-date-range-picker>
+        <mat-form-field appearance="outline" class="me-3">
+          <mat-label>Date Filter</mat-label>
+          <mat-select [(ngModel)]="search.dateFilter" (selectionChange)="onDateFilterChange()">
+            <mat-option [value]="1">Today</mat-option>
+            <mat-option [value]="2">This Week</mat-option>
+            <mat-option [value]="3">Last 7 Days</mat-option>
+            <mat-option [value]="4">This Month</mat-option>
+            <mat-option [value]="5">Last 30 Days</mat-option>
+            <mat-option [value]="6">This Year</mat-option>
+            <mat-option [value]="7">Last 365 Days</mat-option>
+            <mat-option [value]="8">Current Quarter</mat-option>
+            <mat-option [value]="9">Quarter 1</mat-option>
+            <mat-option [value]="10">Quarter 2</mat-option>
+            <mat-option [value]="11">Quarter 3</mat-option>
+            <mat-option [value]="12">Quarter 4</mat-option>
+            <mat-option [value]="13">Last Month</mat-option>
+            <mat-option value="custom">Custom</mat-option>
+          </mat-select>
         </mat-form-field>
+        
+        
+        <ng-container *ngIf="search.dateFilter === 'custom'">
+          <mat-form-field appearance="outline">
+            <mat-label>Date Range</mat-label>
+            <mat-date-range-input [rangePicker]="picker" separator="to">
+              <input
+                matStartDate
+                placeholder="Start date"
+                [(ngModel)]="search.start_date"
+                (dateChange)="onDateChange()"
+              />
+              <input
+                matEndDate
+                placeholder="End date"
+                [(ngModel)]="search.end_date"
+                (dateChange)="onDateChange()"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+        </ng-container>
+        
       </div>
     </div>
     <div class="card-toolbar">
@@ -34,7 +58,7 @@
         <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['expense.create']">
           Add New
         </button>
-        <button mat-icon-button (click)="loadData()">
+        <button mat-icon-button (click)="onSyncClick()">
           <mat-icon>sync</mat-icon>
         </button>
       </div>
