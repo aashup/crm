@@ -41,7 +41,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   cities: any = [];
   isLoading = false;
-  search: any = { all: '', start_date: '', end_date: '' };
+  search: any = { all: '', dateFilter: 'today', start_date: '', end_date: '' };
   filter: any = {};
   displayableCol = [
     'select',
@@ -94,8 +94,6 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
-
- 
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
@@ -114,18 +112,42 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
-  onDateChange() {
+  onDateFilterChange() {
     this.paginator.pageIndex = 0;
-    this.loadData(); 
+  
+    if (this.search.dateFilter === 'custom') {
+      this.search.start_date = '';
+      this.search.end_date = '';
+      return;
+    } else {
+      this.search.start_date = '';
+      this.search.end_date = '';
+      this.loadData();
+    }
+  }
+  onDateChange() {
+    if (this.search.dateFilter === 'custom') {
+      this.paginator.pageIndex = 0;
+      this.loadData();
+    }
   }
   
 
+ 
   loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
-    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+  
+    this.filter.filter = JSON.stringify(_.pickBy({
+      all: this.search.all,
+      expenseInterval: 
+        this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
+      start_date: this.search.start_date,
+      end_date: this.search.end_date
+    }));
+  
     this.filter.cols = [
       'id',
       'amount',
@@ -133,9 +155,9 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       'expense_type',
       'created_at'
     ]; 
+  
     this.dataSource.find(_.pickBy(this.filter));
   }
-    
   masterToggle() {
     if (
       this.selection.selected.length ===
