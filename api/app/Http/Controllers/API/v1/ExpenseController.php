@@ -45,7 +45,7 @@ class ExpenseController extends Controller
             ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
 
         if (isset($filter['expenseInterval']) && $filter['expenseInterval'] && isset($this->mapInterval[$filter['expenseInterval']])) {
-            $raw = $this->mapInterval[$request->expenseInterval];
+            $raw = $this->mapInterval[$filter['expenseInterval']];
             $model = $model->whereRaw($raw);
         }
 
