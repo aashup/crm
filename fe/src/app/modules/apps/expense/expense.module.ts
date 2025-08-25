@@ -10,6 +10,12 @@ import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { ExpenseComponent } from './expense.component';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
+
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
 @NgModule({
   declarations: [ExpenseComponent, AddExpenseComponent],
   imports: [
@@ -18,10 +24,13 @@ import { AddExpenseComponent } from './add-expense/add-expense.component';
     MatCardModule,
     MatListModule,
     MatTableModule,
+    MatNativeDateModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
     RouterModule.forChild([
       { path: '', component: ExpenseComponent },
       { path: 'add', component: AddExpenseComponent },
-      
     ]),
     NgxPermissionsModule.forChild(),
     SharedMaterialModuleModule,

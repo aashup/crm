@@ -101,7 +101,6 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
   }
   ngOnInit(): void {
     this.productId = this.form.value.productInfo.id || this.ar.snapshot.params['id'];
-    console.log('inventory page ', this.form);
     if (this.productId) this.loadData();
     this.prefetchUserNames();
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe();
@@ -221,9 +220,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       })
       .afterClosed()
       .subscribe((result) => {
-        console.log('result of inventory page ', result);
         this.form.value.inventoryInfo = [...this.form.value.inventoryInfo, result];
-        console.log('result is this ', result);
         this.loadData();
       });
   }
@@ -238,9 +235,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy, AfterViewIn
       })
       .afterClosed()
       .subscribe((result) => {
-        console.log('result of inventory page ', result);
         this.form.value.inventoryInfo = [...this.form.value.inventoryInfo, result];
-        console.log('result is this ', result);
         this.loadData();
       });
   }

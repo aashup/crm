@@ -2,7 +2,9 @@ export class ExpenseModel {
   id: number | null;
   expense_type: string|null;
   amount:number;
-  notes:string
+  notes:string;
+  created_at:string|null
+
 
   constructor() {
     this.id = null;

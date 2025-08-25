@@ -185,8 +185,6 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
   }
 
   onProductSelected(selectedProduct: any, index: number): void {
-    console.log('selectedProduct', selectedProduct);
-
     const group = this.saleDetails.at(index) as FormGroup;
     if (!group || !selectedProduct?.units?.length) {
       return;
@@ -427,10 +425,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     this.filteredUnitsList = [];
 
     sale.sale_details.forEach((detail: any, index: any) => {
-      console.log(detail);
       let p_unit = detail?.product?.units[0] || {};
-      console.log('units', p_unit);
-
       const salePrice = parseFloat(p_unit.sale_price);
       const taxRateId = p_unit.tax_rate_id || null;
       const taxType = p_unit.sale_price_tax_type;

@@ -123,7 +123,6 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
     this.getAllAddresses();
     this.getAllCities();
     this.loadData();
-    console.log('Product Seller Component Initialized ', this.form);
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe();
 
     this.subscriptionHandler.subscribe = merge(this.sort.sortChange)
@@ -219,9 +218,7 @@ export class ProductSellerComponent implements OnInit, OnDestroy, AfterViewInit 
             error: (err) => {
               this.isLoading = false;
               this.spinnerService.hide();
-              console.log('err', err.error.message);
               this.commonService.toastr.error(err.error.message || 'Some error occurred.');
-              // this.commonService.handleError(err.error.message);
             },
           });
         }

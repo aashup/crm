@@ -89,7 +89,6 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
   ngOnInit(): void {
     this.productId = this.form.value.productInfo.id || this.ar.snapshot.params['id'];
     this.loadData();
-    console.log(this.form);
     this.cdr.detectChanges();
     this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe();
     this.subscriptionHandler.subscribe = merge(this.sort.sortChange,)
@@ -182,16 +181,12 @@ export class UnitConversionComponent implements OnInit, OnDestroy, AfterViewInit
       .afterClosed()
       .pipe(take(1))
       .subscribe((result) => {
-        console.log('result is ', result);
         this.form.value.unitConversionInfo = [...this.form.value.unitConversionInfo, result];
-        console.log('result is this ', result);
         this.loadData();
       });
   }
 
   edit(item: UnitConversionModel) {
-    console.log('item is ', item);
-
     this.dialog
       .open(AddUnitConversionComponent, {
         data: {

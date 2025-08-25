@@ -44,11 +44,6 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.productId = this.form.value.productInfo.id ||  this.ar.snapshot.params['id'];
-    console.log('Product ID from URL:', this.productId);
-
-    console.log(this.form);
-    console.log(this.productId);
-    
    if(this.productId)
     this.loadUnit();
   }
@@ -57,7 +52,6 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
     this.service.find(this.productId).subscribe({
       next: (resp: any) => {
         this.productUnits = resp.data;
-        console.log('Product Units:', this.productUnits);
         this.form.value.unitInfo = this.productUnits;
         this.cdr.detectChanges();
       },
@@ -80,9 +74,7 @@ export class ProductUnitComponent implements OnInit, OnDestroy {
       })
       .afterClosed()
       .subscribe((result) => {
-        console.log("result is ",result);
         this.form.value.unitInfo=[...this.form.value.unitInfo,result];
-        console.log("form",this.form);
         this.loadUnit();
       });
      

@@ -41,9 +41,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
     this.model = new ProductUnitModel().clear();
     this.isEdit = this.data.isEdit ?? false;
     if (this.isEdit && this.data.unit) {
-      this.model = this.data.unit;
-      console.log(this.data);
-      
+      this.model = this.data.unit;      
     }
 
     this.initForm(this.model);

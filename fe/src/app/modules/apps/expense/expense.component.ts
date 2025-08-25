@@ -29,7 +29,7 @@ import { AddExpenseComponent } from './add-expense/add-expense.component';
 @Component({
     selector: 'app-expense',
     templateUrl:'./expense.component.html',
-    styleUrl: './expense.component.scss',
+    styleUrls: ['./expense.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: false
 })
@@ -41,7 +41,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly dialog = inject(MatDialog);
   cities: any = [];
   isLoading = false;
-  search: any = { all: '' };
+  search: any = { all: '', start_date: '', end_date: '' };
   filter: any = {};
   displayableCol = [
     'select',
@@ -49,6 +49,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
     'expense_type',
     'amount',
     'note',
+    'created_at',
     'action'
   ];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -61,6 +62,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
     {ref:'expense_type',name:'Expense Type'},
     { ref: 'amount', name: 'Amount' },
     { ref: 'note', name: 'Notes' },
+    { ref: 'created_at', name: 'Created At',  mutator: (row: ExpenseModel) => this.datePipe.transform(row.created_at, 'mediumDate')},
     { ref: 'action', name: 'Actions' },
   ];
 
@@ -97,35 +99,42 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
-    ngAfterViewInit(): void {
-      this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
-        .pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          tap(() => {
-            this.paginator.pageIndex = 0;
-            this.search.all = this.searchElementRef.nativeElement.value;
-            this.loadData();
-          })
-        )
-        .subscribe();
-    }
 
-    loadData() {
-      this.filter.orderField = this.sort.active;
-      this.filter.orderBy = this.sort.direction;
-      this.filter.page = this.paginator.pageIndex + 1;
-      this.filter.pageSize = this.paginator.pageSize || 20;
-      this.filter.filter = JSON.stringify(_.pickBy(this.search));
-     
-      this.filter.cols = [
-        'id',
-        'amount',
-        'note',
-        'expense_type'
-      ]; 
-      this.dataSource.find(_.pickBy(this.filter));
-    }
+  ngAfterViewInit(): void {
+    this.subscriptionHandler.subscribe = fromEvent(this.searchElementRef.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.search.all = this.searchElementRef.nativeElement.value;
+          this.loadData();
+        })
+      )
+      .subscribe();
+  }
+
+  onDateChange() {
+    this.paginator.pageIndex = 0;
+    this.loadData(); 
+  }
+  
+
+  loadData() {
+    this.filter.orderField = this.sort.active;
+    this.filter.orderBy = this.sort.direction;
+    this.filter.page = this.paginator.pageIndex + 1;
+    this.filter.pageSize = this.paginator.pageSize || 20;
+    this.filter.filter = JSON.stringify(_.pickBy(this.search));
+    this.filter.cols = [
+      'id',
+      'amount',
+      'note',
+      'expense_type',
+      'created_at'
+    ]; 
+    this.dataSource.find(_.pickBy(this.filter));
+  }
     
   masterToggle() {
     if (
