@@ -6,10 +6,27 @@ use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\API\BaseResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 class ExpenseController extends Controller
 {
+    protected $mapInterval = [
+        1 => 'DATE(created_at) = CURDATE()', // Today
+        2 => '(YEARWEEK(created_at) = YEARWEEK(NOW()) AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // This week
+        3 => '(DATE(created_at) >= DATE(SUBDATE(now(), INTERVAL 7 DAY)))', // Last 7 days
+        4 => '(MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // This Month
+        5 => '(DATE(created_at) >= DATE(SUBDATE(now(), INTERVAL 1 MONTH)))', // Last 30 days
+        6 => '(YEAR(created_at) = YEAR(CURDATE()))', // This year
+        7 => '(DATE(created_at) >= DATE(SUBDATE(now(), INTERVAL 365 DAY)))', // Last 365 days
+        8 => '(QUARTER(created_at) = QUARTER(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // Current Quarters
+        9 => '(QUARTER(created_at) = 1 AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // Q1 Quarters
+        10 => '(QUARTER(created_at) = 2 AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // Q2 Quarters
+        11 => '(QUARTER(created_at) = 3 AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // Q3 Quarters
+        12 => '(QUARTER(created_at) = 4 AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // Q4 Quarters
+        13 => '(MONTH(created_at) = IF((MONTH(CURRENT_DATE())-1) = 0, 12, (MONTH(CURRENT_DATE())-1)) AND YEAR(created_at) = IF((MONTH(CURRENT_DATE())-1) = 0, (YEAR(CURRENT_DATE()) - 1), YEAR(CURRENT_DATE())) AND YEAR(created_at) = YEAR(CURRENT_DATE()))', // LAST MONTH
+    ];
+
     /**
      * Display a listing of the resource.
      */
@@ -21,9 +38,25 @@ class ExpenseController extends Controller
         if (intval($request->pageSize)) {
             $pageSize = intval($request->get('pageSize', 1000));
         }
+        $filter = json_decode($request->get('filter'), 1);
+
         $model = new Expense();
         $model = $model->handleWith($request->with)->selectCols($request->get('cols'))
             ->applyFilter($request->get('filter'))->sortOrder($request->orderField, $request->orderBy)->getBuilder();
+
+        // Handle interval filters
+        if ($filter['expenseInterval'] && isset($this->mapInterval[$filter['expenseInterval']])) {
+            $raw = $this->mapInterval[$request->expenseInterval];
+            $model = $model->whereRaw($raw);
+        }
+
+        // Handle custom range filter
+        if ($filter['start_date'] && $filter['end_date']) {
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end   = Carbon::parse($request->end_date)->endOfDay();
+
+            $model = $model->whereBetween('created_at', [$start, $end]);
+        }
 
         return $model->paginate($pageSize, ['*'], 'page', $request->page);
     }
