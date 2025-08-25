@@ -486,7 +486,7 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
 
   onUnitSelected(selectedUnitName: string, index: number): void {
     const group = this.purchaseDetails.at(index);
-    const selectedUnit = this.filteredUnitsList[index].find((u: UnitModel) => u.name === selectedUnitName);
+    const selectedUnit = this.units.find((u: UnitModel) => u.name === selectedUnitName);
     if (selectedUnit) {
       group.get('unit_id')?.setValue(selectedUnit.id);
     }
@@ -562,9 +562,12 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
   }
 
   onProductSelected(selectedProduct: any, index: number): void {
-
     const group = this.purchaseDetails.at(index) as FormGroup;
     if (!group || !selectedProduct?.units?.length) {
+      group.patchValue({
+        product_id: selectedProduct.id,
+        product_name: selectedProduct.name,
+      })
       return;
     }
 

@@ -480,7 +480,6 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onUnitSelected(selectedUnitName: string, index: number): void {
-    debugger
     const group = this.saleDetails.at(index);
     const selectedUnit = this.units.find((u: UnitModel) => u.name === selectedUnitName);
     if (selectedUnit) {
