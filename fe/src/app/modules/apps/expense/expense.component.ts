@@ -94,6 +94,21 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
+  onSyncClick(): void {
+    this.search = {
+      all: null,
+      dateFilter: null,
+      start_date: null,
+      end_date: null
+    };
+    this.filter = {};
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.loadData();
+  }
+  
+  
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
