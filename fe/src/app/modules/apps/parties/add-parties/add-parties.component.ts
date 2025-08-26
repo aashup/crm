@@ -301,7 +301,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       credit_limit: [model?.credit_limit ?? false],
       credit_limit_amount: [model?.credit_limit_amount || 0],
       billing_address: ['',[Validators.required]],
-      billing_address_id: ['', Validators.required],
+      billing_address_id: [model?.billing_address_id, Validators.required],
       shipping_address: [''],
       shipping_address_id: [model?.shipping_address_id || ''],
       state_id: [model?.state_id || ''],
@@ -384,6 +384,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   save(resetAfter: boolean = false) {
+    debugger
     this.commonService.markFormGroupTouched(this.form);
   
     if (this.form.invalid) {
