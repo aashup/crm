@@ -7,6 +7,7 @@ import {
   LOCALE_ID,
   Inject,
   Optional,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -29,6 +30,7 @@ import { AddAddressComponent } from 'src/app/modules/settings/address/add-addres
 import { AddressModel } from 'src/app/modules/settings/address/address.model';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { formatDate } from '@angular/common';
+import { validate } from 'schema-utils';
 
 @Component({
   selector: 'app-add-parties',
@@ -73,6 +75,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     private contactService: ContactService,
     private addressService: AddressService,
     private router: Router,
+    private cdr:ChangeDetectorRef,
     @Inject(LOCALE_ID) private locale: string,
     
 
@@ -86,7 +89,8 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getAllStates();
     this.initForm(this.model);
     this.getContacts();
-
+   
+    
     this.form
       .get('credit_limit')
       ?.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
@@ -102,10 +106,21 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+
   get billingAddressControl() {
     return this.form.get('billing_address') as FormControl;
   }
 
+  onBillingAddressBlur(){
+    if (this.form.get('billing_address_id')?.hasError("required")) {
+      this.form.patchValue({
+          billing_address:null
+      })
+      this.cdr.detectChanges()
+      this.form.get('billing_address')?.markAsTouched();
+    
+    }
+  }
   get shippingAddressControl() {
     return this.form.get('shipping_address') as FormControl;
   }
@@ -189,27 +204,43 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setupAddressAutocompletes(): void {
+   
     this.filteredBillingAddresses = this.billingAddressControl.valueChanges.pipe(
       startWith(''),
       map((val: string) => {
         const value = val?.toLowerCase() || '';
-        return this.billing_address.filter((a: any) =>
-          a.address.toLowerCase().includes(value)
-        );
+        return this.billing_address.filter(a => a.address.toLowerCase().includes(value));
       })
     );
-
+  
+    this.billingAddressControl.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
+      const selected = this.billing_address.find(a => a.address === val);
+      if (selected) {
+        this.form.patchValue({ billing_address_id: selected.id }, { emitEvent: false });
+      } else {
+        this.form.patchValue({ billing_address_id: null }, { emitEvent: false });
+      }
+    });
+  
+   
     this.filteredShippingAddresses = this.shippingAddressControl.valueChanges.pipe(
       startWith(''),
       map((val: string) => {
         const value = val?.toLowerCase() || '';
-        return this.shipping_address.filter((a: any) =>
-          a.address.toLowerCase().includes(value)
-        );
+        return this.shipping_address.filter(a => a.address.toLowerCase().includes(value));
       })
     );
+  
+    this.shippingAddressControl.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
+      const selected = this.shipping_address.find(a => a.address === val);
+      if (selected) {
+        this.form.patchValue({ shipping_address_id: selected.id }, { emitEvent: false });
+      } else {
+        this.form.patchValue({ shipping_address_id: null }, { emitEvent: false });
+      }
+    });
   }
-
+  
   onBillingSelect(addressStr: string) {
     const selected = this.billing_address.find((a: any) => a.address === addressStr);
     if (selected) {
@@ -269,8 +300,8 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
       opening_balance_date: [model?.opening_balance_date || new Date()],
       credit_limit: [model?.credit_limit ?? false],
       credit_limit_amount: [model?.credit_limit_amount || 0],
-      billing_address: [''],
-      billing_address_id: [model?.billing_address_id || ''],
+      billing_address: ['',[Validators.required]],
+      billing_address_id: [model?.billing_address_id, Validators.required],
       shipping_address: [''],
       shipping_address_id: [model?.shipping_address_id || ''],
       state_id: [model?.state_id || ''],

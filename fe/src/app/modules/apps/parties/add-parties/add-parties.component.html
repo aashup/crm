@@ -79,7 +79,7 @@
                 <mat-label>Billing Address</mat-label>
                 <input type="text" matInput [matAutocomplete]="autoBilling"
                        [formControl]="billingAddressControl"
-                       placeholder="Search or enter billing address" />
+                       placeholder="Search or enter billing address"  (blur)="onBillingAddressBlur()"/>
                 <mat-autocomplete #autoBilling="matAutocomplete" style="padding: 0px;" >
                   <mat-option  (click)="add('billing')" style="color: blue !important;" class="sticky-option">
                     <span>
@@ -91,9 +91,10 @@
                   </mat-option>
                 </mat-autocomplete>
                 <input class="d-none" formControlName="billing_address_id" />
-                <mat-error *ngIf="form.get('billing_address_id')?.hasError('required') && form.get('billing_address_id')?.touched">
-                  Billing address is <strong>required</strong>
+                <mat-error *ngIf="form.get('billing_address_id')?.hasError('required') && billingAddressControl.touched">
+                  Please select a valid <strong>billing address </strong>
                 </mat-error>
+
               </mat-form-field>
               
               <a class="cursor-pointer" [class.text-primary]="!enableShipping" [class.text-danger]="enableShipping" (click)="enableShipping = !enableShipping">
@@ -119,6 +120,7 @@
                   </mat-option>
                 </mat-autocomplete>
                 <input class="d-none" formControlName="shipping_address_id" />
+
               </mat-form-field>
             </div>
           </div>
@@ -186,11 +188,11 @@
 </div>
 
 <div mat-dialog-actions align="end">
-  <button mat-flat-button color="primary" class="mr-3" [disabled]="isLoading" (click)="save(true)"
+  <button mat-flat-button color="primary" class="mr-3" (click)="save(true)"
     style="margin-right: 15px;">
     Save & New
   </button>
-  <button mat-flat-button color="primary" [disabled]="isLoading" (click)="save(false)">
+  <button mat-flat-button color="primary"  (click)="save(false)">
     Save
   </button>
 </div>
