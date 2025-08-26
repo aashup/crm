@@ -74,7 +74,7 @@ class SaleController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['rate'],
+                        'sale_price' => $item['price_per_unit'],
                         'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
                         'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
                         'sale_price_discount_type' => $item['discount_type'] ?? 1,
@@ -101,8 +101,17 @@ class SaleController extends Controller
                 if ($productUnit) {
                     $this->updateInventory($productUnit, $detail);
                 } else {
-                    DB::rollBack();
-                    return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
+                    $product = Product::find($detail['product_id']);
+                    $productUnit = $product->units()->create([
+                        'unit_id' => $item['unit_id'],
+                        'sale_price' => $item['price_per_unit'],
+                        'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
+                        'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
+                        'sale_price_discount_type' => $item['discount_type'] ?? 1,
+                        'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
+                        'status' => 1,
+                    ]);
+                    $this->updateInventory($productUnit, $detail);
                 }
             }
 
@@ -167,7 +176,7 @@ class SaleController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['rate'],
+                        'sale_price' => $item['price_per_unit'],
                         'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
                         'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
                         'sale_price_discount_type' => $item['discount_type'] ?? 1,
@@ -204,8 +213,17 @@ class SaleController extends Controller
                 if ($productUnit) {
                     $this->updateInventory($productUnit, $detail);
                 } else {
-                    DB::rollBack();
-                    return $this->error("Product unit not found for product ID: {$detail['product_id']} and unit ID: {$detail['unit_id']}");
+                    $product = Product::find($detail['product_id']);
+                    $productUnit = $product->units()->create([
+                        'unit_id' => $item['unit_id'],
+                        'sale_price' => $item['price_per_unit'],
+                        'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
+                        'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
+                        'sale_price_discount_type' => $item['discount_type'] ?? 1,
+                        'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
+                        'status' => 1,
+                    ]);
+                    $this->updateInventory($productUnit, $detail);
                 }
             }
 
