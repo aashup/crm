@@ -206,7 +206,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
   setupAddressAutocompletes(): void {
    
     this.filteredBillingAddresses = this.billingAddressControl.valueChanges.pipe(
-      startWith(''),
+      
       map((val: string) => {
         const value = val?.toLowerCase() || '';
         return this.billing_address.filter(a => a.address.toLowerCase().includes(value));

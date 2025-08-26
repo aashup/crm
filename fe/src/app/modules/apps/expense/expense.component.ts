@@ -25,13 +25,14 @@ import { ExpenseDatasource } from './expense.datasource';
 import { ExpenseModel } from './expense.model';
 import { ExpenseService } from './expense.service';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 @Component({
-    selector: 'app-expense',
-    templateUrl:'./expense.component.html',
-    styleUrls: ['./expense.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-expense',
+  templateUrl: './expense.component.html',
+  styleUrls: ['./expense.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   _ = _;
@@ -43,15 +44,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoading = false;
   search: any = { all: '', dateFilter: 'today', start_date: '', end_date: '' };
   filter: any = {};
-  displayableCol = [
-    'select',
-    'id',
-    'expense_type',
-    'amount',
-    'note',
-    'created_at',
-    'action'
-  ];
+  displayableCol = ['select', 'id', 'expense_type', 'amount', 'note', 'created_at', 'action'];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild('sort1', { static: true }) sort: MatSort;
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
@@ -59,10 +52,14 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   tableColumns: Array<any> = [
     { ref: 'select', name: 'Select', style: { width: '70px' } },
     { ref: 'id', name: 'ID', style: { 'max-width': '30px' } },
-    {ref:'expense_type',name:'Expense Type'},
+    { ref: 'expense_type', name: 'Expense Type' },
     { ref: 'amount', name: 'Amount' },
     { ref: 'note', name: 'Notes' },
-    { ref: 'created_at', name: 'Created At',  mutator: (row: ExpenseModel) => this.datePipe.transform(row.created_at, 'mediumDate')},
+    {
+      ref: 'created_at',
+      name: 'Created At',
+      mutator: (row: ExpenseModel) => this.datePipe.transform(row.created_at, 'mediumDate'),
+    },
     { ref: 'action', name: 'Actions' },
   ];
 
@@ -78,14 +75,9 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnInit(): void {
     this.loadData();
-    this.checkPermissions()
-    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(
-      () => (this.paginator.pageIndex = 0)
-    );
-    this.subscriptionHandler.subscribe = merge(
-      this.sort.sortChange,
-      this.paginator.page
-    )
+    this.checkPermissions();
+    this.subscriptionHandler.subscribe = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+    this.subscriptionHandler.subscribe = merge(this.sort.sortChange, this.paginator.page)
       .pipe(
         tap(() => {
           this.loadData();
@@ -94,12 +86,78 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
+  private async loadImageAsBase64(path: string): Promise<string> {
+    const response = await fetch(path);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+  
+
+   async downloadPDF() {
+    const doc = new jsPDF();
+
+   
+    doc.setFontSize(16);
+    doc.text('Expense Report', 14, 15);
+    const rows = this.dataSource.originalData.data.map((item: ExpenseModel, i: number) => [
+      i + 1,
+      item.expense_type,
+      item.amount,
+      item.notes || '',
+      this.datePipe.transform(item.created_at, 'mediumDate'),
+    ]);
+
+    autoTable(doc, {
+      startY: 25,
+      head: [['#', 'Expense Type', 'Amount', 'Note', 'Created At']],
+      body: rows,
+    });
+    debugger;
+
+    const totalExpense = this.dataSource.originalData.data
+      .filter((item: any) => item.expense_type === 'expense')
+      .reduce((sum: number, item: any) => sum + parseFloat(item.amount || '0'), 0);
+
+    const totalGain = this.dataSource.originalData.data
+      .filter((item: any) => item.expense_type === 'gain')
+      .reduce((sum: number, item: any) => sum + parseFloat(item.amount || '0'), 0);
+    const balance = totalGain - totalExpense;
+    let finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(12);
+    doc.text(`Total Gain :Rs.${totalGain}`, 14, finalY + 10);
+    doc.text(`Total Expense: Rs.${totalExpense}`, 14, finalY + 20);
+    const balanceText = `Balance: Rs.${balance}`;
+    doc.text(balanceText, 14, finalY + 30);
+    const textWidth = doc.getTextWidth(balanceText); 
+   
+   
+   
+    if(balance==0){
+      // const normal=await this.loadImageAsBase64('assets/media/svg/general/normal.png');
+      // doc.addImage(normal, 'PNG',14+textWidth+2, finalY+27,4,3);
+    }else if(balance>0){
+      const green = await this.loadImageAsBase64('assets/media/svg/general/green.png');
+      doc.addImage(green, 'PNG',14+textWidth+2, finalY+27,4,3);
+    }else{
+      const red = await this.loadImageAsBase64('assets/media/svg/general/red.png');
+      doc.addImage(red, 'PNG',14+textWidth+2, finalY+27,4,3);
+    }
+   
+
+    doc.save('expense-report.pdf');
+  }
+
   onSyncClick(): void {
     this.search = {
       all: null,
       dateFilter: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     };
     this.filter = {};
     if (this.paginator) {
@@ -107,8 +165,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.loadData();
   }
-  
-  
+
   ngOnDestroy(): void {
     this.subscriptionHandler.unsubscribe();
   }
@@ -129,7 +186,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onDateFilterChange() {
     this.paginator.pageIndex = 0;
-  
+
     if (this.search.dateFilter === 'custom') {
       this.search.start_date = '';
       this.search.end_date = '';
@@ -146,54 +203,39 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       this.loadData();
     }
   }
-  
 
- 
   loadData() {
     this.filter.orderField = this.sort.active;
     this.filter.orderBy = this.sort.direction;
     this.filter.page = this.paginator.pageIndex + 1;
     this.filter.pageSize = this.paginator.pageSize || 20;
-  
-    this.filter.filter = JSON.stringify(_.pickBy({
-      all: this.search.all,
-      expenseInterval: 
-        this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
-      start_date: this.search.start_date,
-      end_date: this.search.end_date
-    }));
-  
-    this.filter.cols = [
-      'id',
-      'amount',
-      'note',
-      'expense_type',
-      'created_at'
-    ]; 
-  
+
+    this.filter.filter = JSON.stringify(
+      _.pickBy({
+        all: this.search.all,
+        expenseInterval: this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
+        start_date: this.search.start_date,
+        end_date: this.search.end_date,
+      })
+    );
+
+    this.filter.cols = ['id', 'amount', 'note', 'expense_type', 'created_at'];
+
     this.dataSource.find(_.pickBy(this.filter));
   }
   masterToggle() {
-    if (
-      this.selection.selected.length ===
-      this.dataSource.originalData.data.length
-    ) {
+    if (this.selection.selected.length === this.dataSource.originalData.data.length) {
       this.selection.clear();
     } else {
-      this.dataSource.originalData.data.forEach((row: ExpenseModel) =>
-        this.selection.select(row)
-      );
+      this.dataSource.originalData.data.forEach((row: ExpenseModel) => this.selection.select(row));
     }
   }
 
   checkPermissions() {
-    const userData = this.authService.getCurrentUser(); 
+    const userData = this.authService.getCurrentUser();
   }
   isAllSelected(): boolean {
-    return (
-      this.dataSource.originalData.data.length ===
-      this.selection.selected.length
-    );
+    return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
 
   delete(item: ExpenseModel) {
@@ -207,7 +249,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .afterClosed()
       .subscribe((res) => {
-        this.isLoading = true; 
+        this.isLoading = true;
         this.spinnerService.show();
 
         if (res) {
@@ -215,13 +257,13 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
             complete: () => {
               this.commonService.toastr.success('Expense has been deleted.');
               this.loadData();
-              this.isLoading = false; 
+              this.isLoading = false;
               this.spinnerService.hide();
-              this.cdr.detectChanges(); 
+              this.cdr.detectChanges();
             },
             error: (err) => {
               this.commonService.handleError(err);
-              this.isLoading = false; 
+              this.isLoading = false;
               this.spinnerService.hide();
             },
           });
@@ -234,7 +276,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .open(AddExpenseComponent, {
         height: 'auto',
         width: '80%',
-        maxWidth:"fit-content",
+        maxWidth: 'fit-content',
         data: {
           model: new ExpenseModel().clear(),
           isEdit: false,
@@ -245,7 +287,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((flag) => {
         if (flag) {
           this.loadData();
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         }
       });
   }
@@ -255,7 +297,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .open(AddExpenseComponent, {
         height: 'auto',
         width: 'fit-content',
-        maxWidth:"100%",
+        maxWidth: '100%',
         data: {
           model: item,
           isEdit: true,
@@ -266,7 +308,7 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((flag) => {
         if (flag) {
           this.loadData();
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         }
       });
   }
