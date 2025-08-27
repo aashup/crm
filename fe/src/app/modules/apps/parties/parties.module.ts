@@ -13,9 +13,10 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { PartyDetailsComponent } from './party-details/party-details.component';
 
 @NgModule({
-  declarations: [PartiesComponent],
+  declarations: [PartiesComponent,PartyDetailsComponent],
   imports: [
     CommonModule,
     MatTooltipModule,
@@ -30,6 +31,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatButtonModule,
     RouterModule.forChild([
       { path: '', component: PartiesComponent },
+      { path: ':id', component: PartyDetailsComponent },
+      
     ]),
     NgxPermissionsModule.forChild(),
     SharedMaterialModuleModule,

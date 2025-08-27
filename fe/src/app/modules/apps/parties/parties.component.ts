@@ -30,7 +30,7 @@ import { AddPartiesComponent } from './add-parties/add-parties.component';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 @Component({
-  selector: 'app-parties',
+  selector: 'app-parties-details',
   templateUrl: './parties.component.html',
   styleUrl: './parties.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -225,6 +225,13 @@ export class PartiesComponent implements OnInit, OnDestroy, AfterViewInit {
   isAllSelected(): boolean {
     return this.dataSource.originalData.data.length === this.selection.selected.length;
   }
+
+  viewDetails(item:any){
+    this.router.navigate([`/app/parties/${item.id}`])
+  }
+
+ 
+
 
   delete(item: PartiesModel) {
     this.dialog
