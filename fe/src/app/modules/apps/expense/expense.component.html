@@ -55,8 +55,11 @@
     </div>
     <div class="card-toolbar">
       <div class="d-flex justify-content-end">
-        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['expense.create']">
+        <button mat-flat-button class="bg-success" (click)="add()" *ngxPermissionsOnly="['expense.create']" style="margin-right: 5px;">
           Add New
+        </button>
+        <button mat-flat-button color="primary" (click)="downloadPDF()">
+          <mat-icon>download</mat-icon> Download
         </button>
         <button mat-icon-button (click)="onSyncClick()">
           <mat-icon>sync</mat-icon>

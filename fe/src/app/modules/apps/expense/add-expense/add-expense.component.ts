@@ -34,7 +34,7 @@ export class AddExpenseComponent implements OnInit, AfterViewInit {
       id: [null],
       expense_type: [null, Validators.required],
       amount: [null, Validators.required],
-      note: [''],
+      note: ['',[Validators.required]],
     });
 
     if (this.isEdit) {
