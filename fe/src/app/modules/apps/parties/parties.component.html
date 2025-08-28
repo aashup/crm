@@ -113,6 +113,9 @@
               <button mat-icon-button class="text-danger" (click)="delete(item)" *ngxPermissionsOnly="['parties.delete']">
                 <mat-icon>delete</mat-icon>
               </button>
+              <button mat-icon-button color="primary"  (click)="viewDetails(item)">
+                <mat-icon>visibility</mat-icon>
+              </button>
             </td>
           </ng-container>
         </ng-container>
