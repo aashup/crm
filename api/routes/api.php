@@ -40,5 +40,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('expense', controller: 'App\Http\Controllers\API\v1\ExpenseController');
         Route::apiResource('party', controller: 'App\Http\Controllers\API\v1\PartyController');
         Route::apiResource('tax-rate', controller: 'App\Http\Controllers\API\v1\TaxRateController');
+        Route::any('dashboard', ['App\Http\Controllers\API\v1\DashboardController', 'index']);
     });
 });

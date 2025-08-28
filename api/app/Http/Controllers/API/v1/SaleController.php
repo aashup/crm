@@ -74,7 +74,7 @@ class SaleController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['price_per_unit'],
+                        'sale_price' => $item['rate'],
                         'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
                         'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
                         'sale_price_discount_type' => $item['discount_type'] ?? 1,
@@ -104,7 +104,7 @@ class SaleController extends Controller
                     $product = Product::find($detail['product_id']);
                     $productUnit = $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['price_per_unit'],
+                        'sale_price' => $item['rate'],
                         'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
                         'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
                         'sale_price_discount_type' => $item['discount_type'] ?? 1,
@@ -176,7 +176,7 @@ class SaleController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['price_per_unit'],
+                        'sale_price' => $item['rate'],
                         'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
                         'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
                         'sale_price_discount_type' => $item['discount_type'] ?? 1,
@@ -216,7 +216,7 @@ class SaleController extends Controller
                     $product = Product::find($detail['product_id']);
                     $productUnit = $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'sale_price' => $item['price_per_unit'],
+                        'sale_price' => $item['rate'],
                         'sale_price_tax_type' => $item['sale_price_tax_type'] ?? 2,
                         'sale_price_discount_amount' => $item['discount_amount'] ?? 0,
                         'sale_price_discount_type' => $item['discount_type'] ?? 1,

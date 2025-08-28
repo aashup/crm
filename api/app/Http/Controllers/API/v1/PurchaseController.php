@@ -74,7 +74,7 @@ class PurchaseController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'purchase_price' => $item['price_per_unit'],
+                        'purchase_price' => $item['rate'],
                         'purchase_price_tax_type' => $item['purchase_price_tax_type'] ?? 2,
                         'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
                         'status' => 1,
@@ -103,7 +103,7 @@ class PurchaseController extends Controller
 
                     $productUnit = $product->units()->create([
                         'unit_id' => $detail['unit_id'],
-                        'purchase_price' => $detail['price_per_unit'],
+                        'purchase_price' => $detail['rate'],
                         'purchase_price_tax_type' => $detail['purchase_price_tax_type'] ?? 2,
                         'tax_rate_id' => $detail['tax_rate'] ? getTaxRateIdFromString($detail['tax_rate']) : null,
                         'status' => 1,
@@ -173,7 +173,7 @@ class PurchaseController extends Controller
 
                     $product->units()->create([
                         'unit_id' => $item['unit_id'],
-                        'purchase_price' => $item['price_per_unit'],
+                        'purchase_price' => $item['rate'],
                         'purchase_price_tax_type' => $item['purchase_price_tax_type'] ?? 2,
                         'tax_rate_id' => $item['tax_rate'] ? getTaxRateIdFromString($item['tax_rate']) : null,
                         'status' => 1,
