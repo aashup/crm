@@ -1,37 +1,64 @@
-import { Component } from '@angular/core';
-import { ApexAxisChartSeries, ApexChart, ApexXAxis, NgApexchartsModule } from 'ng-apexcharts';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  ApexOptions,
+  NgApexchartsModule
+} from 'ng-apexcharts';
 
 @Component({
   selector: 'app-sales-product',
   standalone: true,
-  imports: [NgApexchartsModule],
+  imports: [CommonModule, NgApexchartsModule],
   templateUrl: './sales-product.component.html',
-  styleUrl: './sales-product.component.scss'
+  styleUrls: ['./sales-product.component.scss']
 })
-export class SalesProductComponent {
-  constructor() {
-  }
-  salesByProductData: ApexAxisChartSeries = [
-    {
-      name: 'Above Target',
-      data: [597, 4263, 3405, 379, 87]
+export class SalesProductComponent implements OnChanges {
+  @Input() data: any[] = [];
+  salesByProductOptions: ApexOptions = {
+    series: [],
+    chart: {
+      type: 'bar',
+      height: 0,
+      toolbar: { show: true }
     },
-    {
-      name: 'Below Target',
-      data: [200, 1500, 1200, 800, 300]
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '60%',
+        borderRadius: 1,
+        borderRadiusApplication: 'end'
+      }
     },
-    {
-      name: 'Target',
-      data: [3000, 4000, 5000, 6000, 7000]
+    dataLabels: {
+      enabled: true
+    },
+    xaxis: {
+      categories: []
+    },
+    tooltip: {
+      y: { formatter: (val) => `${val}` }
+    },
+    responsive: []
+  };
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['data']) {
+      this.updateChart(this.data || []);
     }
-  ];
+  }
 
-  salesByProductOptions: ApexChart = {
-    type: 'bar',
-    height: 350
-  };
-  chartXAxis: ApexXAxis = {
-    categories: ['Product 1', 'Product 2', 'Product 3', 'Product 4', 'Product 5']
-  };
+  private updateChart(apiData: any[]) {
+    const categories = apiData.map(d => d?.product_name ?? 'Unknown');
+    const totalSales = apiData.map(d => Number(d?.total_sales) || 0);
+    const totalQty = apiData.map(d => Number(d?.total_qty) || 0);
 
+    this.salesByProductOptions = {
+      ...this.salesByProductOptions,
+      series: [
+        { name: 'Total Sales', data: totalSales },
+        { name: 'Quantity', data: totalQty }
+      ],
+      xaxis: { categories }
+    };
+  }
 }

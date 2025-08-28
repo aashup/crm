@@ -1,8 +1,19 @@
 <div class="card p-3">
-    <h6>Sales (Amount) by Product/Category</h6>
+  <h6>Top Selling Products</h6>
+
+  <ng-container *ngIf="(salesByProductOptions.series?.length ?? 0) > 0; else empty">
     <apx-chart
-      [series]="salesByProductData"
-      [chart]="salesByProductOptions"
-      [xaxis]="chartXAxis"
-    ></apx-chart>
-  </div>
+      [series]="salesByProductOptions.series!"
+      [chart]="salesByProductOptions.chart!"
+      [xaxis]="salesByProductOptions.xaxis!"
+      [plotOptions]="salesByProductOptions.plotOptions!"
+      [dataLabels]="salesByProductOptions.dataLabels!"
+      [tooltip]="salesByProductOptions.tooltip!"
+      [responsive]="salesByProductOptions.responsive!">
+    </apx-chart>
+  </ng-container>
+
+  <ng-template #empty>
+    <div class="text-center p-4">No sales data available</div>
+  </ng-template>
+</div>
