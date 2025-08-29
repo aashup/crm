@@ -80,6 +80,7 @@ class DashboardService
         return  $model
             ->selectRaw('SUM(quantity) as total_qty, SUM(net) as total_sales, product_id, products.name as product_name')
             ->join('products', 'products.id', '=', 'sale_details.product_id')
+            ->whereRaw(str_replace('created_at', 'sale_details.created_at', $rawWhere))
             ->groupBy('product_id')
             ->orderByDesc('total_sales')
             ->limit(10)
@@ -115,6 +116,7 @@ class DashboardService
         return  $model
             ->selectRaw('SUM(quantity) as total_qty, SUM(net) as total_sales, product_id, products.name as product_name')
             ->join('products', 'products.id', '=', 'purchase_details.product_id')
+            ->whereRaw(str_replace('created_at', 'purchase_details.created_at', $rawWhere))
             ->groupBy('product_id')
             ->orderByDesc('total_sales')
             ->limit(10)
