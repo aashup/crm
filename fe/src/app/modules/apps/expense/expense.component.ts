@@ -96,12 +96,10 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
       reader.readAsDataURL(blob);
     });
   }
-  
 
-   async downloadPDF() {
+  async downloadPDF() {
     const doc = new jsPDF();
 
-   
     doc.setFontSize(16);
     doc.text('Expense Report', 14, 15);
     const rows = this.dataSource.originalData.data.map((item: ExpenseModel, i: number) => [
@@ -133,21 +131,18 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
     doc.text(`Total Expense: Rs.${totalExpense}`, 14, finalY + 20);
     const balanceText = `Balance: Rs.${balance}`;
     doc.text(balanceText, 14, finalY + 30);
-    const textWidth = doc.getTextWidth(balanceText); 
-   
-   
-   
-    if(balance==0){
+    const textWidth = doc.getTextWidth(balanceText);
+
+    if (balance == 0) {
       // const normal=await this.loadImageAsBase64('assets/media/svg/general/normal.png');
       // doc.addImage(normal, 'PNG',14+textWidth+2, finalY+27,4,3);
-    }else if(balance>0){
+    } else if (balance > 0) {
       const green = await this.loadImageAsBase64('assets/media/svg/general/green.png');
-      doc.addImage(green, 'PNG',14+textWidth+2, finalY+27,4,3);
-    }else{
+      doc.addImage(green, 'PNG', 14 + textWidth + 2, finalY + 27, 4, 3);
+    } else {
       const red = await this.loadImageAsBase64('assets/media/svg/general/red.png');
-      doc.addImage(red, 'PNG',14+textWidth+2, finalY+27,4,3);
+      doc.addImage(red, 'PNG', 14 + textWidth + 2, finalY + 27, 4, 3);
     }
-   
 
     doc.save('expense-report.pdf');
   }
@@ -311,5 +306,32 @@ export class ExpenseComponent implements OnInit, OnDestroy, AfterViewInit {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  downloadExpenseReport() {
+    const params: any = {
+      orderField: this.sort.active,
+      orderBy: this.sort.direction,
+      page: this.paginator.pageIndex + 1,
+      pageSize: this.paginator.pageSize || 20,
+      filter: JSON.stringify({
+        all: this.search.all,
+        expenseInterval: this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
+        start_date: this.search.start_date,
+        end_date: this.search.end_date,
+      }),
+      cols: ['id', 'amount', 'note', 'expense_type', 'created_at'],
+      download: 1,
+    };
+
+    this.service.download(params).subscribe((res: Blob) => {
+      const url = window.URL.createObjectURL(res);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'expense-report.pdf');
+      document.body.appendChild(link);
+      link.click();
+      this.commonService.toastr.success('Expense report downloaded.');
+    });
   }
 }

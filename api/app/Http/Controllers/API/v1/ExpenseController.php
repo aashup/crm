@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Models\Expense;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\API\BaseResponse;
@@ -56,6 +57,17 @@ class ExpenseController extends Controller
         if (!empty($filter['end_date'])) {
             $to_date = Carbon::parse($filter['end_date'])->setTimeZone('UTC')->addDay();
             $model->where('created_at', '<', $to_date);
+        }
+
+        if ($request->download==1) {
+            \Log::info('download');
+            $expenses = $model->get();
+
+            $pdf = Pdf::loadView('pdf.expenses', [
+                'expenses' => $expenses
+            ]);
+
+            return $pdf->download('expense-report.pdf');
         }
 
         return $model->paginate($pageSize, ['*'], 'page', $request->page);

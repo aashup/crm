@@ -4,34 +4,32 @@ import { environment } from 'src/environments/environment';
 import { HttpUtils } from '../../core/http-util';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExpenseService {
-    readonly endpoint = 'expense';
+  readonly endpoint = 'expense';
 
-    constructor(
-        private http: HttpClient,
-    ) { }
+  constructor(private http: HttpClient) {}
 
-    find(params = {}) {
-        return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}`, {
-            params: HttpUtils.toHttpParams(params)
-        })
-    }
+  find(params = {}) {
+    return this.http.get(`${environment.API_ENDPOINT}/${this.endpoint}`, {
+      params: HttpUtils.toHttpParams(params),
+    });
+  }
 
-    update(items: { id: any; }) {
-        return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items)
-    }
+  update(items: { id: any }) {
+    return this.http.put(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`, items);
+  }
 
-    create(items: any) {
-        return this.http.post(`${environment.API_ENDPOINT}/${this.endpoint}`, items)
-    }
+  create(items: any) {
+    return this.http.post(`${environment.API_ENDPOINT}/${this.endpoint}`, items);
+  }
 
-    delete(items: { id: any; }) {
-        return this.http.delete(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`)
-    }
+  delete(items: { id: any }) {
+    return this.http.delete(`${environment.API_ENDPOINT}/${this.endpoint}/${items.id}`);
+  }
 
-    /** UI */
+  /** UI */
   getItemCssClassByStatus(status: number = 0): string {
     switch (status) {
       case 0:
@@ -54,5 +52,12 @@ export class ExpenseService {
         return 'Suspend';
     }
     return '';
+  }
+
+  download(params: any = {}) {
+    return this.http.get<Blob>(`${environment.API_ENDPOINT}/${this.endpoint}`, {
+      params: HttpUtils.toHttpParams(params),
+      responseType: 'blob' as 'json',
+    });
   }
 }

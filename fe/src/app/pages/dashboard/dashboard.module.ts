@@ -5,23 +5,31 @@ import { DashboardComponent } from './dashboard.component';
 import { ModalsModule, WidgetsModule } from '../../_metronic/partials';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { SalesProductComponent } from './sales-graph/sales-product/sales-product.component';
-import { SalesActualTargetComponent } from './sales-graph/sales-actual-target/sales-actual-target.component';
-import { SalesByRegionComponent } from './sales-graph/sales-by-region/sales-by-region.component';
 import { SalesByChannelComponent } from './sales-graph/sales-by-channel/sales-by-channel.component';
 import { SalesInventoryComponent } from './sales-graph/sales-inventory/sales-inventory.component';
 import { SalesReceivableComponent } from './sales-graph/sales-receivable/sales-receivable.component';
-import { PurchaseGraphComponent } from './purchase-graph/purchase-graph.component';
+import { MatIconModule } from '@angular/material/icon';
+import { SalesByPaymentMethodComponent } from './sales-graph/sales-by-payment-method/sales-by-payment-method.component';
+import { SalesByPartyComponent } from './sales-graph/sales-by-party/sales-by-party.component';
+import { PurchaseProductComponent } from './purchase-graph/purchase-top-product/purchase-product.component';
+import { PurchaseByPartyComponent } from './purchase-graph/purchase-by-party/purchase-by-party.component';
+import { PurchaseByPaymentMethodComponent } from './purchase-graph/purchase-by-payment-method/purchase-by-payment-method.component';
 @NgModule({
   declarations: [DashboardComponent],
   imports: [
     CommonModule,
     SalesProductComponent,
-    SalesActualTargetComponent,
-    SalesByRegionComponent,
+    SalesByPartyComponent,
+    SalesByPaymentMethodComponent,
     SalesByChannelComponent,
     SalesInventoryComponent,
     SalesReceivableComponent,
-    PurchaseGraphComponent,
+
+    PurchaseProductComponent,
+    PurchaseByPartyComponent,
+    PurchaseByPaymentMethodComponent,
+
+    MatIconModule,
     RouterModule.forChild([
       {
         path: '',

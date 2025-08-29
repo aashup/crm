@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SalesByPartyComponent } from './sales-by-party.component';
 
-import { SalesByRegionComponent } from './sales-by-region.component';
 
-describe('SalesByRegionComponent', () => {
-  let component: SalesByRegionComponent;
-  let fixture: ComponentFixture<SalesByRegionComponent>;
+describe('SalesByPartyComponent', () => {
+  let component: SalesByPartyComponent;
+  let fixture: ComponentFixture<SalesByPartyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SalesByRegionComponent]
+      imports: [SalesByPartyComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SalesByRegionComponent);
+    fixture = TestBed.createComponent(SalesByPartyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

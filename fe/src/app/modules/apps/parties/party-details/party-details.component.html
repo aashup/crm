@@ -1,0 +1,71 @@
+<div class="party-details-container" style="padding: 20px; font-family: Arial, sans-serif;">
+  <mat-card class="party-card" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px;">
+    <mat-card-header>
+      <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div>
+          <mat-card-title style="color: #333; font-weight: 700; font-size: 1.5rem;">
+            {{ partyDetails?.name || 'N/A' }}
+          </mat-card-title>
+        </div>
+        <div>
+          <button mat-icon-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-divider style="margin-top: 10px; margin-bottom: 20px;"></mat-divider>
+
+    <mat-card class="info-card"
+      style="background-color: #e8f5e9; border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: none;">
+      <mat-card-content>
+        <h2 style="color: #4caf50; font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">Basic Information</h2>
+        <div class="info-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+          <div style="font-size: 0.95rem;"><strong>Mobile:</strong> {{ partyDetails?.mobile || 'N/A' }}</div>
+          <div style="font-size: 0.95rem;"><strong>Email:</strong> {{ partyDetails?.email || 'N/A' }}</div>
+          <div style="font-size: 0.95rem;"><strong>GSTIN:</strong> {{ partyDetails?.gstin || 'N/A' }}</div>
+          <div style="font-size: 0.95rem;"><strong>GST Type:</strong>
+            {{ partyDetails?.gst_type === 1 ? 'Registered' : (partyDetails?.gst_type === 2 ? 'Unregistered' : 'N/A') }}
+          </div>
+          <div style="font-size: 0.95rem;"><strong>Opening Balance:</strong> ₹{{ partyDetails?.opening_balance || 'N/A'
+            }}</div>
+          <div style="font-size: 0.95rem;"><strong>As of Date:</strong> {{ partyDetails?.opening_balance_date ?
+            (partyDetails?.opening_balance_date | date) : 'N/A' }}</div>
+          <div style="font-size: 0.95rem;"><strong>Credit Limit:</strong>
+            {{ partyDetails?.credit_limit === 1 ? ('₹' + (partyDetails?.credit_limit_amount || '0')) : 'No Limit' }}
+          </div>
+          <div style="font-size: 0.95rem;"><strong>State:</strong> {{ partyDetails?.state?.name || 'N/A' }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="info-card"
+      style="background-color: #f3e5f5; border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: none;">
+      <mat-card-content>
+        <h2 style="color: #9c27b0; font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">Addresses</h2>
+        <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+          <div>
+            <h3 style="color:#2196f3; font-size: 1rem; margin-bottom: 8px;">Billing Address</h3>
+            <p><strong>Address:</strong> {{ partyDetails?.billing_address?.address || 'N/A' }}</p>
+            <p><strong>City:</strong> {{ partyDetails?.billing_address?.city?.name || 'N/A' }}</p>
+            <p><strong>Pin:</strong> {{ partyDetails?.billing_address?.pin || 'N/A' }}</p>
+            <p><strong>Mobile 1:</strong> {{ partyDetails?.billing_address?.mob1 || 'N/A' }}</p>
+            <p><strong>Mobile 2:</strong> {{ partyDetails?.billing_address?.mob2 || 'N/A' }}</p>
+          </div>
+
+          <div>
+            <h3 style="color:#e91e63; font-size: 1rem; margin-bottom: 8px;">Shipping Address</h3>
+            <p><strong>Address:</strong> {{ partyDetails?.shipping_address?.address || 'N/A' }}</p>
+            <p><strong>City:</strong> {{ partyDetails?.shipping_address?.city?.name || 'N/A' }}</p>
+            <p><strong>Pin:</strong> {{ partyDetails?.shipping_address?.pin || 'N/A' }}</p>
+            <p><strong>Mobile 1:</strong> {{ partyDetails?.shipping_address?.mob1 || 'N/A' }}</p>
+            <p><strong>Mobile 2:</strong> {{ partyDetails?.shipping_address?.mob2 || 'N/A' }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+</div>

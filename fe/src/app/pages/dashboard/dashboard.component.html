@@ -1,156 +1,121 @@
-<!--begin::Row-->
-<!-- <div class="row g-5 g-xl-10 mb-5 mb-xl-10"> -->
-<!--begin::Col-->
-<!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-    <app-cards-widget20 cssClass="h-md-50 mb-5 mb-xl-10" description="Active Projects" color="#F1416C"
-      img="./assets/media/patterns/vector-1.png"></app-cards-widget20>
-
-    <app-cards-widget7 cssClass="h-md-50 mb-5 mb-xl-10" [icon]="false" [stats]="357" description="Professionals"
-      labelColor="dark" textColor="gray-300"></app-cards-widget7>
-  </div> -->
-<!--end::Col-->
-
-<!--begin::Col-->
-<!-- <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-    <app-cards-widget17 cssClass="h-md-50 mb-5 mb-xl-10"></app-cards-widget17>
-    <app-lists-widget26 class="h-lg-50"></app-lists-widget26>
-  </div> -->
-<!--end::Col-->
-
-<!--begin::Col-->
-<!-- <app-engage-widget10 class="col-xxl-6" cssClass="h-md-100"></app-engage-widget10> -->
-<!--end::Col-->
-<!-- </div> -->
-<!--end::Row-->
-
-<!--begin::Row-->
-<!-- <div class="row gx-5 gx-xl-10"> -->
-<!--begin::Col-->
-<!-- <div class="col-xxl-6 mb-5 mb-xl-10">
-  </div> -->
-<!--end::Col-->
-
-<!--begin::Col-->
-<!-- <div class="col-xxl-6 mb-5 mb-xl-10">
-    <app-cards-widget18 cssClass="h-xl-100" image="./assets/media/stock/600x600/img-65.jpg"></app-cards-widget18>
-  </div> -->
-<!--end::Col-->
-<!-- </div> -->
-<!--end::Row-->
-
-<!-- begin::Row -->
-<!-- <div class="row gy-5 gx-xl-8">
-  <div class="col-xxl-4">
-    <app-lists-widget3 class="card card-xxl-stretch mb-xl-3"></app-lists-widget3>
-  </div>
-  <div class="col-xl-8">
-    <app-tables-widget10 class="card card-xxl-stretch mb-5 mb-xl-8"></app-tables-widget10>
-  </div>
-</div> -->
-<!-- end::Row -->
-
-<!-- begin::Row -->
-<!-- <div class="row gy-5 g-xl-8">
-  <div class="col-xl-4">
-    <app-lists-widget2 class="card card-xl-stretch mb-xl-8"></app-lists-widget2>
-  </div>
-  <div class="col-xl-4">
-    <app-lists-widget6 class="card card-xl-stretch mb-xl-8"></app-lists-widget6>
-  </div>
-  <div class="col-xl-4">
-    <app-lists-widget4 class="card card-xl-stretch mb-5 mb-xl-8"></app-lists-widget4>
-  </div>
-</div> -->
-<!-- end::Row -->
-
-<!-- <div class="row g-5 gx-xxl-8">
-  <div class="col-xxl-4">
-    <app-mixed-widget8 class="card card-xxl-stretch mb-xl-3" chartColor="success" chartHeight="150px">
-    </app-mixed-widget8>
-  </div>
-  <div class="col-xxl-8">
-    <app-tables-widget5 class="card card-xxl-stretch mb-5 mb-xxl-8"></app-tables-widget5>
-  </div>
-</div> -->
-
-<!-- begin:: Modal example -->
-<!-- <app-modal #modal [modalConfig]="modalConfig">
-  Modal body html
-</app-modal>
-<button class="btn btn-primary" (click)="openModal()">Open modal</button> -->
-<!-- Note: Don't forget import ModalsModule (from _metronic/partials) into your module -->
-<!-- end:: Modal example -->
-<!-- dashboard.component.html -->
 <div class="container-fluid mt-4">
-  <h4 class="mb-4">Sale Dashboard</h4>
   <div class="row">
-    <!-- KPI Column -->
+
     <div class="col-md-2">
       <div class="card mb-3 p-3 text-center">
-        <h6>Sales</h6>
-        <h4>16,461</h4>
-        <small class="text-success">YoY 43% ↑</small>
+        <h6>Total Parties</h6>
+        <h4>{{graphDetails?.card?.total_parties}}</h4>
       </div>
       <div class="card mb-3 p-3 text-center">
-        <h6>Sales Target</h6>
-        <h4>15,907</h4>
+        <h6>Total Sale</h6>
+        <h4>₹ {{graphDetails?.card?.total_sales}}</h4>
       </div>
       <div class="card mb-3 p-3 text-center">
-        <h6>Target Achievement</h6>
-        <h4>103%</h4>
+        <h6>Total Purchase</h6>
+        <h4>₹ {{graphDetails?.card?.total_purchases}}</h4>
       </div>
       <div class="card mb-3 p-3 text-center">
-        <h6>Sales Last Year</h6>
-        <h4>11,545</h4>
+        <h6>Total Product</h6>
+        <h4>{{graphDetails?.card?.total_products}}</h4>
+      </div>
+      <div class="card mb-3 p-3 text-center" style="border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+
+        <h6 style="font-weight:600; color:#1a1a2e; margin-bottom:8px;">
+          Expense
+        </h6>
+
+
+        <h4 title="Total Expense" style="font-weight:700; color:#1a1a2e; margin-bottom:12px;">
+          ₹ {{ graphDetails?.card?.expenses?.total_expenses }}
+        </h4>
+
+
+        <div style="display:flex; justify-content:space-between; padding:0 15px; font-size:14px;">
+
+          <!-- Total Gain -->
+          <span title="Total Gain"
+            style="color:green; display:inline-flex; align-items:center; gap:4px; font-size:14px;">
+            {{ graphDetails?.card?.expenses?.total_gains | number:'1.0-2' }}
+            <mat-icon style="font-size:16px; line-height:1;">arrow_upward</mat-icon>
+          </span>
+
+          <!-- Net Balance -->
+          <span title="Net Balance (Gain - Expense)" [ngStyle]="{color: balance >= 0 ? 'green' : 'red'}"
+            style="display:inline-flex; align-items:center; gap:4px; font-size:14px;">
+            {{ abs(balance) }}
+            <mat-icon *ngIf="balance >= 0" style="font-size:16px; line-height:1;">arrow_upward</mat-icon>
+            <mat-icon *ngIf="balance < 0" style="font-size:16px; line-height:1;">arrow_downward</mat-icon>
+          </span>
+        </div>
       </div>
       <div class="card mb-3 p-3 text-center">
-        <h6>Gross Profit</h6>
-        <h4>5,868</h4>
-      </div>
-      <div class="card mb-3 p-3 text-center">
-        <h6>Gross Profit Margin</h6>
-        <h4>36%</h4>
+        <h6>Net Profit</h6>
+        <h4 [ngStyle]="{ color: graphDetails?.card?.net_profit >= 0 ? 'green' : 'red' }"
+          style="display:inline-flex; align-items:center; gap:4px; justify-content:center;">
+          ₹ {{abs(graphDetails?.card?.net_profit) | number:'1.0-2' }}
+          <mat-icon style="font-size:18px;">
+            {{ graphDetails?.card?.net_profit >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+          </mat-icon>
+        </h4>
       </div>
     </div>
 
-    <!-- Charts Column -->
+
+
     <div class="col-md-10">
       <div class="row">
-        <!-- Sales by Product Chart -->
         <div class="col-md-6 mb-4">
-          <app-sales-product></app-sales-product>
+          <app-sales-product [data]="graphDetails?.sales?.top_selling_products"></app-sales-product>
         </div>
-
-        <!-- Actual Sales vs Target Chart -->
         <div class="col-md-6 mb-4">
-          <app-sales-actual-target></app-sales-actual-target>
+          <app-sales-by-party [data]="graphDetails?.sales?.sales_by_party"></app-sales-by-party>
         </div>
       </div>
 
       <div class="row">
-        <!-- Sales by Region Chart -->
         <div class="col-md-6 mb-4">
-          <app-sales-by-region></app-sales-by-region>
+          <app-sales-by-payment-method
+            [data]="graphDetails?.sales?.sales_by_payment_method"></app-sales-by-payment-method>
         </div>
-
-        <!-- Sales by Channel Pie Chart -->
-        <div class="col-md-6 mb-4">
+        <!-- <div class="col-md-6 mb-4">
           <app-sales-by-channel></app-sales-by-channel>
-        </div>
+        </div> -->
       </div>
 
-      <div class="row">
-        <!-- Inventory Days Outstanding -->
+      <!-- <div class="row">
         <div class="col-md-6 mb-4">
           <app-sales-inventory></app-sales-inventory>
         </div>
-        <!-- Receivable Days Outstanding -->
         <div class="col-md-6 mb-4">
           <app-sales-receivable></app-sales-receivable>
         </div>
-      </div>
+      </div> -->
       <hr>
-      <app-purchase-graph></app-purchase-graph>
+      <h3>Purchase Details</h3>
+
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <app-purchase-product [data]="graphDetails?.purchase?.top_purchasing_products"></app-purchase-product>
+        </div>
+        <div class="col-md-6 mb-4">
+          <app-purchase-by-party [data]="graphDetails?.purchase?.purchase_by_party"></app-purchase-by-party>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <app-purchase-by-payment-method
+            [data]="graphDetails?.purchase?.purchase_by_payment_method"></app-purchase-by-payment-method>
+        </div>
+        <div class="col-md-6 mb-4">
+          <!-- <app-sales-by-channel></app-sales-by-channel> -->
+        </div>
+      </div>
+
     </div>
+
+
+
+
   </div>
 </div>

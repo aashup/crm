@@ -1,0 +1,19 @@
+<div class="card p-3">
+  <h6>Top Purchasing Products</h6>
+
+  <ng-container *ngIf="(purchaseByProductOptions.series?.length ?? 0) > 0; else empty">
+    <apx-chart
+      [series]="purchaseByProductOptions.series!"
+      [chart]="purchaseByProductOptions.chart!"
+      [xaxis]="purchaseByProductOptions.xaxis!"
+      [plotOptions]="purchaseByProductOptions.plotOptions!"
+      [dataLabels]="purchaseByProductOptions.dataLabels!"
+      [tooltip]="purchaseByProductOptions.tooltip!"
+      [responsive]="purchaseByProductOptions.responsive!">
+    </apx-chart>
+  </ng-container>
+
+  <ng-template #empty>
+    <div class="text-center p-4">No Purchase data available</div>
+  </ng-template>
+</div>
