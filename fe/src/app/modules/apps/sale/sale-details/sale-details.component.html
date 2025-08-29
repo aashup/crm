@@ -65,13 +65,11 @@
           <td>{{ item?.product?.hsn || 'N/A' }}</td>
           <td>{{ item?.quantity }}</td>
           <td>{{ item?.unit?.name || 'N/A' }}</td>
-          <td>₹{{calculatePricePerUnit(item?.quantity,item?.rate,item?.tax_amount,item.discount_amount*item?.quantity)}}
+          <td>₹{{item?.rate}}
           </td>
-          <td>₹{{item.discount_amount*item?.quantity|number: '1.2-2' }},&nbsp;&nbsp;({{
-            calculateDiscountPercentage(item?.rate,item?.tax_amount,item.discount_amount*item?.quantity) }}%)</td>
-          <td>{{ item?.tax_amount | number: '1.2-2' }},&nbsp;&nbsp;( {{calculateTaxPercentage(item?.rate,
-            item?.tax_amount)}}% )</td>
-          <td>₹{{item?.rate | number: '1.2-2' }}</td>
+          <td>₹{{item.discount_amount*item?.quantity|number: '1.2-2' }},&nbsp;&nbsp;({{calculateDiscountPercentage(item?.net,item?.tax_amount,item.discount_amount*item?.quantity)}}%)</td>
+          <td>{{ item?.tax_amount | number: '1.2-2' }},&nbsp;&nbsp;( {{calculateTaxPercentage(item?.net,item?.tax_amount)}}% )</td>
+          <td>₹{{item?.net | number: '1.2-2' }}</td>
         </tr>
       </tbody>
     </table>
@@ -163,18 +161,10 @@
           <td style="border: 1px solid #000; padding: 5px;">{{ item?.product?.hsn || 'N/A' }}</td>
           <td style="border: 1px solid #000; padding: 5px;">{{ item?.quantity }}</td>
           <td style="border: 1px solid #000; padding: 5px;">{{ item?.unit?.name || 'N/A' }}</td>
-          <td style="border: 1px solid #000; padding: 5px;">₹{{
-            calculatePricePerUnit(item?.quantity,item?.rate,item?.tax_amount,item.discount_amount*item?.quantity) }}
-          </td>
-          <td style="border: 1px solid #000; padding: 5px;">
-            ₹{{ item.discount_amount*item?.quantity | number:'1.2-2' }},
-            ({{ calculateDiscountPercentage(item?.rate,item?.tax_amount,item.discount_amount*item?.quantity) }}%)
-          </td>
-          <td style="border: 1px solid #000; padding: 5px;">
-            ₹{{ item?.tax_amount | number:'1.2-2' }},
-            ({{ calculateTaxPercentage(item?.rate, item?.tax_amount) }}%)
-          </td>
-          <td style="border: 1px solid #000; padding: 5px;">₹{{ item?.rate | number:'1.2-2' }}</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{item?.rate}}</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{item.discount_amount*item?.quantity|number: '1.2-2' }},&nbsp;&nbsp;({{calculateDiscountPercentage(item?.net,item?.tax_amount,item.discount_amount*item?.quantity)}}%)</td>
+          <td style="border: 1px solid #000; padding: 5px;">{{ item?.tax_amount | number: '1.2-2' }},&nbsp;&nbsp;( {{calculateTaxPercentage(item?.net,item?.tax_amount)}}% )</td>
+          <td style="border: 1px solid #000; padding: 5px;">₹{{item?.net | number: '1.2-2' }}</td>
         </tr>
       </tbody>
     </table>

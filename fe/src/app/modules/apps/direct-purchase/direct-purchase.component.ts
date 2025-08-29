@@ -740,7 +740,7 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
       const taxRateObj = this.tax_rates.find((t) => t.id === rateId);
       return {
         ...detail,
-        rate: detail.amount,
+        rate: detail.price_per_unit,
         net: detail.net,
         with_tax: withTax,
         tax_rate: this.getFormattedTaxLabel(taxRateObj?.type, taxRateObj?.rate),
@@ -749,6 +749,7 @@ export class DirectPurchaseComponent implements AfterViewInit, OnInit, OnDestroy
 
     processedpurchaseDetails.forEach((details: any) => {
       delete details.amount;
+      delete details.price_per_unit
     });
 
     const payload = {

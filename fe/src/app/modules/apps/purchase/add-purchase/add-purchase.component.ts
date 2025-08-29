@@ -7,16 +7,14 @@ import { PurchaseModel } from '../purchase.model';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { UnitService } from 'src/app/modules/settings/unit/unit.service';
 import { ProductService } from '../../product/product.service';
-import { ContactService } from 'src/app/modules/settings/contact/contact.service';
 import { PurchaseService } from '../purchase.service';
-import { VendorService } from '../../vendor/vendor.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { filter, map, Observable, startWith, take } from 'rxjs';
 import { PartiesModel } from '../../parties/parties.model';
 import { PartiesService } from '../../parties/parties.service';
 import { ProductModel } from '../../product/product.model';
 import { UnitModel } from 'src/app/modules/settings/unit/unit.model';
-import { TaxRateService } from '../../tax-rate/tax-rate.service';
+
 
 @Component({
   selector: 'app-add-purchase',
@@ -778,6 +776,7 @@ export class AddPurchaseComponent implements AfterViewInit, OnInit {
     });
     processedpurchaseDetails.forEach((details: any) => {
       delete details.amount;
+      delete details.price_per_unit
     });
     const payload = {
       ...rawForm,

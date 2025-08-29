@@ -734,7 +734,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
       const taxRateObj = this.tax_rates.find((t) => t.id === rateId);
       return {
         ...detail,
-        rate: detail.amount,
+        rate: detail.price_per_unit,
         net: detail.net,
         with_tax: withTax,
         tax_rate: this.getFormattedTaxLabel(taxRateObj?.type, taxRateObj?.rate),
@@ -759,7 +759,9 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     };
 
     delete payload.partyName;
-
+    payload.saleDetails?.forEach((e:any) => {
+      delete e.price_per_unit
+    });
     this.subscriptionHandler.subscribe = this.service.create(payload).subscribe({
       next: (response: any) => {
         this.isLoading = false;
