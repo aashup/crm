@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Inventory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\DB;
@@ -75,16 +76,27 @@ class StoreSaleRequest extends FormRequest
             foreach ($saleDetails as $index => $detail) {
                 $totalSaleAmount += $detail['net'] ?? 0;
 
-                if (!empty($detail['product_id']) && !empty($detail['unit_id'])) {
-                    $availableQty = DB::table('inventories')
-                        ->where('product_id', $detail['product_id'])
-                        ->where('unit_id', $detail['unit_id'])
-                        ->value('rem_qty');
+                $productId = $detail['product_id'] ?? null;
+                $unitId = $detail['unit_id'] ?? null;
+                $quantity = $detail['quantity'] ?? 0;
+                if ($productId && $unitId && $quantity > 0) {
+                    $inventory = Inventory::where('product_id', $productId)
+                        ->where('unit_id', $unitId)
+                        ->first();
 
-                    if ($availableQty) {
-                        if ($detail['quantity'] > $availableQty) {
-                            $validator->errors()->add("saleDetails.$index.quantity", "Only {$availableQty} quantity available for this product.");
-                        }
+                    if (!$inventory) {
+                        $validator->errors()->add(
+                            "saleDetails.$index.quantity",
+                            "No inventory record found for product ID {$productId} with unit ID {$unitId}."
+                        );
+                        continue;
+                    }
+
+                    if ($quantity > $inventory->rem_qty) {
+                        $validator->errors()->add(
+                            "saleDetails.$index.quantity",
+                            "Not enough stock for product ID {$productId} (Available: {$inventory->rem_qty}, Requested: {$quantity})."
+                        );
                     }
                 }
             }

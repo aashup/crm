@@ -257,20 +257,15 @@ class SaleController extends Controller
 
     private function updateInventory($productUnit, $detail)
     {
-        $inventory = Inventory::where(['product_id' => $productUnit->product_id, 'unit_id' => $productUnit->unit_id])->first();
-        if ($inventory) {
-            $inventory->rem_qty -= $detail['quantity'];
-            $inventory->save();
-        } else {
-            Inventory::create([
-                'product_id' => $productUnit->product_id,
-                'unit_id' => $productUnit->unit_id,
-                'rem_qty' => -$detail['quantity'],
-                'qty' => $detail['quantity'],
-                'created_by' => Auth::id(),
-                'unit_price' => $detail['rate'] ?? 0,
-            ]);
+        $inventory = Inventory::where(['product_id' => $productUnit->product_id, 'unit_id' => $productUnit->unit_id])
+            ->lockForUpdate()
+            ->first();
+
+        if (!$inventory || $inventory->rem_qty < $detail['quantity']) {
+            throw new \Exception("Inventory mismatch for product {$detail['product_id']}");
         }
+
+        $inventory->decrement('rem_qty', $detail['quantity']);
     }
 
     private function restoreInventory($productUnit, $detail)
@@ -278,11 +273,10 @@ class SaleController extends Controller
         $inventory = Inventory::where([
             'product_id' => $productUnit->product_id,
             'unit_id' => $productUnit->unit_id
-        ])->first();
+        ])->lockForUpdate()->first();
 
         if ($inventory) {
-            $inventory->rem_qty += $detail->quantity; // restore back
-            $inventory->save();
+            $inventory->increment('rem_qty', $detail->quantity);
         }
     }
 }
