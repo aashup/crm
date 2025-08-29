@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Inventory;
+use App\Models\SaleDetail;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\DB;
@@ -77,19 +79,36 @@ class UpdateSaleRequest extends FormRequest
 
             $totalSaleAmount = 0;
 
+            $saleId = $this->route('sale')->id ?? null;
+            $oldDetails = SaleDetail::where('sale_id', $saleId)->get()->groupBy(fn($d) => $d->product_id . '-' . $d->unit_id);
             foreach ($saleDetails as $index => $detail) {
                 $totalSaleAmount += $detail['net'] ?? 0;
 
-                if (!empty($detail['product_id']) && !empty($detail['unit_id'])) {
-                    $availableQty = DB::table('inventories')
-                        ->where('product_id', $detail['product_id'])
-                        ->where('unit_id', $detail['unit_id'])
-                        ->value('rem_qty');
+                $productId = $detail['product_id'] ?? null;
+                $unitId = $detail['unit_id'] ?? null;
+                $quantity = $detail['quantity'] ?? 0;
 
-                    if ($availableQty) {
-                        if ($detail['quantity'] > $availableQty) {
-                            $validator->errors()->add("saleDetails.$index.quantity", "Only {$availableQty} Qantity available for this product.");
-                        }
+                if ($productId && $unitId && $quantity > 0) {
+                    $inventory = Inventory::where('product_id', $productId)
+                        ->where('unit_id', $unitId)
+                        ->first();
+
+                    $oldQty = optional($oldDetails[$productId . '-' . $unitId][0] ?? null)->quantity ?? 0;
+                    $available = $inventory ? $inventory->rem_qty + $oldQty : 0;
+
+                    if (!$inventory) {
+                        $validator->errors()->add(
+                            "saleDetails.$index.quantity",
+                            "No inventory record found for product ID {$productId} with unit ID {$unitId}."
+                        );
+                        continue;
+                    }
+
+                    if ($quantity > $available) {
+                        $validator->errors()->add(
+                            "saleDetails.$index.quantity",
+                            "Not enough stock for product ID {$productId} (Available: {$available}, Requested: {$quantity})."
+                        );
                     }
                 }
             }
