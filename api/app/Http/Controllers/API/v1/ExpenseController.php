@@ -60,7 +60,6 @@ class ExpenseController extends Controller
         }
 
         if ($request->download==1) {
-            \Log::info('download');
             $expenses = $model->get();
 
             $pdf = Pdf::loadView('pdf.expenses', [
