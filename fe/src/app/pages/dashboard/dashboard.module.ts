@@ -14,6 +14,12 @@ import { SalesByPartyComponent } from './sales-graph/sales-by-party/sales-by-par
 import { PurchaseProductComponent } from './purchase-graph/purchase-top-product/purchase-product.component';
 import { PurchaseByPartyComponent } from './purchase-graph/purchase-by-party/purchase-by-party.component';
 import { PurchaseByPaymentMethodComponent } from './purchase-graph/purchase-by-payment-method/purchase-by-payment-method.component';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 @NgModule({
   declarations: [DashboardComponent],
   imports: [
@@ -38,7 +44,15 @@ import { PurchaseByPaymentMethodComponent } from './purchase-graph/purchase-by-p
     ]),
     WidgetsModule,
     ModalsModule,
-    NgApexchartsModule
+    NgApexchartsModule,
+    FormsModule,            
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule, 
+    MatOptionModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    
   ],
 })
 export class DashboardModule {}

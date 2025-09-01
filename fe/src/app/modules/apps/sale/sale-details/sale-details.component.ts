@@ -47,6 +47,8 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
           this.saleDetails = data.data;
           this.cdr.detectChanges();
           this.spinnerService.hide()
+          console.log(this.saleDetails);
+          
         },
         (error) => {
           console.error('Error fetching sale details:', error);
@@ -63,15 +65,7 @@ export class SaleDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.commonService.printHtmlContent(printContent)
   }
   
-  calculatePricePerUnit(qty: number, total: number, taxAmount: number, discountAmount: number): number {
-    if (qty <= 0) throw new Error('Quantity must be greater than zero.');
   
-    const subtotalAfterDiscount = total - taxAmount;
-    const subtotalBeforeDiscount = subtotalAfterDiscount + discountAmount;
-    const pricePerUnit = subtotalBeforeDiscount / qty;
-  
-    return parseFloat(pricePerUnit.toFixed(2));
-  }
   
   calculateDiscountPercentage(total: number, taxAmount: number, discountAmount: number): number {
     const discountedPrice = total - taxAmount;

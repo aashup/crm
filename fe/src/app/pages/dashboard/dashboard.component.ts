@@ -1,37 +1,53 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { 
+  AfterViewInit, 
+  ChangeDetectorRef, 
+  Component, 
+  ElementRef, 
+  OnDestroy, 
+  OnInit, 
+  ViewChild 
+} from '@angular/core';
 import { ModalConfig, ModalComponent } from '../../_metronic/partials';
-
 import { DashboardService } from './dashboard.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
 
 @Component({
-    selector: 'app-dashboard',
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.scss'],
-    standalone: false
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  standalone: false
 })
-export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit{
+export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
+  
   modalConfig: ModalConfig = {
     modalTitle: 'Modal title',
     dismissButtonLabel: 'Submit',
     closeButtonLabel: 'Cancel'
   };
+
+  search: any = { all: '', dateFilter: '1', start_date: '', end_date: '' };
+  subscriptionHandler = new SubscriptionHandler();
+
   @ViewChild('modal') private modalComponent: ModalComponent;
-  graphDetails:any
+  @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
+
+  graphDetails: any;
+
   constructor(
-    private dashboardService:DashboardService,
-    private commonService:CommonService,
-    private spinnerService:SpinnerService,
-    private cdr:ChangeDetectorRef
+    private dashboardService: DashboardService,
+    private commonService: CommonService,
+    private spinnerService: SpinnerService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.getDashboardDetails()
+    this.getDashboardDetails();
   }
-  ngAfterViewInit(): void {
-    
-  }
+
+  ngAfterViewInit(): void {}
+
   ngOnDestroy(): void {
     
   }
@@ -41,31 +57,55 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit{
     const expenses = Number(this.graphDetails?.card?.expenses?.total_expenses || 0);
     return gains - expenses;
   }
-  
+
   abs(value: number): number {
     return Math.abs(value);
   }
-  getDashboardDetails() {
-    this.spinnerService.show()
-    this.dashboardService.find().subscribe({
+
+  onDateFilterChange(): void {
+    if (this.search.dateFilter === 'custom') {
+      this.search.start_date = '';
+      this.search.end_date = '';
+    } else {
+      this.search.start_date = '';
+      this.search.end_date = '';
+      this.getDashboardDetails();
+    }
+  }
+
+  onDateChange(): void {
+    if (this.search.dateFilter === 'custom') {
+      this.getDashboardDetails();
+    }
+  }
+
+  getDashboardDetails(): void {
+    this.spinnerService.show();
+
+
+
+    const sub = this.dashboardService.find({
+     
+      interval: this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
+      start_date: this.search.start_date,
+      end_date: this.search.end_date,
+    }).subscribe({
       next: (res: any) => {
-        this.graphDetails = res?.data ?? []
-        this.cdr.detectChanges()
-        this.spinnerService.hide()
+        this.graphDetails = res?.data ?? {};
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        this.commonService.toastr.error("Something went wrong")
-        this.spinnerService.hide()
+      error: () => {
+        this.commonService.toastr.error('Something went wrong');
       },
       complete: () => {
-        this.commonService.toastr.success("data retrieved successfuly!")
-        this.spinnerService.hide()
+        this.spinnerService.hide();
+        this.commonService.toastr.success('Data retrieved successfully!');
         console.log(this.graphDetails);
-        
       }
     });
+
+    this.subscriptionHandler.add(sub);
   }
-  
 
   async openModal() {
     return await this.modalComponent.open();

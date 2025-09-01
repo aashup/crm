@@ -770,6 +770,7 @@ export class AddSaleComponent implements AfterViewInit, OnInit {
     });
     processedSaleDetails.forEach((details: any) => {
       delete details.amount;
+      delete details.price_per_unit
     });
     const payload = {
       ...rawForm,
