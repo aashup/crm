@@ -10,6 +10,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\ProductUnit;
 use App\Models\Purchase;
+use App\Models\SaleDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -247,20 +248,29 @@ class PurchaseController extends Controller
 
     private function updateInventory($productUnit, $detail)
     {
-        $inventory = Inventory::where(['product_id' => $productUnit->product_id, 'unit_id' => $productUnit->unit_id])->first();
-        if ($inventory) {
-            $inventory->qty += $detail['quantity'];
-            $inventory->rem_qty += $detail['quantity'];
-            $inventory->save();
-        } else {
-            Inventory::create([
-                'product_id' => $productUnit->product_id,
-                'unit_id' => $productUnit->unit_id,
-                'rem_qty' => $detail['quantity'],
-                'qty' => $detail['quantity'],
-                'created_by' => Auth::id(),
-                'unit_price' => $detail['rate'] ?? 0,
-            ]);
+        try {
+            $inventory = Inventory::where(['product_id' => $productUnit->product_id, 'unit_id' => $productUnit->unit_id])->first();
+            $totalSaleProductQty = SaleDetail::where('unit_id', $productUnit->unit_id)
+                ->where('product_id', $productUnit->product_id)
+                ->sum('quantity');
+
+            if ($inventory) {
+                $remQty = !empty($totalSaleProductQty) ? ($detail['quantity'] - $totalSaleProductQty) : $detail['quantity'];
+                $inventory->qty += $detail['quantity'];
+                $inventory->rem_qty += $remQty;
+                $inventory->save();
+            } else {
+                Inventory::create([
+                    'product_id' => $productUnit->product_id,
+                    'unit_id' => $productUnit->unit_id,
+                    'rem_qty' => $detail['quantity'],
+                    'qty' => $detail['quantity'],
+                    'created_by' => Auth::id(),
+                    'unit_price' => $detail['rate'] ?? 0,
+                ]);
+            }
+
+        } catch (\Exception $ex) {
         }
     }
 

@@ -567,7 +567,7 @@ export class DirectSaleComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     const productUnit = selectedProduct.units[0];
-    const salePrice = parseFloat(productUnit.sale_price);
+    const salePrice = productUnit.sale_price ? parseFloat(productUnit.sale_price) : 0;
     const taxRateId = productUnit.tax_rate_id || null;
     const taxType = productUnit.sale_price_tax_type;
     const discountAmount = parseFloat(productUnit.sale_price_discount_amount) || 0;
