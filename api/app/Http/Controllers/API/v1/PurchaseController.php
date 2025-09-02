@@ -255,9 +255,9 @@ class PurchaseController extends Controller
                 ->sum('quantity');
 
             if ($inventory) {
-                $remQty = !empty($totalSaleProductQty) ? ($detail['quantity'] - $totalSaleProductQty) : $detail['quantity'];
+                $remQty = !empty($totalSaleProductQty) ? (($inventory->qty + $detail['quantity']) - $totalSaleProductQty) : $detail['quantity'];
                 $inventory->qty += $detail['quantity'];
-                $inventory->rem_qty += $remQty;
+                $inventory->rem_qty = $remQty;
                 $inventory->save();
             } else {
                 Inventory::create([
