@@ -99,6 +99,15 @@ class SaleController extends Controller
                     ->first();
 
                 if ($productUnit) {
+                    ProductUnit::where('product_id', $detail['product_id'])
+                        ->where('unit_id', $detail['unit_id'])
+                        ->update([
+                            'sale_price' => $detail['rate'] ?? 0,
+                            'sale_price_tax_type' => $detail['sale_price_tax_type'] ?? 2,
+                            'sale_price_discount_amount' => $detail['discount_amount'] ?? 0,
+                            'sale_price_discount_type' => $detail['discount_type'] ?? 1,
+                        ]);
+
                     $this->updateInventory($productUnit, $detail);
                 } else {
                     $product = Product::find($detail['product_id']);

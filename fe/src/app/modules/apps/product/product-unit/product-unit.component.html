@@ -33,8 +33,8 @@
         <tbody>
           <tr *ngFor="let item of productUnits">
             <td scope="row">{{ item?.unit?.name }}</td>
-            <td scope="row">{{ item.sale_price }}</td>
-            <td scope="row">{{ item.purchase_price }}</td>
+            <td scope="row">{{ item.sale_price || '0.00' }}</td>
+            <td scope="row">{{ item.purchase_price || '0.00' }}</td>
             <td scope="row">{{ item.status ? 'Active' : 'In-Active' }}</td>
             <td scope="row">{{ item.notes }}</td>
             <td>
