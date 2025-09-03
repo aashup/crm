@@ -12,6 +12,7 @@ import { DashboardService } from './dashboard.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
+import { DashboardReportService } from './dashboard-report-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,7 +40,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     private dashboardService: DashboardService,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private reportService:DashboardReportService
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +51,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
-    
+   
   }
 
   get balance(): number {
@@ -73,6 +75,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  downloadReport() {
+    this.reportService.generateDummyReport();
+  }
+  
+
   onDateChange(): void {
     if (this.search.dateFilter === 'custom') {
       this.getDashboardDetails();
@@ -81,17 +88,15 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getDashboardDetails(): void {
     this.spinnerService.show();
-
-
-
     const sub = this.dashboardService.find({
-     
       interval: this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
       start_date: this.search.start_date,
       end_date: this.search.end_date,
     }).subscribe({
       next: (res: any) => {
         this.graphDetails = res?.data ?? {};
+        console.log(this.graphDetails);
+        
         this.cdr.detectChanges();
       },
       error: () => {
