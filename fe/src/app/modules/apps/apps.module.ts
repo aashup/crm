@@ -4,8 +4,6 @@ import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
-import { PurchaseComponent } from './purchase/purchase.component';
-import { SaleDetailsComponent } from './sale/sale-details/sale-details.component';
 import { PurchaseDetailsComponent } from './purchase/purchase-details/purchase-details.component';
 @NgModule({
   declarations: [],

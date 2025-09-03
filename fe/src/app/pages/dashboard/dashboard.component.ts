@@ -28,7 +28,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     closeButtonLabel: 'Cancel'
   };
 
-  search: any = { all: '', dateFilter: '1', start_date: '', end_date: '' };
+  search: any = { all: '', dateFilter: '', start_date: '', end_date: '' };
   subscriptionHandler = new SubscriptionHandler();
 
   @ViewChild('modal') private modalComponent: ModalComponent;

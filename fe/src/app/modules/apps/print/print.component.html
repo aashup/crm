@@ -69,6 +69,10 @@
       <div>Discount:</div>
       <div>₹{{ saleData?.discount_amount }}</div>
     </div>
+    <div style="display: flex; justify-content: space-between">
+      <div>Tax Amount:</div>
+      <div>₹{{ getTotalTaxAmount(saleData?.sale_details) }}</div>
+    </div>
     <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 6px">
       <div>Net Total:</div>
       <div>₹{{ saleData?.net_total }}</div>

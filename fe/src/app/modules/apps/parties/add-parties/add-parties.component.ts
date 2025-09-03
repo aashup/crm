@@ -30,7 +30,6 @@ import { AddAddressComponent } from 'src/app/modules/settings/address/add-addres
 import { AddressModel } from 'src/app/modules/settings/address/address.model';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { formatDate } from '@angular/common';
-import { validate } from 'schema-utils';
 
 @Component({
   selector: 'app-add-parties',
@@ -206,7 +205,7 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
   setupAddressAutocompletes(): void {
    
     this.filteredBillingAddresses = this.billingAddressControl.valueChanges.pipe(
-      
+      startWith(''),
       map((val: string) => {
         const value = val?.toLowerCase() || '';
         return this.billing_address.filter(a => a.address.toLowerCase().includes(value));
@@ -384,7 +383,6 @@ export class AddPartiesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   save(resetAfter: boolean = false) {
-    debugger
     this.commonService.markFormGroupTouched(this.form);
   
     if (this.form.invalid) {

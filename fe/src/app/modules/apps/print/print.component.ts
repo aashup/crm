@@ -43,6 +43,17 @@ export class PrintComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getTotalTaxAmount(saleItems: any[]): number {
+    if (!saleItems || saleItems.length === 0) {
+      return 0;
+    }
+    return saleItems.reduce((total, item) => {
+      const tax = parseFloat(item.tax_amount || 0);
+      return total + tax;
+    }, 0);
+  }
+  
+
   ngAfterViewInit(): void {  
     setTimeout(() => {
       if (this.saleData) {
@@ -56,10 +67,12 @@ export class PrintComponent implements OnInit, AfterViewInit {
     this.spinner.show();
 
     this.saleService.findById(this.saleId + '', {
-      with: ['saleDetails.product', 'party' , 'saleDetails', 'createdby']
+      with: ['saleDetails.product', 'party' , 'saleDetails.unit', 'createdby']
     }).subscribe({
       next: (res: any) => {        
         this.saleData = res.data;
+        console.log(this.saleData);
+        
         this.isLoading = false;
         this.spinner.hide();
         this.cdr.detectChanges();
