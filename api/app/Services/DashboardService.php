@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\API\BaseResponse;
 use App\Models\Expense;
 use App\Models\Party;
 use App\Models\Product;
@@ -12,6 +13,25 @@ use App\Models\SaleDetail;
 
 class DashboardService
 {
+    public function downloadReport($rawWhere)
+    {
+        $sales = Sale::with('party', 'saleDetails', 'unit', 'createdBy')->whereRaw($rawWhere)->get();
+
+        $purchases = Purchase::with('createdBy', "party", "purchaseDetails")->whereRaw($rawWhere)->get();
+
+        $expenses = Expense::whereRaw($rawWhere)->get();
+
+        $data = [
+            'sales' => $sales,
+            'purchases' => $purchases,
+            'expenses' => $expenses,
+        ];
+
+        return BaseResponse::success([
+            'message' => 'Report data fetched successfully.',
+            'data' => $data,
+        ]);
+    }
 
     public function getTotalSales($rawWhere)
     {

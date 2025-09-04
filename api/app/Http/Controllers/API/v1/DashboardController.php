@@ -44,6 +44,10 @@ class DashboardController extends Controller
             $raw = $this->mapInterval[$request->interval];
         }
 
+        if (isset($request->download_report) && (int)$request->download_report === 1) {
+            return $this->dashboardService->downloadReport($raw);
+        }
+
         $card = [
             'total_sales' => $this->dashboardService->getTotalSales($raw),
             'total_purchases' => $this->dashboardService->getTotalPurchases($raw),
