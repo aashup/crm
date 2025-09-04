@@ -7,21 +7,42 @@ import autoTable, { UserOptions } from 'jspdf-autotable';
 })
 export class DashboardReportService {
 
-  generateDummyReport() {
+  generateReport(report: any, startDate?: Date, endDate?: Date) {
     const doc = new jsPDF('p', 'pt', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
     const marginX = 40;
     const tableWidth = pageWidth - marginX * 2;
+
+    let sDate = startDate;
+    let eDate = endDate;
+
+    if (!sDate || !eDate) {
+      const allDates: Date[] = [];
+      (report.sales || []).forEach((s: any) => allDates.push(new Date(s.created_at)));
+      (report.purchases || []).forEach((p: any) => allDates.push(new Date(p.created_at)));
+      (report.expenses || []).forEach((e: any) => allDates.push(new Date(e.created_at)));
+
+      if (allDates.length) {
+        allDates.sort((a, b) => a.getTime() - b.getTime());
+        sDate = allDates[0];
+        eDate = allDates[allDates.length - 1];
+      } else {
+        sDate = new Date();
+        eDate = new Date();
+      }
+    }
+
+    const dateRangeText = `${sDate.toLocaleDateString()} to ${eDate.toLocaleDateString()}`;
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(22);
     doc.setTextColor(37, 99, 235);
     doc.text('BUSINESS REPORT', pageWidth / 2, 50, { align: 'center' });
 
-
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
     doc.setTextColor(80);
-    doc.text('2024-01-01 to 2024-01-31', pageWidth / 2, 72, { align: 'center' });
+    doc.text(dateRangeText, pageWidth / 2, 72, { align: 'center' });
 
     let cursorY = 100;
 
@@ -35,72 +56,133 @@ export class DashboardReportService {
     };
 
     drawHeading('Sales', cursorY);
+
+    const salesRows = (report.sales || []).map((s: any) => {
+      const details = (s.sale_details || []).map((d: any, idx: number) =>
+        `${idx + 1}. ${d.product_name ?? d.product_id} | ${d.unit_name ?? d.unit_id} | Qty:${d.quantity} | Rate:${d.rate} | Tax:${d.tax_amount} | Total:${d.net}`
+      ).join('\n');
+
+      return [
+        s.id,
+        new Date(s.created_at).toLocaleDateString(),
+        s.party?.name ?? '',
+        details,
+        `Rs.${(+s.net_total).toFixed(2)}`
+      ];
+    });
+
     autoTable(doc, {
       startY: cursorY + 25,
       margin: { left: marginX, right: marginX },
-      head: [['ID', 'Date', 'Amount','Product','Unit']],
-      body: [
-        ['1', '2024-01-05', 'Rs.1,000.00','Tomato','Kilograrm'],
-        ['2', '2024-01-12', 'Rs.2,500.00','Potato','Kilogram'],
-        ['3', '2024-01-18', 'Rs.3,000.00','Carrot','Kilogram'],
-        ['4', '2024-01-25', 'Rs.1,500.00','Batata','Kilogram'],
-      ],
+      head: [['ID', 'Date', 'Party Name', 'Sale Details', 'Amount']],
+      body: salesRows,
       theme: 'grid',
-      headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' },
-      styles: { fontSize: 10, cellPadding: 6, textColor: [0, 0, 0], lineColor: [200, 200, 200], lineWidth: 0.3 }
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: [0, 0, 0],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.3,
+        valign: 'top'
+      },
+      columnStyles: {
+        3: { cellWidth: 260 } 
+      },
+      headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' }
     } as UserOptions);
 
     let lastY = (doc as any).lastAutoTable.finalY + 20;
 
     drawHeading('Purchases', lastY);
+
+    const purchaseRows = (report.purchases || []).map((p: any) => {
+      const details = (p.purchase_details || []).map((d: any, idx: number) =>
+        `${idx + 1}. ${d.product_name ?? d.product_id} | ${d.unit_name ?? d.unit_id} | Qty:${d.quantity} | Rate:${d.rate} | Tax:${d.tax_amount} | Total:${d.net}`
+      ).join('\n');
+
+      return [
+        p.id,
+        new Date(p.created_at).toLocaleDateString(),
+        p.party?.name ?? '',
+        details,
+        `Rs.${(+p.net_total).toFixed(2)}`
+      ];
+    });
+
     autoTable(doc, {
       startY: lastY + 25,
       margin: { left: marginX, right: marginX },
-      head: [['ID', 'Date', 'Amount','Product','Unit']],
-      body: [
-        ['1', '2024-01-03', 'Rs.800.00'  ,'Tomato','Kilograrm'],
-        ['2', '2024-01-10', 'Rs.1,200.00','Potato','Kilogram'],
-        ['3', '2024-01-20', 'Rs.1,500.00','Carrot','Kilogram'],
-        ['4', '2024-01-28', 'Rs.700.00'  ,'Batata','Kilogram'],
-      ],
+      head: [['ID', 'Date', 'Party Name', 'Purchase Details', 'Amount']],
+      body: purchaseRows,
       theme: 'grid',
-      headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' },
-      styles: { fontSize: 10, cellPadding: 6, textColor: [0, 0, 0], lineColor: [200, 200, 200], lineWidth: 0.3 }
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: [0, 0, 0],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.3,
+        valign: 'top'
+      },
+      columnStyles: {
+        3: { cellWidth: 260 }
+      },
+      headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' }
     } as UserOptions);
 
     let lastY2 = (doc as any).lastAutoTable.finalY + 20;
 
-    drawHeading('Expense', lastY2);
+    drawHeading('Expenses', lastY2);
+
+    const expenseRows = (report.expenses || []).map((e: any) => [
+      e.id,
+      new Date(e.created_at).toLocaleDateString(),
+      e.expense_type,
+      `Rs.${(+e.amount).toFixed(2)}`
+    ]);
+
     autoTable(doc, {
       startY: lastY2 + 25,
       margin: { left: marginX, right: marginX },
       head: [['ID', 'Date', 'Type', 'Amount']],
-      body: [
-        ['1', '2024-01-02', 'Office Rent', 'Rs.3,000.00'],
-        ['2', '2024-01-08', 'Electricity', 'Rs.1,200.00'],
-        ['3', '2024-01-15', 'Stationery', 'Rs.300.00'],
-        ['4', '2024-01-22', 'Internet', 'Rs.500.00'],
-      ],
+      body: expenseRows,
       theme: 'grid',
-      headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' },
-      styles: { fontSize: 10, cellPadding: 6, textColor: [0, 0, 0], lineColor: [200, 200, 200], lineWidth: 0.3 }
+      styles: {
+        fontSize: 10,
+        cellPadding: 6,
+        textColor: [0, 0, 0],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.3
+      },
+      headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' }
     } as UserOptions);
 
     let lastY3 = (doc as any).lastAutoTable.finalY + 20;
 
+    const totalSales = (report.sales || []).reduce((sum: number, s: any) => sum + +s.net_total, 0);
+    const totalPurchases = (report.purchases || []).reduce((sum: number, p: any) => sum + +p.net_total, 0);
+    const totalExpenses = (report.expenses || []).reduce((sum: number, e: any) => sum + +e.amount, 0);
+    const netProfit = totalSales - totalPurchases - totalExpenses;
+
     drawHeading('Summary', lastY3);
+
     autoTable(doc, {
       startY: lastY3 + 25,
       margin: { left: marginX, right: marginX },
       head: [['', '']],
       body: [
-        ['Total Sales:', 'Rs.8,000.00'],
-        ['Total Purchases:', 'Rs.4,200.00'],
-        ['Total Expenses:', 'Rs.900.00'],
-        ['Net Profit:', 'Rs.2,900.00'],
+        ['Total Sales:', `Rs.${totalSales.toFixed(2)}`],
+        ['Total Purchases:', `Rs.${totalPurchases.toFixed(2)}`],
+        ['Total Expenses:', `Rs.${totalExpenses.toFixed(2)}`],
+        ['Net Profit:', `Rs.${netProfit.toFixed(2)}`]
       ],
       theme: 'grid',
-      styles: { fontSize: 10, cellPadding: 6, textColor: [0, 0, 0], lineColor: [200, 200, 200], lineWidth: 0.3 },
+      styles: {
+        fontSize: 10,
+        cellPadding: 6,
+        textColor: [0, 0, 0],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.3
+      },
       headStyles: { fillColor: [245, 245, 245], textColor: [0, 0, 0], fontStyle: 'bold' },
       columnStyles: { 0: { halign: 'left' }, 1: { halign: 'right' } }
     } as UserOptions);
