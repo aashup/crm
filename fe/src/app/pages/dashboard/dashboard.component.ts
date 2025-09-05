@@ -46,6 +46,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.getDashboardDetails();
+    this.getReportDetails()
   }
 
   ngAfterViewInit(): void {}
@@ -107,14 +108,14 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         this.spinnerService.hide();
       },
       complete: () => {
-        this.getReportDetails(params);
+        this.spinnerService.hide()
       }
     });
     this.subscriptionHandler.add(sub);
   }
   
-  getReportDetails(filterParams: any): void {
-    const params = { ...filterParams, download_report: 1 ,with:["purchases.purchaseDetails.product"]};
+  getReportDetails(): void {
+    const params = {download_report: 1 ,with:["purchases.purchaseDetails.product"],interval:"1"};
     const sub = this.dashboardService.find(params).subscribe({
       next: (res: any) => {
         this.report = res?.data?.data ?? {};
