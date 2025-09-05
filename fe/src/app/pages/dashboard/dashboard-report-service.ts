@@ -169,7 +169,7 @@ export class DashboardReportService {
     const totalGain = expenses
       .filter((e: any) => e.expense_type === 'gain')
       .reduce((sum: number, e: any) => sum + +e.amount, 0);
-    const netProfit =  (totalPurchases - totalExpense)-(totalSales + totalGain);
+    const netProfit =  (totalSales + totalGain)-(totalPurchases + totalExpense)
 
     drawHeading('Summary', lastY3);
 
