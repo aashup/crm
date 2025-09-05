@@ -12,6 +12,7 @@ import { DashboardService } from './dashboard.service';
 import { CommonService } from 'src/app/modules/core/common.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { SubscriptionHandler } from 'src/app/modules/core/subscription.handler';
+import { DashboardReportService } from './dashboard-report-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,12 +35,13 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('searchElementRef', { static: true }) searchElementRef: ElementRef;
 
   graphDetails: any;
-
+  report:any
   constructor(
     private dashboardService: DashboardService,
     private commonService: CommonService,
     private spinnerService: SpinnerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private reportService:DashboardReportService
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +51,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
-    
+   
   }
 
   get balance(): number {
@@ -73,25 +75,51 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  downloadReport() {
+    this.reportService.generateReport(this.report);
+  }
+  
+
   onDateChange(): void {
     if (this.search.dateFilter === 'custom') {
       this.getDashboardDetails();
     }
   }
 
-  getDashboardDetails(): void {
-    this.spinnerService.show();
-
-
-
-    const sub = this.dashboardService.find({
-     
+  private getCommonFilterParams() {
+    return {
       interval: this.search.dateFilter !== 'custom' ? this.search.dateFilter : null,
       start_date: this.search.start_date,
-      end_date: this.search.end_date,
-    }).subscribe({
+      end_date: this.search.end_date
+    };
+  }
+  
+  getDashboardDetails(): void {
+    this.spinnerService.show();
+    const params = this.getCommonFilterParams();
+    const sub = this.dashboardService.find(params).subscribe({
       next: (res: any) => {
         this.graphDetails = res?.data ?? {};
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.commonService.toastr.error('Something went wrong');
+        this.spinnerService.hide();
+      },
+      complete: () => {
+        this.getReportDetails(params);
+      }
+    });
+    this.subscriptionHandler.add(sub);
+  }
+  
+  getReportDetails(filterParams: any): void {
+    const params = { ...filterParams, download_report: 1 ,with:["purchases.purchaseDetails.product"]};
+    const sub = this.dashboardService.find(params).subscribe({
+      next: (res: any) => {
+        this.report = res?.data?.data ?? {};
+        console.log(this.report);
+        
         this.cdr.detectChanges();
       },
       error: () => {
@@ -100,12 +128,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       complete: () => {
         this.spinnerService.hide();
         this.commonService.toastr.success('Data retrieved successfully!');
-        console.log(this.graphDetails);
       }
     });
-
     this.subscriptionHandler.add(sub);
   }
+  
 
   async openModal() {
     return await this.modalComponent.open();

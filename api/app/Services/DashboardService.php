@@ -15,9 +15,9 @@ class DashboardService
 {
     public function downloadReport($rawWhere)
     {
-        $sales = Sale::with('party', 'saleDetails', 'unit', 'createdBy')->whereRaw($rawWhere)->get();
+        $sales = Sale::with(['party', 'saleDetails.product', 'saleDetails.unit'])->whereRaw($rawWhere)->get();
 
-        $purchases = Purchase::with('createdBy', "party", "purchaseDetails")->whereRaw($rawWhere)->get();
+        $purchases = Purchase::with(['party', 'purchaseDetails.product', 'purchaseDetails.unit'])->whereRaw($rawWhere)->get();
 
         $expenses = Expense::whereRaw($rawWhere)->get();
 
