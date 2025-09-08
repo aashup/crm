@@ -101,7 +101,7 @@ class DashboardService
             ->selectRaw('SUM(quantity) as total_qty, SUM(net) as total_sales, product_id, products.name as product_name')
             ->join('products', 'products.id', '=', 'sale_details.product_id')
             ->whereRaw(str_replace('created_at', 'sale_details.created_at', $rawWhere))
-            ->groupBy('product_id')
+            ->groupBy('product_id', 'products.name')
             ->orderByDesc('total_sales')
             ->limit(10)
             ->get();
@@ -114,7 +114,7 @@ class DashboardService
             ->selectRaw('SUM(net_total) as total, party_id, parties.name as party_name')
             ->join('parties', 'parties.id', '=', 'sales.party_id')
             ->whereRaw(str_replace('created_at', 'sales.created_at', $rawWhere))
-            ->groupBy('party_id')
+            ->groupBy('party_id', 'parties.name')
             ->orderByDesc('total')
             ->limit(10)
             ->get();
@@ -137,7 +137,7 @@ class DashboardService
             ->selectRaw('SUM(quantity) as total_qty, SUM(net) as total_sales, product_id, products.name as product_name')
             ->join('products', 'products.id', '=', 'purchase_details.product_id')
             ->whereRaw(str_replace('created_at', 'purchase_details.created_at', $rawWhere))
-            ->groupBy('product_id')
+            ->groupBy('product_id', 'products.name')
             ->orderByDesc('total_sales')
             ->limit(10)
             ->get();
@@ -150,7 +150,7 @@ class DashboardService
             ->selectRaw('SUM(net_total) as total, party_id, parties.name as party_name')
             ->join('parties', 'parties.id', '=', 'purchases.party_id')
             ->whereRaw(str_replace('created_at', 'purchases.created_at', $rawWhere))
-            ->groupBy('party_id')
+            ->groupBy('party_id', 'parties.name')
             ->orderByDesc('total')
             ->limit(10)
             ->get();
