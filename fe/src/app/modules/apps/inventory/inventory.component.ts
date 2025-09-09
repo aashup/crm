@@ -24,6 +24,7 @@ import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { InventoryService } from './inventory.service';
 import { UsersService } from '../../usermanagement/users/users.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -87,7 +88,8 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
     private service: InventoryService,
     private commonService: CommonService,
     private userService: UsersService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private router:Router
   ) {
     this.dataSource = new InventoryDatasource(this.service);
   }
@@ -224,7 +226,9 @@ export class InventoryComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
   }
-  
+  viewDetails(item:any){
+    this.router.navigate([`/app/inventory/${item.id}`])
+  }
 
   add() {
     this.dialog

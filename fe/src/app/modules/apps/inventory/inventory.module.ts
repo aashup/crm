@@ -7,17 +7,19 @@ import { SharedMaterialModuleModule } from '../../shared-material-module/shared-
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { InventoryComponent } from './inventory.component';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
+import { InventoryDetailsComponent } from './inventory-details/inventory-details.component';
 
 
 
 @NgModule({
-  declarations: [ InventoryComponent, AddInventoryComponent],
+  declarations: [ InventoryComponent, AddInventoryComponent,InventoryDetailsComponent],
   imports: [
     CommonModule,
     MatTooltipModule,
     RouterModule.forChild([
          { path: '', component: InventoryComponent },
          { path: 'add', component: AddInventoryComponent },
+         {path:':id', component:InventoryDetailsComponent}
        ]),
     NgxPermissionsModule.forChild(),
     SharedMaterialModuleModule

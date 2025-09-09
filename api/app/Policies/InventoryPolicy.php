@@ -21,7 +21,7 @@ class InventoryPolicy
      */
     public function view(User $user, Inventory $inventory): bool
     {
-        return false;
+        return $user->can('inventory.show');
     }
 
     /**

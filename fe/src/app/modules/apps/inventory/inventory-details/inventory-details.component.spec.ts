@@ -1,0 +1,19 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { InventoryDetailsComponent } from './inventory-details.component';
+
+
+
+describe('InventoryDetailsComponent', () => {
+  let component: InventoryDetailsComponent;
+  let fixture: ComponentFixture<InventoryDetailsComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [InventoryDetailsComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(InventoryDetailsComponent);
+    fixture.detectChanges();
+  });
+});

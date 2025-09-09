@@ -56,7 +56,7 @@ class InventoryController extends Controller
      */
     public function show(Inventory $inventory)
     {
-        $this->authorize('view', Inventory::class);
+        $this->authorize('view', $inventory);
 
         $inventory->load($inventory->getWith(request()->with));
         return $this->success("", $inventory);
