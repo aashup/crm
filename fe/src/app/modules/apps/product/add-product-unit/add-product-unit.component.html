@@ -88,7 +88,7 @@
             <mat-form-field class="w-100" appearance="outline">
               <mat-label>Tax Rate</mat-label>
               <mat-select placeholder="Tax Rate" formControlName="tax_rate_id">
-                <mat-option [value]="'None'">None</mat-option>
+                <mat-option [value]="0">None</mat-option>
                 <mat-option *ngFor="let rate of rates" [value]="rate.id">
                   {{getFormattedTaxLabel(rate.type, rate.rate)}}
                 </mat-option>
