@@ -51,13 +51,14 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
 
   getFormattedTaxLabel(type: number, rate: number): string {
     const taxTypeMap: { [key: number]: string } = {
+      0:"",
       1: 'GST',
       2: 'IGST',
       3: 'CGST',
       4: 'SGST',
       5: 'VAT',
       6: 'Service Tax',
-      7: 'Other'
+      7: 'Other',
     };
   
     const taxName = taxTypeMap[type] || 'Unknown';
@@ -78,7 +79,7 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
       purchase_price_tax_type: [model?.purchase_price_tax_type || 2],
       notes: [model.notes],
       status: [model.status],
-      tax_rate_id: [model?.tax_rate_id || 'None', [Validators.required]],
+      tax_rate_id: [model?.tax_rate_id || '',],
     });
   }
 
@@ -149,6 +150,9 @@ export class AddProductUnitComponent implements OnInit, OnDestroy {
       payload = this.form.value;
     }
 
+    if(payload.tax_rate_id==0){
+      payload.tax_rate_id=null
+    }
     this.unsubscribe.subscribe = this.service[this.isEdit ? 'update' : 'create'](
       this.data.productId,
       this.data?.unit?.unit_id || payload.unit_id,
